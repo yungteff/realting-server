@@ -1,0 +1,14 @@
+*.xml
+*.iml
+
+*.class
+.classpath
+.project
+.gradle/
+
+/bin/
+/temp/
+/data/saves/
+/data/config.yaml
+# Project exclude paths
+/build/
