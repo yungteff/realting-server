@@ -1,6 +1,6 @@
 run the server 
 -
-server.Server.class
+com.ruse.GameServer.class
 
 player files:
 -
