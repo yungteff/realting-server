@@ -1,28 +1,29 @@
-package com.ruse.world.content.skill.mining;
+package com.realting.world.content.skill.mining
 
-import com.ruse.engine.task.Task;
-import com.ruse.engine.task.TaskManager;
-import com.ruse.model.entity.character.player.Player;
+import com.realting.engine.task.Task
+import com.realting.engine.task.TaskManager
+import com.realting.model.entity.character.player.Player
+import java.util.Locale
 
-public class Prospecting {
-
-	public static boolean prospectOre(final Player plr, int objectId) {
-		final MiningData.Ores oreData = MiningData.forRock(objectId);
-		if(oreData != null) {
-			if(!plr.getClickDelay().elapsed(2800))
-				return true;
-			plr.getSkillManager().stopSkilling();
-			plr.getPacketSender().sendMessage("You examine the ore...");
-			TaskManager.submit(new Task(2, plr, false) {
-				@Override
-				public void execute() {
-					plr.getPacketSender().sendMessage("..the rock contains "+oreData.toString().toLowerCase()+" ore.");
-					this.stop();
-				}
-			});
-			plr.getClickDelay().reset();
-			return true;
-		}
-		return false;
-	}
+object Prospecting {
+    @JvmStatic
+    fun prospectOre(player: Player, objectId: Int): Boolean {
+        val oreData = MiningData.forRock(objectId)
+        if (oreData != null) {
+            if (!player.clickDelay.elapsed(2800)) return true
+            player.skillManager.stopSkilling()
+            player.packetSender.sendMessage("You examine the ore...")
+            TaskManager.submit(object : Task(2, player, false) {
+                public override fun execute() {
+                    player.packetSender.sendMessage(
+                        "..the rock contains " + oreData.toString().lowercase(Locale.getDefault()) + " ore."
+                    )
+                    stop()
+                }
+            })
+            player.clickDelay.reset()
+            return true
+        }
+        return false
+    }
 }

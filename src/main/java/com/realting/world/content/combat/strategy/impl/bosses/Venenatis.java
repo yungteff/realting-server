@@ -1,0 +1,85 @@
+package com.realting.world.content.combat.strategy.impl.bosses;
+
+import com.realting.engine.task.Task;
+import com.realting.engine.task.TaskManager;
+import com.realting.model.Animation;
+import com.realting.model.Skill;
+import com.realting.util.Misc;
+import com.realting.world.content.combat.CombatContainer;
+import com.realting.world.content.combat.CombatType;
+import com.realting.world.content.combat.HitQueue.CombatHit;
+import com.realting.world.content.combat.magic.CombatSpells;
+import com.realting.world.content.combat.strategy.CombatStrategy;
+import com.realting.model.entity.character.CharacterEntity;
+import com.realting.model.entity.character.npc.NPC;
+import com.realting.model.entity.character.player.Player;
+
+public class Venenatis implements CombatStrategy {
+
+	@Override
+	public boolean canAttack(CharacterEntity entity, CharacterEntity victim) {
+		return true;
+	}
+
+	@Override
+	public CombatContainer attack(CharacterEntity entity, CharacterEntity victim) {
+		return null;
+	}
+
+	@Override
+	public boolean customContainerAttack(CharacterEntity entity, CharacterEntity victim) {
+		NPC venenatis = (NPC)entity;
+		if(venenatis.isChargingAttack() || victim.getConstitution() <= 0) {
+			return true;
+		}
+		venenatis.setChargingAttack(true);
+		venenatis.performAnimation(new Animation(venenatis.getDefinition().getAttackAnimation()));
+		venenatis.getCombatBuilder().setContainer(new CombatContainer(venenatis, victim, 1, 1, CombatType.MELEE, true));
+		TaskManager.submit(new Task(1, venenatis, false) {
+			int tick = 0;
+			@Override
+			public void execute() {
+				if(tick == 0) {
+					final int random = Misc.getRandom(15);
+					if(random <= 12) {
+						venenatis.prepareSpell(CombatSpells.EARTH_WAVE.getSpell(), victim);
+					} else if(random == 13) {
+						venenatis.prepareSpell(CombatSpells.ENFEEBLE.getSpell(), victim);
+					} else if(random == 14) {
+						venenatis.prepareSpell(CombatSpells.CONFUSE.getSpell(), victim);
+					} else if(random == 15) {
+						venenatis.prepareSpell(CombatSpells.STUN.getSpell(), victim);
+					}
+				} else if(tick == 3) {
+					new CombatHit(venenatis.getCombatBuilder(), new CombatContainer(venenatis, victim, 1, CombatType.MAGIC, true)).handleAttack();
+					if(Misc.getRandom(10) <= 2) {
+						Player p = (Player)victim;
+						int lvl = p.getSkillManager().getCurrentLevel(Skill.PRAYER);
+						lvl *= 0.9;
+						p.getSkillManager().setCurrentLevel(Skill.PRAYER, p.getSkillManager().getCurrentLevel(Skill.PRAYER) - lvl <= 0 ?  1 : lvl);
+						p.getPacketSender().sendMessage("Venenatis has reduced your Prayer level.");
+					}
+					venenatis.setChargingAttack(false);
+					stop();
+				}
+				tick++;
+			}
+		});
+		return true;
+	}
+
+	@Override
+	public int attackDelay(CharacterEntity entity) {
+		return entity.getAttackSpeed();
+	}
+
+	@Override
+	public int attackDistance(CharacterEntity entity) {
+		return 3;
+	}
+
+	@Override
+	public CombatType getCombatType(CharacterEntity entity) {
+		return CombatType.MIXED;
+	}
+}
