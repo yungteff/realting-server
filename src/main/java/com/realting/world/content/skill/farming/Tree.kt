@@ -1,4 +1,3 @@
-package com.realting.world.content.skill.farming;
+package com.realting.world.content.skill.farming
 
-public class Tree {
-}
+class Tree 

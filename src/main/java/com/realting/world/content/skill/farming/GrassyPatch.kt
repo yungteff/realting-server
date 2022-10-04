@@ -1,120 +1,109 @@
-package com.realting.world.content.skill.farming;
+package com.realting.world.content.skill.farming
 
-import java.util.Calendar;
+import com.realting.engine.task.Task
+import java.util.Calendar
+import com.realting.engine.task.TaskManager
+import com.realting.model.Animation
+import com.realting.model.Skill
+import com.realting.model.entity.character.player.Player
+import com.realting.util.Misc
 
-import com.realting.engine.task.Task;
-import com.realting.engine.task.TaskManager;
-import com.realting.model.Animation;
-import com.realting.model.Skill;
-import com.realting.util.Misc;
-import com.realting.model.entity.character.player.Player;
+class GrassyPatch {
+    var stage: Byte = 0
+    var minute = 0
+    var hour = 0
+    var day = 0
+    var year = 0
+    fun setTime() {
+        minute = Calendar.getInstance()[12]
+        hour = Calendar.getInstance()[11]
+        day = Calendar.getInstance()[6]
+        year = Calendar.getInstance()[1]
+    }
 
-public class GrassyPatch {
-	public byte stage = 0;
-	public int minute;
-	public int hour;
-	public int day;
-	public int year;
+    val isRaked: Boolean
+        get() = stage.toInt() == 3
 
-	public void setTime() {
-		minute = Calendar.getInstance().get(12);
-		hour = Calendar.getInstance().get(11);
-		day = Calendar.getInstance().get(6);
-		year = Calendar.getInstance().get(1);
-	}
+    fun process(player: Player, index: Int) {
+        if (stage.toInt() == 0) return
+        val elapsed = Misc.getMinutesElapsed(minute, hour, day, year)
+        val grow = 4
+        if (elapsed >= grow) {
+            for (i in 0 until elapsed / grow) {
+                if (stage.toInt() == 0) {
+                    return
+                }
+                stage = (stage - 1).toByte()
+            }
+            player.farming.doConfig()
+            setTime()
+        }
+    }
 
-	public boolean isRaked() {
-		return stage == 3;
-	}
+    fun click(player: Player, option: Int, index: Int) {
+        if (option == 1) rake(player, index)
+    }
 
-	public void process(Player player, int index) {
-		if (stage == 0)
-			return;
-		int elapsed = Misc.getMinutesElapsed(minute, hour, day, year);
-		int grow = 4;
+    var raking = false
+    fun rake(p: Player, index: Int) {
+        if (raking) return
+        if (isRaked) {
+            p.packetSender.sendMessage("This plot is fully raked. Try planting a seed.")
+            return
+        }
+        if (!p.inventory.contains(5341)) {
+            p.packetSender.sendMessage("This patch needs to be raked before anything can grow in it.")
+            p.packetSender.sendMessage("You do not have a rake in your inventory.")
+            return
+        }
+        raking = true
+        p.skillManager.stopSkilling()
+        p.performAnimation(Animation(2273))
+        p.currentTask = object : Task(1, p, true) {
+            public override fun execute() {
+                if (!p.inventory.contains(5341)) {
+                    p.packetSender.sendMessage("This patch needs to be raked before anything can grow in it.")
+                    p.packetSender.sendMessage("You do not have a rake in your inventory.")
+                    stop()
+                    return
+                }
+                if (p.inventory.freeSlots == 0) {
+                    p.inventory.full()
+                    stop()
+                    return
+                }
+                p.performAnimation(Animation(2273))
+                if (delay >= 2 + Misc.getRandom(2)) {
+                    setTime()
+                    val grassyPatch = this@GrassyPatch
+                    grassyPatch.stage = (grassyPatch.stage + 1).toByte()
+                    p.setProcessFarming(true)
+                    grassyPatch.doConfig(p, index)
+                    p.skillManager.addExperience(Skill.FARMING, Misc.getRandom(2))
+                    p.inventory.add(6055, 1)
+                    if (isRaked) {
+                        p.packetSender.sendMessage("The plot is now fully raked.")
+                        stop()
+                    }
+                    delay = 0
+                }
+                delay++
+            }
 
-		if (elapsed >= grow) {
-			for (int i = 0; i < elapsed / grow; i++) {
-				if (stage == 0) {
-					return;
-				}
+            override fun stop() {
+                raking = false
+                setEventRunning(false)
+                p.performAnimation(Animation(65535))
+            }
+        }
+        TaskManager.submit(p.currentTask)
+    }
 
-				stage = ((byte) (stage - 1));
-			}
-			player.getFarming().doConfig();
-			setTime();
-		}
-	}
+    fun doConfig(p: Player, index: Int) {
+        p.farming.doConfig()
+    }
 
-	public void click(Player player, int option, int index) {
-		if (option == 1)
-			rake(player, index);
-	}
-
-	boolean raking = false;
-	public void rake(final Player p, final int index) {
-		if(raking)
-			return;
-		if (isRaked()) {
-			p.getPacketSender().sendMessage("This plot is fully raked. Try planting a seed.");
-			return;
-		}
-		if (!p.getInventory().contains(5341)) {
-			p.getPacketSender().sendMessage("This patch needs to be raked before anything can grow in it.");
-			p.getPacketSender().sendMessage("You do not have a rake in your inventory.");
-			return;
-		}
-		raking = true;
-		p.getSkillManager().stopSkilling();
-		p.performAnimation(new Animation(2273));
-		p.setCurrentTask(new Task(1, p, true) {
-			int delay = 0;
-			@Override
-			public void execute() {
-				if (!p.getInventory().contains(5341)) {
-					p.getPacketSender().sendMessage("This patch needs to be raked before anything can grow in it.");
-					p.getPacketSender().sendMessage("You do not have a rake in your inventory.");
-					stop();
-					return;
-				}
-				if(p.getInventory().getFreeSlots() == 0) {
-					p.getInventory().full();
-					stop();
-					return;
-				}
-				p.performAnimation(new Animation(2273));
-				if(delay >= 2 + Misc.getRandom(2)) {
-					setTime();
-					GrassyPatch grassyPatch = GrassyPatch.this;
-					grassyPatch.stage = ((byte) (grassyPatch.stage + 1));
-					p.setProcessFarming(true);
-					grassyPatch.doConfig(p, index);
-					p.getSkillManager().addExperience(Skill.FARMING, Misc.getRandom(2));
-					p.getInventory().add(6055, 1);
-					if (isRaked()) {
-						p.getPacketSender().sendMessage("The plot is now fully raked.");
-						stop();
-					}
-					delay = 0;
-				}
-				delay++;
-			}
-			
-			@Override
-			public void stop() {
-				raking = false;
-				setEventRunning(false);
-				p.performAnimation(new Animation(65535));
-			}
-		});
-		TaskManager.submit(p.getCurrentTask());
-	}
-
-	public void doConfig(Player p, int index) {
-		p.getFarming().doConfig();
-	}
-
-	public int getConfig(int index) {
-		return stage * FarmingPatches.values()[index].mod;
-	}
+    fun getConfig(index: Int): Int {
+        return stage * FarmingPatches.values()[index].mod
+    }
 }

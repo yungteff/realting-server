@@ -1,13 +1,14 @@
-package com.realting.world.content.skill.farming;
+package com.realting.world.content.skill.farming
 
-public enum SeedType {
-	HERB, ALLOTMENT, FLOWER;
+enum class SeedType {
+    HERB, ALLOTMENT, FLOWER;
 
-	public static SeedType forId(int id) {
-		for(SeedType type : SeedType.values()) {
-			if(type != null && type.ordinal() == id)
-				return type;
-		}
-		return HERB;
-	}
+    companion object {
+        fun forId(id: Int): SeedType {
+            for (type in values()) {
+                if (type.ordinal == id) return type
+            }
+            return HERB
+        }
+    }
 }

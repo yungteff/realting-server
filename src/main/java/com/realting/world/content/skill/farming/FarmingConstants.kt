@@ -1,16 +1,16 @@
-package com.realting.world.content.skill.farming;
+package com.realting.world.content.skill.farming
 
-public class FarmingConstants {
-	public static final int PLANT_SEED = 2291;
-	public static final int RAKE = 2273;
-	public static final int COMPOST = 2283;
-	public static final int PICK_HERB = 2275;
-	public static final int WATER = 2293;
-	public static final int CURE_PLANT = 2288;
-	public static final int SEED_DIBBER = 5343;
-	public static final int RAKE_ITEM = 5341;
-	public static final int SECATEURS = 5329;
-	public static final int MAGIC_SECATEURS = 7409;
-	public static final int WATERING_CAN = 5331;
-	public static final int DISEASE_CHANCE = 5;
+object FarmingConstants {
+    const val PLANT_SEED = 2291
+    const val RAKE = 2273
+    const val COMPOST = 2283
+    const val PICK_HERB = 2275
+    const val WATER = 2293
+    const val CURE_PLANT = 2288
+    const val SEED_DIBBER = 5343
+    const val RAKE_ITEM = 5341
+    const val SECATEURS = 5329
+    const val MAGIC_SECATEURS = 7409
+    const val WATERING_CAN = 5331
+    const val DISEASE_CHANCE = 5
 }
