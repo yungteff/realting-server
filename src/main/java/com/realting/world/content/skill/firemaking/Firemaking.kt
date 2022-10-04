@@ -1,125 +1,126 @@
-package com.realting.world.content.skill.firemaking;
+package com.realting.world.content.skill.firemaking
 
-import com.realting.engine.task.Task;
-import com.realting.engine.task.TaskManager;
-import com.realting.model.Animation;
-import com.realting.model.GameObject;
-import com.realting.model.Skill;
-import com.realting.model.container.impl.Equipment;
-import com.realting.model.movement.MovementQueue;
-import com.realting.util.Misc;
-import com.realting.world.content.Achievements;
-import com.realting.world.content.Achievements.AchievementData;
-import com.realting.world.content.CustomObjects;
-import com.realting.world.content.Sounds;
-import com.realting.world.content.Sounds.Sound;
-import com.realting.world.content.skill.dungeoneering.Dungeoneering;
-import com.realting.model.entity.character.player.Player;
+import com.realting.engine.task.Task
+import com.realting.world.content.skill.dungeoneering.Dungeoneering
+import com.realting.model.movement.MovementQueue
+import com.realting.model.Skill
+import com.realting.model.container.impl.Equipment
+import com.realting.world.content.Achievements
+import com.realting.world.content.Achievements.AchievementData
+import com.realting.engine.task.TaskManager
+import com.realting.model.Animation
+import com.realting.model.GameObject
+import com.realting.model.entity.character.player.Player
+import com.realting.util.Misc
+import com.realting.world.content.CustomObjects
+import com.realting.world.content.Sounds
 
 /**
  * The Firemaking skill
  * @author Gabriel Hannason
  */
+object Firemaking {
+    @JvmStatic
+    fun lightFire(player: Player, log: Int, addingToFire: Boolean, amount: Int) {
+        if (!player.clickDelay.elapsed(2000) || player.movementQueue.isLockMovement) return
+        if (!player.location.isFiremakingAllowed) {
+            player.packetSender.sendMessage("You can not light a fire in this area.")
+            return
+        }
+        val objectExists = CustomObjects.objectExists(player.position.copy())
+        if (!Dungeoneering.doingDungeoneering(player)) {
+            if (objectExists && !addingToFire || player.position.z > 0 || !player.movementQueue.canWalk(
+                    1, 0
+                ) && !player.movementQueue.canWalk(-1, 0) && !player.movementQueue.canWalk(
+                    0, 1
+                ) && !player.movementQueue.canWalk(0, -1)
+            ) {
+                player.packetSender.sendMessage("You can not light a fire here.")
+                return
+            }
+            if (player.position.x == 2848 && player.position.y == 3335 || player.position.x == 2711 && player.position.y == 3438) { //fm
+                player.packetSender.sendMessage("There's already a perfectly good fire here.")
+                return
+            }
+        }
+        val logData = Logdata.getLogData(player, log) ?: return
+        player.movementQueue.reset()
+        if (objectExists && addingToFire) MovementQueue.stepAway(player)
+        player.packetSender.sendInterfaceRemoval()
+        player.setEntityInteraction(null)
+        player.skillManager.stopSkilling()
+        val cycle = 2 + Misc.getRandom(3)
+        if (player.skillManager.getMaxLevel(Skill.FIREMAKING) < logData.level) {
+            player.packetSender.sendMessage("You need a Firemaking level of atleast " + logData.level + " to light this.")
+            return
+        }
+        if (!addingToFire) {
+            player.packetSender.sendMessage("You attempt to light a fire..")
+            player.performAnimation(Animation(733))
+            player.movementQueue.isLockMovement = true
+        }
+        player.currentTask = object : Task(if (addingToFire) 2 else cycle, player, if (addingToFire) true else false) {
+            var added = 0
+            public override fun execute() {
+                player.packetSender.sendInterfaceRemoval()
+                if (addingToFire && player.interactingObject == null) { //fire has died
+                    player.skillManager.stopSkilling()
+                    player.packetSender.sendMessage("The fire has died out.")
+                    return
+                }
+                if (player.equipment[Equipment.RING_SLOT].id == 13659 && Misc.getRandom(7) == 1) {
+                    player.packetSender.sendMessage("Your cape has salvaged your log.")
+                } else {
+                    if (player.skillManager.skillCape(Skill.FIREMAKING) && Misc.getRandom(10) == 1) {
+                        player.packetSender.sendMessage("Your cape has salvaged your log.")
+                    } else {
+                        player.inventory.delete(logData.logId, 1)
+                    }
+                }
+                if (addingToFire) {
+                    player.performAnimation(Animation(827))
+                    player.packetSender.sendMessage("You add some logs to the fire..")
+                } else {
+                    if (!player.movementQueue.isMoving) {
+                        player.movementQueue.isLockMovement = false
+                        player.performAnimation(Animation(65535))
+                        MovementQueue.stepAway(player)
+                    }
+                    CustomObjects.globalFiremakingTask(
+                        GameObject(logData.gameObject, player.position.copy()), player, logData.burnTime
+                    )
+                    player.packetSender.sendMessage("The fire catches and the logs begin to burn.")
+                    stop()
+                }
+                if (logData.name == "OAK") {
+                    Achievements.doProgress(player, AchievementData.BURN_25_OAK_LOGS)
+                } else if (logData.name == "MAGIC") {
+                    Achievements.doProgress(player, AchievementData.BURN_100_MAGIC_LOGS)
+                    Achievements.doProgress(player, AchievementData.BURN_2500_MAGIC_LOGS)
+                }
+                Sounds.sendSound(player, Sounds.Sound.LIGHT_FIRE)
+                player.skillManager.addExperience(Skill.FIREMAKING, logData.xp)
+                added++
+                if (added >= amount || !player.inventory.contains(logData.logId)) {
+                    stop()
+                    if (added < amount && addingToFire && Logdata.getLogData(player, -1) != null && Logdata.getLogData(
+                            player, -1
+                        )!!.logId != log
+                    ) {
+                        player.clickDelay.reset(0)
+                        lightFire(player, -1, true, amount - added)
+                    }
+                    return
+                }
+            }
 
-public class Firemaking {
-
-	public static void lightFire(final Player player, int log, final boolean addingToFire, final int amount) {
-		if (!player.getClickDelay().elapsed(2000) || player.getMovementQueue().isLockMovement())
-			return;
-		if(!player.getLocation().isFiremakingAllowed()) {
-			player.getPacketSender().sendMessage("You can not light a fire in this area.");
-			return;
-		}
-		boolean objectExists = CustomObjects.objectExists(player.getPosition().copy());
-		if(!Dungeoneering.doingDungeoneering(player)) {
-			if(objectExists && !addingToFire || player.getPosition().getZ() > 0 || !player.getMovementQueue().canWalk(1, 0) && !player.getMovementQueue().canWalk(-1, 0) && !player.getMovementQueue().canWalk(0, 1) && !player.getMovementQueue().canWalk(0, -1)) {
-				player.getPacketSender().sendMessage("You can not light a fire here.");
-				return;
-			}
-			if(player.getPosition().getX() == 2848 && player.getPosition().getY() == 3335 || player.getPosition().getX() == 2711 && player.getPosition().getY() == 3438){//fm
-				player.getPacketSender().sendMessage("There's already a perfectly good fire here.");
-				return;
-			}
-		}
-		final Logdata.logData logData = Logdata.getLogData(player, log);
-		if(logData == null)
-			return;
-		player.getMovementQueue().reset();
-		if(objectExists && addingToFire)
-			MovementQueue.stepAway(player);
-		player.getPacketSender().sendInterfaceRemoval();
-		player.setEntityInteraction(null);
-		player.getSkillManager().stopSkilling();
-		int cycle = 2 + Misc.getRandom(3);
-		if (player.getSkillManager().getMaxLevel(Skill.FIREMAKING) < logData.getLevel()) {
-			player.getPacketSender().sendMessage("You need a Firemaking level of atleast "+logData.getLevel()+" to light this.");
-			return;
-		}
-		if(!addingToFire) {
-			player.getPacketSender().sendMessage("You attempt to light a fire..");
-			player.performAnimation(new Animation(733));
-			player.getMovementQueue().setLockMovement(true);
-		}
-		player.setCurrentTask(new Task(addingToFire ? 2 : cycle, player, addingToFire ? true : false) {
-			int added = 0;
-			@Override
-			public void execute() {
-				player.getPacketSender().sendInterfaceRemoval();
-				if(addingToFire && player.getInteractingObject() == null) { //fire has died
-					player.getSkillManager().stopSkilling();
-					player.getPacketSender().sendMessage("The fire has died out.");
-					return;
-				}
-				if(player.getEquipment().get(Equipment.RING_SLOT).getId() == 13659 && Misc.getRandom(7) == 1) {
-					player.getPacketSender().sendMessage("Your cape has salvaged your log.");
-				} else {
-					if(player.getSkillManager().skillCape(Skill.FIREMAKING) && Misc.getRandom(10) == 1) {
-						player.getPacketSender().sendMessage("Your cape has salvaged your log.");
-					} else {
-						player.getInventory().delete(logData.getLogId(), 1);
-					}
-				}
-				if(addingToFire) {
-					player.performAnimation(new Animation(827));
-					player.getPacketSender().sendMessage("You add some logs to the fire..");
-				} else {
-					if(!player.getMovementQueue().isMoving()) {
-						player.getMovementQueue().setLockMovement(false);
-						player.performAnimation(new Animation(65535));
-						MovementQueue.stepAway(player);
-					}
-					CustomObjects.globalFiremakingTask(new GameObject(logData.getGameObject(), player.getPosition().copy()), player, logData.getBurnTime());
-					player.getPacketSender().sendMessage("The fire catches and the logs begin to burn.");
-					stop();
-				}
-				if(logData == Logdata.logData.OAK) {
-					Achievements.doProgress(player, AchievementData.BURN_25_OAK_LOGS);
-				} else if(logData == Logdata.logData.MAGIC) {
-					Achievements.doProgress(player, AchievementData.BURN_100_MAGIC_LOGS);
-					Achievements.doProgress(player, AchievementData.BURN_2500_MAGIC_LOGS);
-				}
-				Sounds.sendSound(player, Sound.LIGHT_FIRE);
-				player.getSkillManager().addExperience(Skill.FIREMAKING, (int) (logData.getXp()));
-				added++;
-				if(added >= amount || !player.getInventory().contains(logData.getLogId())) {
-					stop();
-					if(added < amount && addingToFire && Logdata.getLogData(player, -1) != null && Logdata.getLogData(player, -1).getLogId() != log) {
-						player.getClickDelay().reset(0);
-						Firemaking.lightFire(player, -1, true, (amount-added));
-					}
-					return;
-				}
-			}
-
-			@Override
-			public void stop() {
-				setEventRunning(false);
-				player.performAnimation(new Animation(65535));
-				player.getMovementQueue().setLockMovement(false);
-			}
-		});
-		TaskManager.submit(player.getCurrentTask());
-		player.getClickDelay().reset(System.currentTimeMillis() + 500);
-	}
-
+            override fun stop() {
+                setEventRunning(false)
+                player.performAnimation(Animation(65535))
+                player.movementQueue.isLockMovement = false
+            }
+        }
+        TaskManager.submit(player.currentTask)
+        player.clickDelay.reset(System.currentTimeMillis() + 500)
+    }
 }

@@ -1,60 +1,43 @@
-package com.realting.world.content.skill.firemaking;
+package com.realting.world.content.skill.firemaking
 
-import com.realting.engine.task.Task;
-import com.realting.engine.task.TaskManager;
-import com.realting.model.Animation;
-import com.realting.model.entity.character.player.Player;
+import com.realting.engine.task.Task
+import com.realting.engine.task.TaskManager
+import com.realting.model.Animation
+import com.realting.model.entity.character.player.Player
 
-public enum Firelighter {
-	
-	RED_LOGS(7329, 7404),//new Item[] {new Item(1511), new Item(7329)}, new Item(7404), new int[] {21, 0, 0}),
-	GREEN_LOGS(7330, 7405),//new Item[] {new Item(1511), new Item(7330)}, new Item(7405), new int[] {21, 0, 0}),
-	BLUE_LOGS(7331, 7406),//new Item[] {new Item(1511), new Item(7331)}, new Item(7406), new int[] {21, 0, 0}),
-	PURPLE_LOGS(10326, 10329),//new Item[] {new Item(1511), new Item(10326)}, new Item(10329), new int[] {21, 0, 0}),
-	WHITE_LOGS(10327, 10328);//new Item[] {new Item(1511), new Item(10327)}, new Item(10328), new int[] {21, 0, 0}),
-	
-	private int lighterId, coloredLogId;
-	
-	private Firelighter(int lighterId, int coloredLogId) {
-		this.lighterId = lighterId;
-		this.coloredLogId = coloredLogId;
-	}
-	
-	public int getLighterId() {
-		return this.lighterId;
-	}
-	
-	public int getColoredLogId() {
-		return this.coloredLogId;
-	}
-	
-	public static void handleFirelighter(Player player, int index) {
-		if (!player.getInventory().contains(Firelighter.values()[index].getLighterId())) {
-			player.getPacketSender().sendMessage("You'll need a firelighter to color logs.");
-			return;
-		}
+enum class Firelighter(//new Item[] {new Item(1511), new Item(10327)}, new Item(10328), new int[] {21, 0, 0}),
+    val lighterId: Int, val coloredLogId: Int
+) {
+    RED_LOGS(7329, 7404),  //new Item[] {new Item(1511), new Item(7329)}, new Item(7404), new int[] {21, 0, 0}),
+    GREEN_LOGS(7330, 7405),  //new Item[] {new Item(1511), new Item(7330)}, new Item(7405), new int[] {21, 0, 0}),
+    BLUE_LOGS(7331, 7406),  //new Item[] {new Item(1511), new Item(7331)}, new Item(7406), new int[] {21, 0, 0}),
+    PURPLE_LOGS(10326, 10329),  //new Item[] {new Item(1511), new Item(10326)}, new Item(10329), new int[] {21, 0, 0}),
+    WHITE_LOGS(10327, 10328);
 
-		player.getSkillManager().stopSkilling();
-		
-		player.setCurrentTask(new Task(1, player, false) {
-			@Override
-			public void execute() {
-				if (!player.getInventory().contains(1511)) {
-					player.getPacketSender().sendMessage("You've run out of logs to recolor.");
-					stop();
-					return;
-				}
-				player.getInventory().delete(1511, 1);
-				player.performAnimation(new Animation(7211)); //CHANGE
-				player.getInventory().add(Firelighter.values()[index].getColoredLogId(), 1);
-
-				
-			}
-		});
-		TaskManager.submit(player.getCurrentTask());
-	}
-	
-	/*public static void handleFirelighter(Player player, int firelighterid) {
+    companion object {
+        @JvmStatic
+        fun handleFirelighter(player: Player, index: Int) {
+            if (!player.inventory.contains(values()[index].lighterId)) {
+                player.packetSender.sendMessage("You'll need a firelighter to color logs.")
+                return
+            }
+            player.skillManager.stopSkilling()
+            player.currentTask = object : Task(1, player, false) {
+                public override fun execute() {
+                    if (!player.inventory.contains(1511)) {
+                        player.packetSender.sendMessage("You've run out of logs to recolor.")
+                        stop()
+                        return
+                    }
+                    player.inventory.delete(1511, 1)
+                    player.performAnimation(Animation(7211)) //CHANGE
+                    player.inventory.add(
+                        values()[index].coloredLogId, 1
+                    )
+                }
+            }
+            TaskManager.submit(player.currentTask)
+        } /*public static void handleFirelighter(Player player, int firelighterid) {
 		if (!player.getClickDelay().elapsed(100)) {
 			return;
 		}
@@ -89,5 +72,5 @@ public enum Firelighter {
 		
 		player.getClickDelay().reset();
 	}*/
-
+    }
 }
