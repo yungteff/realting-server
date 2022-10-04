@@ -1,80 +1,59 @@
-package com.ruse.world.content.skill.thieving;
+package com.ruse.world.content.skill.thieving
 
-import com.ruse.model.Animation;
-import com.ruse.model.Flag;
-import com.ruse.model.Graphic;
-import com.ruse.model.Hit;
-import com.ruse.model.Skill;
-import com.ruse.util.Misc;
-import com.ruse.model.entity.character.npc.NPC;
-import com.ruse.model.entity.character.player.Player;
+import com.ruse.model.*
+import com.ruse.model.entity.character.npc.NPC
+import com.ruse.model.entity.character.player.Player
+import com.ruse.util.Misc
 
-
-public class Pickpocket {
-	
-	/**
-	 * Use this method when an NPC is pickpocketed.
-	 * @author Crimson 
-	 * @since Aug 12, 2017
-	 * @param player - the person trying to steal
-	 * @param npc - the npc being stolen from
-	 */
-	public static void handleNpc(Player player, NPC npc) {
-		PickpocketData data = PickpocketData.forNpc(npc.getId());
-		
-		player.setPositionToFace(npc.getPosition());
-				
-		if(player.isFrozen() || player.isStunned()) {
-			return;
-		}
-		
-		if (player.getCombatBuilder().isAttacking() || player.getCombatBuilder().isBeingAttacked()) {
-			return;
-		}
-		
-		if (player.getSkillManager().getMaxLevel(Skill.THIEVING) < data.getRequirement()) {
-			player.getPacketSender().sendMessage("You need a thieving level of "+data.getRequirement()+" to steal from there.");
-			return;
-		}
-		
-		if (player.getInventory().isFull()) {
-			player.getPacketSender().sendMessage("You need some inventory space to hold anything more.");
-			return;
-		}
-		
-		player.performAnimation(new Animation(881));
-		
-		if (shouldFail(player, data.getRequirement())) {
-			
-			player.getMovementQueue().stun(5);
-			
-			npc.forceChat(data.getFailMessage());
-			npc.setPositionToFace(player.getPosition());
-			if (npc.getDefinition().getAttackAnimation() > 0) {
-				npc.performAnimation(new Animation(npc.getDefinition().getAttackAnimation()));
-			} else {
-				npc.performAnimation(new Animation(422)); //punch anim
-			}
-			player.performGraphic(new Graphic(254));
-			
-			player.dealDamage(new Hit(data.getDamage()));
-			player.getCombatBuilder().addDamage(player, data.getDamage());
-			player.getUpdateFlag().isUpdateRequired();
-			player.getUpdateFlag().flag(Flag.SINGLE_HIT);
-			
-			
-			return;
-		}
-		
-		player.getInventory().add(data.getReward());
-		player.getSkillManager().addExperience(Skill.THIEVING, data.getExperience());
-		player.getPacketSender().sendMessage("You steal from the "+npc.getDefinition().getName()+"'s pocket.");
-		
-	}
-	
-	public static boolean shouldFail(Player player, int levelReq) {
-        return player.getSkillManager().getCurrentLevel(Skill.THIEVING) - levelReq < Misc.getRandom(levelReq);
+object Pickpocket {
+    /**
+     * Use this method when an NPC is pickpocketed.
+     * @author Crimson
+     * @since Aug 12, 2017
+     * @param player - the person trying to steal
+     * @param npc - the npc being stolen from
+     */
+    @JvmStatic
+    fun handleNpc(player: Player, npc: NPC) {
+        val data = PickpocketData.Companion.forNpc(npc.id)
+        player.positionToFace = npc.position
+        if (player.isFrozen || player.isStunned) {
+            return
+        }
+        if (player.combatBuilder.isAttacking || player.combatBuilder.isBeingAttacked) {
+            return
+        }
+        if (player.skillManager.getMaxLevel(Skill.THIEVING) < data?.requirement!!) {
+            player.packetSender.sendMessage("You need a thieving level of " + data.requirement + " to steal from there.")
+            return
+        }
+        if (player.inventory.isFull) {
+            player.packetSender.sendMessage("You need some inventory space to hold anything more.")
+            return
+        }
+        player.performAnimation(Animation(881))
+        if (shouldFail(player, data.requirement)) {
+            player.movementQueue.stun(5)
+            npc.forceChat(data.failMessage.random())
+            npc.positionToFace = player.position
+            if (npc.definition.attackAnimation > 0) {
+                npc.performAnimation(Animation(npc.definition.attackAnimation))
+            } else {
+                npc.performAnimation(Animation(422)) //punch anim
+            }
+            player.performGraphic(Graphic(254))
+            player.dealDamage(Hit(data.damage.random()))
+            player.combatBuilder.addDamage(player, data.damage.random())
+            player.updateFlag.isUpdateRequired
+            player.updateFlag.flag(Flag.SINGLE_HIT)
+            return
+        }
+        player.inventory.add(data.reward)
+        player.skillManager.addExperience(Skill.THIEVING, data.experience)
+        player.packetSender.sendMessage("You steal from the " + npc.definition.name + "'s pocket.")
     }
-	
-}
 
+    fun shouldFail(player: Player, levelReq: Int): Boolean {
+        return player.skillManager.getCurrentLevel(Skill.THIEVING) - levelReq < Misc.getRandom(levelReq)
+    }
+}

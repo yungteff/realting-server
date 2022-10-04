@@ -114,9 +114,9 @@ object Woodcutting {
                                         }
                                     }
                                     Sounds.sendSound(player, Sounds.Sound.WOODCUT)
-                                    if (t != null && t == WoodcuttingData.Trees.NORMAL) {
+                                    if (t == WoodcuttingData.Trees.NORMAL) {
                                         Achievements.doProgress(player, AchievementData.CUT_10_LOGS)
-                                    } else if (t != null && t == WoodcuttingData.Trees.MAGIC) {
+                                    } else if (t == WoodcuttingData.Trees.MAGIC) {
                                         Achievements.doProgress(player, AchievementData.CUT_100_MAGIC_LOGS)
                                         Achievements.doProgress(player, AchievementData.CUT_5000_MAGIC_LOGS)
                                     }
