@@ -247,7 +247,17 @@ object SmithingData {
             }
             2414, 3988, 3992, 3996, 4000, 4158, 7442, 7447 -> {
                 val bar =
-                    if (id == 2414) 2349 else if (id == 3988) 2351 else if (id == 3992) 2355 else if (id == 3996) 2353 else if (id == 4000) 2357 else if (id == 4158) 2359 else if (id == 7442) 2361 else if (id == 7447) 2363 else -1
+                    when (id) {
+                        2414 -> 2349
+                        3988 -> 2351
+                        3992 -> 2355
+                        3996 -> 2353
+                        4000 -> 2357
+                        4158 -> 2359
+                        7442 -> 2361
+                        7447 -> 2363
+                        else -> -1
+                    }
                 if (bar > 0) {
                     player.inputHandling = EnterAmountOfBarsToSmelt(bar)
                     player.packetSender.sendEnterAmountPrompt("How many " + ItemDefinition.forId(bar).name + "s would you like to smelt?")
