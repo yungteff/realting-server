@@ -22,7 +22,6 @@ import com.ruse.world.content.Sounds.Sound;
 import com.ruse.model.entity.character.npc.NPC;
 import com.ruse.model.entity.character.npc.NPCMovementCoordinator.CoordinateState;
 import com.ruse.model.entity.character.player.Player;
-import com.sun.xml.internal.bind.v2.TODO;
 
 /**
  * Handles the Dwarf multi Cannon
