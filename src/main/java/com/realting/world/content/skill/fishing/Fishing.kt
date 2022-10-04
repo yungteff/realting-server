@@ -1,207 +1,164 @@
-package com.realting.world.content.skill.fishing;
+package com.realting.world.content.skill.fishing
 
-import com.realting.engine.task.Task;
-import com.realting.engine.task.TaskManager;
-import com.realting.model.Animation;
-import com.realting.model.Skill;
-import com.realting.model.definitions.ItemDefinition;
-import com.realting.util.Misc;
-import com.realting.world.content.Achievements;
-import com.realting.world.content.Achievements.AchievementData;
-import com.realting.model.entity.character.player.Player;
+import com.realting.engine.task.Task
+import com.realting.model.Skill
+import java.util.Locale
+import com.realting.world.content.Achievements
+import com.realting.world.content.Achievements.AchievementData
+import com.realting.engine.task.TaskManager
+import com.realting.model.Animation
+import com.realting.model.definitions.ItemDefinition
+import com.realting.model.entity.character.player.Player
+import com.realting.util.Misc
 
-public class Fishing {
+object Fishing {
+    @JvmStatic
+    fun forSpot(npcId: Int, secondClick: Boolean): Spot? {
+        for (s in Spot.values()) {
+            if (secondClick) {
+                if (s.second) {
+                    if (s.nPCId == npcId) {
+                        return s
+                    }
+                }
+            } else {
+                if (s.nPCId == npcId && !s.second) {
+                    return s
+                }
+            }
+        }
+        return null
+    }
 
-	public enum Spot {
+    @JvmStatic
+    fun setupFishing(p: Player, s: Spot?) {
+        if (s == null) return
+        if (p.inventory.freeSlots <= 0) {
+            p.packetSender.sendMessage("You do not have any free inventory space.")
+            p.skillManager.stopSkilling()
+            return
+        }
+        if (p.skillManager.getCurrentLevel(Skill.FISHING) >= s.levelReq[0]) {
+            if (p.inventory.contains(s.equipment) || p.skillManager.skillCape(Skill.FISHING)) {
+                if (s.bait != -1) {
+                    if (p.inventory.contains(s.bait)) {
+                        startFishing(p, s)
+                    } else {
+                        var baitName = ItemDefinition.forId(s.bait).name
+                        if (baitName.contains("Feather") || baitName.contains("worm")) baitName += "s"
+                        p.packetSender.sendMessage("You need some $baitName to fish here.")
+                        p.performAnimation(Animation(65535))
+                    }
+                } else {
+                    startFishing(p, s)
+                }
+            } else {
+                val def = ItemDefinition.forId(s.equipment).name.lowercase(Locale.getDefault())
+                p.packetSender.sendMessage("You need " + Misc.anOrA(def) + " " + def + " to fish here.")
+            }
+        } else {
+            p.packetSender.sendMessage("You need a fishing level of at least " + s.levelReq[0] + " to fish here.")
+        }
+    }
 
-		LURE(318, new int[]{335, 331}, 309, 314, new int[]{20, 30}, true, new int[]{50, 70}, 623),
+    fun startFishing(p: Player, s: Spot) {
+        p.skillManager.stopSkilling()
+        val fishIndex =
+            if (Misc.getRandom(100) >= 70) getMax(p, s.levelReq) else if (getMax(p, s.levelReq) != 0) getMax(
+                p, s.levelReq
+            ) - 1 else 0
+        //if(p.getInteractingObject() != null && p.getInteractingObject().getId() != 8702)
+        //p.setDirection(s == Spot.MONK_FISH ? Direction.WEST : Direction.NORTH);
+        p.performAnimation(Animation(s.anim))
+        p.currentTask = object : Task(1, p, false) {
+            var cycle = 0
+            var animTick = 0
+            public override fun execute() {
+                if (p.inventory.freeSlots == 0) {
+                    p.packetSender.sendMessage("You have run out of inventory space.")
+                    stop()
+                    return
+                }
+                if (!p.inventory.contains(s.bait)) {
+                    stop()
+                    return
+                }
+                if (++animTick == 2) {
+                    p.performAnimation(Animation(s.anim))
+                    animTick = 0
+                }
+                if (++cycle % 4 == 0 && p.skillManager.isSuccess(Skill.FISHING, s.levelReq[fishIndex])) {
+                    var def = ItemDefinition.forId(s.rawFish[fishIndex]).name
+                    if (def.endsWith("s")) def = def.substring(0, def.length - 1)
+                    p.packetSender.sendMessage(
+                        "You catch " + Misc.anOrA(def) + " " + def.lowercase(Locale.getDefault())
+                            .replace("_", " ") + "."
+                    )
+                    if (s.bait != -1) p.inventory.delete(s.bait, 1)
+                    p.inventory.add(s.rawFish[fishIndex], 1)
+                    if (s.rawFish[fishIndex] == 331) {
+                        //Achievements.finishAchievement(p, AchievementData.FISH_A_SALMON);
+                    } else if (s.rawFish[fishIndex] == 15270) {
+                        Achievements.doProgress(p, AchievementData.FISH_25_ROCKTAILS)
+                        Achievements.doProgress(p, AchievementData.FISH_2000_ROCKTAILS)
+                    } else if (s.rawFish[fishIndex] == 317) {
+                        Achievements.doProgress(p, AchievementData.CATCH_25_SCHRIMPS)
+                    }
+                    p.skillManager.addExperience(Skill.FISHING, s.xp[fishIndex])
+                    setupFishing(p, s)
+                    setEventRunning(false)
+                }
+            }
 
-		CAGE(312, new int[]{377}, 301, -1, new int[]{40}, false, new int[]{90}, 619),
+            override fun stop() {
+                setEventRunning(false)
+                p.performAnimation(Animation(65535))
+            }
+        }
+        TaskManager.submit(p.currentTask)
+    }
 
-		BIGNET(313, new int[]{353, 341, 363}, 305, -1, new int[]{16, 23, 46}, false, new int[]{20, 45, 100}, 620),
+    fun getMax(p: Player, reqs: IntArray): Int {
+        var tempInt = -1
+        for (i in reqs) {
+            if (p.skillManager.getCurrentLevel(Skill.FISHING) >= i) {
+                tempInt++
+            }
+        }
+        return tempInt
+    }
 
-		SMALLNET(316, new int[]{317, 321}, 303, -1, new int[]{1, 15}, false, new int[]{10, 15}, 621),
+    private fun getDelay(req: Int): Int {
+        var timer = 1
+        timer += (req * 0.08).toInt()
+        return timer
+    }
 
-		MONK_FISH(318, new int[]{7944, 389}, 305, -1, new int[]{62, 81}, false, new int[]{120, 150}, 621),
+    enum class Spot(
+        var nPCId: Int,
+        var rawFish: IntArray,
+        var equipment: Int,
+        var bait: Int,
+        var levelReq: IntArray,
+        var second: Boolean,
+        var xp: IntArray,
+        var anim: Int
+    ) {
+        LURE(318, intArrayOf(335, 331), 309, 314, intArrayOf(20, 30), true, intArrayOf(50, 70), 623), CAGE(
+            312, intArrayOf(377), 301, -1, intArrayOf(40), false, intArrayOf(90), 619
+        ),
+        BIGNET(
+            313, intArrayOf(353, 341, 363), 305, -1, intArrayOf(16, 23, 46), false, intArrayOf(20, 45, 100), 620
+        ),
+        SMALLNET(316, intArrayOf(317, 321), 303, -1, intArrayOf(1, 15), false, intArrayOf(10, 15), 621), MONK_FISH(
+            318, intArrayOf(7944, 389), 305, -1, intArrayOf(62, 81), false, intArrayOf(120, 150), 621
+        ),
+        HARPOON(312, intArrayOf(359, 371), 311, -1, intArrayOf(35, 50), true, intArrayOf(80, 100), 618), HARPOON2(
+            313, intArrayOf(383), 311, -1, intArrayOf(76), true, intArrayOf(110), 618
+        ),
+        BAIT(316, intArrayOf(327, 345), 307, 313, intArrayOf(5, 10), true, intArrayOf(20, 30), 623), ROCKTAIL(
+            10091, intArrayOf(15270), 309, 25, intArrayOf(91), false, intArrayOf(200), 380
+        );
 
-		HARPOON(312, new int[]{359, 371}, 311, -1, new int[]{35, 50}, true, new int[]{80, 100}, 618),
-
-		HARPOON2(313, new int[]{383}, 311, -1, new int[]{76}, true, new int[]{110}, 618),
-
-		BAIT(316, new int[]{327, 345}, 307, 313, new int[]{5, 10}, true, new int[]{20, 30}, 623),
-
-		ROCKTAIL(10091, new int[]{15270}, 309, 25, new int[]{91}, false, new int[]{200}, 380);
-
-		int npcId, equipment, bait, anim;
-		int[] rawFish, fishingReqs, xp;
-		boolean second;
-		private Spot(int npcId, int[] rawFish, int equipment, int bait, int[] fishingReqs, boolean second, int[] xp, int anim) {
-			this.npcId = npcId;
-			this.rawFish = rawFish;
-			this.equipment = equipment;
-			this.bait = bait;
-			this.fishingReqs = fishingReqs;
-			this.second = second;
-			this.xp = xp;
-			this.anim = anim;
-		}
-
-		public int getNPCId() {
-			return npcId;
-		}
-
-		public int[] getRawFish() {
-			return rawFish;
-		}
-
-		public int getEquipment() {
-			return equipment;
-		}
-
-		public int getBait() {
-			return bait;
-		}
-
-		public int[] getLevelReq() {
-			return fishingReqs;
-		}
-
-		public boolean getSecond() {
-			return second;
-		}
-
-		public int[] getXp() {
-			return xp;
-		}
-
-		public int getAnim() {
-			return anim;
-		}
-	}
-
-	public static Spot forSpot(int npcId, boolean secondClick) {
-		for (Spot s : Spot.values()) {
-			if (secondClick) {
-				if (s.getSecond()) {
-					if (s.getNPCId() == npcId) {
-						if (s != null) {
-							return s;
-						}
-					}
-				}
-			} else {
-				if (s.getNPCId() == npcId && !s.getSecond()) {
-					if (s != null) {
-						return s;
-					}
-				}
-			}
-		}
-		return null;
-	}
-
-	public static void setupFishing(Player p, Spot s) {
-		if(s == null)
-			return;
-		if(p.getInventory().getFreeSlots() <= 0) {
-			p.getPacketSender().sendMessage("You do not have any free inventory space.");
-			p.getSkillManager().stopSkilling();
-			return;
-		}
-		if (p.getSkillManager().getCurrentLevel(Skill.FISHING) >= s.getLevelReq()[0]) {
-			if (p.getInventory().contains(s.getEquipment()) || (p.getSkillManager().skillCape(Skill.FISHING))) {
-				if (s.getBait() != -1) {
-					if (p.getInventory().contains(s.getBait())) {
-						startFishing(p, s);
-					} else {
-						String baitName = ItemDefinition.forId(s.getBait()).getName();
-						if(baitName.contains("Feather") || baitName.contains("worm"))
-							baitName += "s";
-						p.getPacketSender().sendMessage("You need some "+baitName+" to fish here.");
-						p.performAnimation(new Animation(65535));
-					}
-				} else {
-					startFishing(p, s);
-				}
-			} else {
-				String def = ItemDefinition.forId(s.getEquipment()).getName().toLowerCase();
-				p.getPacketSender().sendMessage("You need "+Misc.anOrA(def)+" "+def+" to fish here.");
-			}
-		} else {
-			p.getPacketSender().sendMessage("You need a fishing level of at least "+s.getLevelReq()[0]+" to fish here.");
-		}
-	}
-
-	public static void startFishing(final Player p, final Spot s) {
-		p.getSkillManager().stopSkilling();
-		final int fishIndex = Misc.getRandom(100) >= 70 ? getMax(p, s.fishingReqs) : (getMax(p, s.fishingReqs) != 0 ? getMax(p, s.fishingReqs) - 1 : 0);
-		//if(p.getInteractingObject() != null && p.getInteractingObject().getId() != 8702)
-			//p.setDirection(s == Spot.MONK_FISH ? Direction.WEST : Direction.NORTH);
-		p.performAnimation(new Animation(s.getAnim()));
-		p.setCurrentTask(new Task(1, p, false) {
-			int cycle = 0, animTick = 0;
-			@Override
-			public void execute() {
-				if(p.getInventory().getFreeSlots() == 0) {
-					p.getPacketSender().sendMessage("You have run out of inventory space.");
-					stop();
-					return;
-				}
-				if(!p.getInventory().contains(s.getBait())) {
-					stop();
-					return;
-				}
-				if(++animTick == 2) {
-					p.performAnimation(new Animation(s.getAnim()));
-					animTick = 0;
-				}
-
-				if (++cycle % 4 == 0 && p.getSkillManager().isSuccess(Skill.FISHING, s.getLevelReq()[fishIndex])) {
-					String def = ItemDefinition.forId(s.getRawFish()[fishIndex]).getName();
-					if(def.endsWith("s"))
-						def = def.substring(0, def.length()-1);
-					p.getPacketSender().sendMessage("You catch "+Misc.anOrA(def)+" "+def.toLowerCase().replace("_", " ")+".");
-					if (s.getBait() != -1)
-						p.getInventory().delete(s.getBait(), 1);
-					p.getInventory().add(s.getRawFish()[fishIndex], 1);
-					if(s.getRawFish()[fishIndex] == 331) {
-						//Achievements.finishAchievement(p, AchievementData.FISH_A_SALMON);
-					} else if(s.getRawFish()[fishIndex] == 15270) {
-						Achievements.doProgress(p, AchievementData.FISH_25_ROCKTAILS);
-						Achievements.doProgress(p, AchievementData.FISH_2000_ROCKTAILS);
-					}else if(s.getRawFish()[fishIndex] == 317) {
-						Achievements.doProgress(p, AchievementData.CATCH_25_SCHRIMPS);
-					}
-
-					p.getSkillManager().addExperience(Skill.FISHING, s.getXp()[fishIndex]);
-					setupFishing(p, s);
-					setEventRunning(false);
-				}
-			}
-			@Override
-			public void stop() {
-				setEventRunning(false);
-				p.performAnimation(new Animation(65535));
-			}
-		});
-
-		TaskManager.submit(p.getCurrentTask());
-	}
-
-	public static int getMax(Player p, int[] reqs) {
-		int tempInt = -1;
-		for (int i : reqs) {
-			if (p.getSkillManager().getCurrentLevel(Skill.FISHING) >= i) {
-				tempInt++;
-			}
-		}
-		return tempInt;
-	}
-
-	private static int getDelay(int req) {
-		int timer = 1;
-		timer += (int) req * 0.08;
-		return timer;
-	}
-
+    }
 }
