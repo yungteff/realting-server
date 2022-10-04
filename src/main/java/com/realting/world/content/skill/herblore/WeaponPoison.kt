@@ -1,175 +1,157 @@
-package com.realting.world.content.skill.herblore;
+package com.realting.world.content.skill.herblore
 
-import java.util.HashMap;
+import com.realting.model.entity.character.CharacterEntity
+import com.realting.model.container.impl.Equipment
+import com.realting.model.entity.character.player.Player
+import com.realting.util.Misc
+import com.realting.world.content.combat.CombatFactory
+import com.realting.world.content.combat.effect.CombatPoisonEffect.PoisonType
+import java.util.HashMap
 
-import com.realting.model.container.impl.Equipment;
-import com.realting.util.Misc;
-import com.realting.world.content.combat.CombatFactory;
-import com.realting.world.content.combat.effect.CombatPoisonEffect.PoisonType;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.player.Player;
+object WeaponPoison {
+    /**
+     * Starts the weapon poison event for each individual weapon item from the
+     * enumeration `Weapon`.
+     *
+     * @param player
+     * The Player player.
+     * @param itemUse
+     * The first item use.
+     * @param useWith
+     * The second item use.
+     */
+    @JvmStatic
+    fun execute(player: Player, itemUse: Int, useWith: Int) {
+        val weapon = Weapon.weapon[useWith]
+        if (weapon != null) {
+            for (element in weapon.newItemId) if (itemUse == element[0] && player.inventory.contains(itemUse)) {
+                player.packetSender.sendMessage("You poison your weapon..")
+                player.inventory.delete(element[0], 1)
+                player.inventory.delete(weapon.itemId, 1)
+                player.inventory.add(229, 1)
+                player.inventory.add(element[1], 1)
+            }
+        }
+    }
 
-public class WeaponPoison {
+    /**
+     * Checks if poison should be applied for a target.
+     * @param p            The player who is going to apply poison onto the target.
+     * @param target    The target who is going to be poisoned.
+     */
+    fun handleWeaponPoison(p: Player, target: CharacterEntity?) {
+        val plrWeapon = p.equipment.items[Equipment.WEAPON_SLOT].id
+        for (w in Weapon.weapon.values) {
+            if (w != null) {
+                var random = 0
+                if (w.newItemId[0][1] == plrWeapon) //Player has p++
+                    random = 5 else if (w.newItemId[1][1] == plrWeapon) //Player has p+
+                    random = 10
+                if (random > 0) {
+                    if (Misc.getRandom(random) == 1) CombatFactory.poisonEntity(
+                        target, if (random == 5) PoisonType.EXTRA else PoisonType.MILD
+                    )
+                    break
+                }
+            }
+        }
+    }
 
-	/**
-	 * Represents a weapon that can be poisoned. Stores the initial weapon item
-	 * id, the type of poison used on the weapon and the new poisoned weapon
-	 * that will be obtained.
-	 * 
-	 */
-	private enum Weapon {
-		/**
-		 * Dragon dagger.
-		 */
-		DRAGON_DAGGER(1215, new int[][] { { 5940, 5698 }, { 5937, 5680 } }),
+    /**
+     * Represents a weapon that can be poisoned. Stores the initial weapon item
+     * id, the type of poison used on the weapon and the new poisoned weapon
+     * that will be obtained.
+     *
+     */
+    private enum class Weapon
+    /**
+     * Creates the weapon.
+     *
+     * @param itemId
+     * The weapon item id.
+     * @param newItemId
+     * The poisoned weapon item id.
+     */(
+        /**
+         * The weapon item id.
+         */
+        val itemId: Int,
+        /**
+         * The poisoned weapon item id.
+         */
+        val newItemId: Array<IntArray>
+    ) {
+        /**
+         * Dragon dagger.
+         */
+        DRAGON_DAGGER(1215, arrayOf(intArrayOf(5940, 5698), intArrayOf(5937, 5680))),
 
-		/**
-		 * Rune dagger.
-		 */
-		RUNE_DAGGER(1213, new int[][] { { 5940, 5696 }, { 5937, 5678 } }),
+        /**
+         * Rune dagger.
+         */
+        RUNE_DAGGER(1213, arrayOf(intArrayOf(5940, 5696), intArrayOf(5937, 5678))),
 
-		/**
-		 * Adamant dagger.
-		 */
-		ADAMANT_DAGGER(1211, new int[][] { { 5940, 5694 }, { 5937, 5676 } }),
+        /**
+         * Adamant dagger.
+         */
+        ADAMANT_DAGGER(1211, arrayOf(intArrayOf(5940, 5694), intArrayOf(5937, 5676))),
 
-		/**
-		 * Mithril dagger.
-		 */
-		MITHRIL_DAGGER(1209, new int[][] { { 5940, 5692 }, { 5937, 5674 } }),
+        /**
+         * Mithril dagger.
+         */
+        MITHRIL_DAGGER(1209, arrayOf(intArrayOf(5940, 5692), intArrayOf(5937, 5674))),
 
-		/**
-		 * Black dagger.
-		 */
-		BLACK_DAGGER(1217, new int[][] { { 5940, 5700 }, { 5937, 5682 } }),
+        /**
+         * Black dagger.
+         */
+        BLACK_DAGGER(1217, arrayOf(intArrayOf(5940, 5700), intArrayOf(5937, 5682))),
 
-		/**
-		 * Steel dagger.
-		 */
-		STEEL_DAGGER(1207, new int[][] { { 5940, 5690 }, { 5937, 5672 } }),
+        /**
+         * Steel dagger.
+         */
+        STEEL_DAGGER(1207, arrayOf(intArrayOf(5940, 5690), intArrayOf(5937, 5672))),
 
-		/**
-		 * Iron dagger.
-		 */
-		IRON_DAGGER(1203, new int[][] { { 5940, 5686 }, { 5937, 5668 } }),
+        /**
+         * Iron dagger.
+         */
+        IRON_DAGGER(1203, arrayOf(intArrayOf(5940, 5686), intArrayOf(5937, 5668))),
 
-		/**
-		 * Bronze dagger.
-		 */
-		BRONZE_DAGGER(1205, new int[][] { { 5940, 5688 }, { 5937, 5670 } });
+        /**
+         * Bronze dagger.
+         */
+        BRONZE_DAGGER(1205, arrayOf(intArrayOf(5940, 5688), intArrayOf(5937, 5670)));
+        /**
+         * Gets the item id.
+         *
+         * @return the itemId
+         */
+        /**
+         * @return the newItemId
+         */
 
-		/**
-		 * Creates the weapon.
-		 * 
-		 * @param itemId
-		 *            The weapon item id.
-		 * @param newItemId
-		 *            The poisoned weapon item id.
-		 */
-		private Weapon(int itemId, int[][] newItemId) {
-			this.itemId = itemId;
-			this.newItemId = newItemId;
-		}
+        companion object {
+            /**
+             * Represents a map for the weapon item ids.
+             */
+            var weapon = HashMap<Int, Weapon>()
 
-		/**
-		 * Gets the item id.
-		 * 
-		 * @return the itemId
-		 */
-		public int getItemId() {
-			return itemId;
-		}
+            /**
+             * Gets the weapon id by the item.
+             *
+             * @param id
+             * The item id.
+             * @return returns null if itemId is not a weapon.
+             */
+            fun forId(id: Int): Weapon? {
+                return weapon[id]
+            }
 
-		/**
-		 * The weapon item id.
-		 */
-		private int itemId;
-
-		/**
-		 * The poisoned weapon item id.
-		 */
-		private int[][] newItemId;
-
-		/**
-		 * Represents a map for the weapon item ids.
-		 */
-		public static HashMap<Integer, Weapon> weapon = new HashMap<Integer, Weapon>();
-
-		/**
-		 * Gets the weapon id by the item.
-		 * 
-		 * @param id
-		 *            The item id.
-		 * @return returns null if itemId is not a weapon.
-		 */
-		@SuppressWarnings("unused")
-		public static Weapon forId(int id) {
-			return weapon.get(id);
-		}
-
-		/**
-		 * @return the newItemId
-		 */
-		public int[][] getNewItemId() {
-			return newItemId;
-		}
-
-		/**
-		 * Populates a map for the weapons.
-		 */
-		static {
-			for (Weapon w : Weapon.values())
-
-				weapon.put(w.getItemId(), w);
-
-		}
-	}
-	
-	/**
-	 * Starts the weapon poison event for each individual weapon item from the
-	 * enumeration <code>Weapon</code>.
-	 * 
-	 * @param player
-	 *            The Player player.
-	 * @param itemUse
-	 *            The first item use.
-	 * @param useWith
-	 *            The second item use.
-	 */
-	public static void execute(final Player player, int itemUse, int useWith) {
-		final Weapon weapon = Weapon.weapon.get(useWith);
-		if (weapon != null) {
-			for (int element[] : weapon.getNewItemId())
-				if (itemUse == element[0] && player.getInventory().contains(itemUse)) {
-					player.getPacketSender().sendMessage("You poison your weapon..");
-					player.getInventory().delete(element[0], 1);
-					player.getInventory().delete(weapon.getItemId(), 1);
-					player.getInventory().add(229, 1);
-					player.getInventory().add(element[1], 1);
-				}
-		}
-	}
-
-	/**
-	 * Checks if poison should be applied for a target.
-	 * @param p			The player who is going to apply poison onto the target.
-	 * @param target	The target who is going to be poisoned.
-	 */
-	public static void handleWeaponPoison(Player p, CharacterEntity target) {
-		int plrWeapon = p.getEquipment().getItems()[Equipment.WEAPON_SLOT].getId();
-		for(Weapon w : Weapon.weapon.values()) {
-			if(w != null) {
-				int random = 0;
-				if(w.getNewItemId()[0][1] == plrWeapon) //Player has p++
-					random = 5;
-				else if(w.getNewItemId()[1][1] == plrWeapon) //Player has p+
-					random = 10;
-				if(random > 0) {
-					if(Misc.getRandom(random) == 1)
-						CombatFactory.poisonEntity(target, random == 5 ? PoisonType.EXTRA : PoisonType.MILD);
-					break;
-				}
-			}
-		}
-	}
+            /**
+             * Populates a map for the weapons.
+             */
+            init {
+                for (w in values()) weapon[w.itemId] = w
+            }
+        }
+    }
 }
