@@ -11,6 +11,8 @@ import com.realting.world.content.Sounds;
 import com.realting.world.content.Sounds.Sound;
 import com.realting.world.content.player.skill.dungeoneering.Dungeoneering;
 
+import java.util.Objects;
+
 
 public class TeleportHandler {
 
@@ -53,7 +55,7 @@ public class TeleportHandler {
 						player.performGraphic(teleportType.getEndGraphic());
 						
 						if(Dungeoneering.doingDungeoneering(player)) {
-							final Position dungEntrance = player.getMinigameAttributes().getDungeoneeringAttributes().getParty().getDungeoneeringFloor().getEntrance().copy().setZ(player.getPosition().getZ());
+							final Position dungEntrance = Objects.requireNonNull(Objects.requireNonNull(player.getMinigameAttributes().getDungeoneeringAttributes().getParty()).getDungeoneeringFloor()).getEntrance().copy().setZ(player.getPosition().getZ());
 							player.moveTo(dungEntrance).setPosition(dungEntrance);
 						} else {
 							player.moveTo(targetLocation).setPosition(targetLocation);

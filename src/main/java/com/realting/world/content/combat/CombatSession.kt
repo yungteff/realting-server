@@ -61,13 +61,14 @@ class CombatSession
 
             // Check if the attack can be made on this hook
             if (!builder.strategy.canAttack(builder.character, builder.victim)) {
-                builder.character.combatBuilder.reset(if (builder.character.isNpc) true else false)
+                builder.character.combatBuilder.reset(builder.character.isNpc)
                 return
             }
 
             // Do all combat calculations here, we create the combat containers
             // using the attacking entity's combat strategy.
             builder.strategy.customContainerAttack(builder.character, builder.victim)
+
             var container = builder.container
             builder.character.setEntityInteraction(builder.victim)
             if (builder.character.isPlayer) {
@@ -114,13 +115,8 @@ class CombatSession
                     }
                 }
 
-//				if(container.getHitDelay() == 0) { //An instant attack
-//					new CombatHitTask(builder, container).handleAttack();
-//				} else {
-//					TaskManager.submit(new CombatHitTask(builder, container, container.getHitDelay(), false));
-//				}
                 builder.hitQueue.append(CombatHit(builder, container, container.hitDelay))
-                builder.container = null //Fetch a brand new container on next attack
+//                builder.container = null //Fetch a brand new container on next attack
             }
 
             // Reset the attacking entity.

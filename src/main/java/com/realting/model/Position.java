@@ -4,7 +4,7 @@ import com.realting.util.Misc;
 
 /**
  * Represents a single world tile position.
- * 
+ *
  * @author relex lawl
  */
 

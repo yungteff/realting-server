@@ -1053,23 +1053,30 @@ class CombatFactory private constructor() {
         }
 
         @JvmStatic
-        fun checkAttackDistance(a: CharacterEntity, b: CharacterEntity): Boolean {
-            val attacker = a.position
-            val victim = b.position
-            if (a.isNpc && (a as NPC).isSummoningNpc) {
-                return Locations.goodDistance(attacker, victim, a.getSize())
+        fun checkAttackDistance(attackerEntity: CharacterEntity, victimEntity: CharacterEntity): Boolean {
+            val attacker = attackerEntity.position
+            val victim = victimEntity.position
+
+            if (attackerEntity.isNpc && (attackerEntity as NPC).isSummoningNpc) {
+                return Locations.goodDistance(attacker, victim, attackerEntity.getSize())
             }
-            if (a.combatBuilder.strategy == null) a.combatBuilder.determineStrategy()
-            val strategy = a.combatBuilder.strategy
-            var distance = strategy.attackDistance(a)
-            if (a.isPlayer && strategy.getCombatType(a) !== CombatType.MELEE) {
-                if (b.size >= 2) distance += b.size - 1
+            if (attackerEntity.combatBuilder.strategy == null) {
+                attackerEntity.combatBuilder.determineStrategy()
             }
-            val movement = a.movementQueue
-            val otherMovement = b.movementQueue
+            val strategy = attackerEntity.combatBuilder.strategy
+
+            var distance = strategy.attackDistance(attackerEntity)
+            if (attackerEntity.isPlayer && strategy.getCombatType(attackerEntity) !== CombatType.MELEE) {
+                if (victimEntity.size >= 2) {
+                    distance += victimEntity.size - 1
+                }
+            }
+
+            val movement = attackerEntity.movementQueue
+            val otherMovement = victimEntity.movementQueue
 
             // We're moving so increase the distance.
-            if (!movement.isMovementDone && !otherMovement.isMovementDone && !movement.isLockedMovement && !a.isFrozen) {
+            if (!movement.isMovementDone && !otherMovement.isMovementDone && !movement.isLockedMovement && !attackerEntity.isFrozen) {
                 distance += 1
 
                 // We're running so increase the distance even more.
@@ -1084,23 +1091,31 @@ class CombatFactory private constructor() {
             /*
 		 *  Clipping checks and diagonal blocking by gabbe
 		 */
-            val sameSpot = attacker == victim && !a.movementQueue.isMoving && !b.movementQueue.isMoving
+            ///TODO:: remake this bs clipping???
+            val sameSpot =
+                attacker == victim && !attackerEntity.movementQueue.isMoving && !victimEntity.movementQueue.isMoving
             val goodDistance = !sameSpot && Locations.goodDistance(attacker.x, attacker.y, victim.x, victim.y, distance)
             var projectilePathBlocked = false
-            if (a.isPlayer && (strategy.getCombatType(a) === CombatType.RANGED || strategy.getCombatType(a) === CombatType.MAGIC && (a as Player).castSpell != null && a.castSpell !is CombatAncientSpell) || a.isNpc && strategy.getCombatType(
-                    a
+            if (attackerEntity.isPlayer && (strategy.getCombatType(attackerEntity) === CombatType.RANGED || strategy.getCombatType(
+                    attackerEntity
+                ) === CombatType.MAGIC && (attackerEntity as Player).castSpell != null && attackerEntity.castSpell !is CombatAncientSpell) || attackerEntity.isNpc && strategy.getCombatType(
+                    attackerEntity
                 ) === CombatType.MELEE
             ) {
-                if (!RegionClipping.canProjectileAttack(b, a)) projectilePathBlocked = true
+                if (!RegionClipping.canProjectileAttack(victimEntity, attackerEntity)) projectilePathBlocked = true
             }
             if (!projectilePathBlocked && goodDistance) {
-                if (strategy.getCombatType(a) === CombatType.MELEE && RegionClipping.isInDiagonalBlock(b, a)) {
-                    PathFinder.findPath(a, victim.x, victim.y + 1, true, 1, 1)
+                if (strategy.getCombatType(attackerEntity) === CombatType.MELEE && RegionClipping.isInDiagonalBlock(
+                        victimEntity,
+                        attackerEntity
+                    )
+                ) {
+                    PathFinder.findPath(attackerEntity, victim.x, victim.y + 1, true, 1, 1)
                     return false
-                } else a.movementQueue.reset()
+                } else attackerEntity.movementQueue.reset()
                 return true
             } else if (projectilePathBlocked || !goodDistance) {
-                a.movementQueue.followCharacter = b
+                attackerEntity.movementQueue.followCharacter = victimEntity
                 return false
             }
             // Check if we're within the required distance.

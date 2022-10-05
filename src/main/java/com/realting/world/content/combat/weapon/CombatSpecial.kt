@@ -1,37 +1,64 @@
- package com.realting.world.content.combat.weapon;
+package com.realting.world.content.combat.weapon
 
- import com.realting.engine.task.Task;
- import com.realting.engine.task.TaskManager;
- import com.realting.engine.task.impl.PlayerSpecialAmountTask;
- import com.realting.engine.task.impl.StaffOfLightSpecialAttackTask;
- import com.realting.model.*;
- import com.realting.model.container.impl.Equipment;
- import com.realting.model.definitions.WeaponInterfaces.WeaponInterface;
- import com.realting.model.entity.character.CharacterEntity;
- import com.realting.model.entity.character.npc.NPC;
- import com.realting.model.entity.character.player.Player;
- import com.realting.util.Misc;
- import com.realting.world.content.combat.CombatContainer;
- import com.realting.world.content.combat.CombatType;
- import com.realting.world.content.combat.HitQueue.CombatHit;
- import com.realting.world.content.combat.magic.Autocasting;
- import com.realting.world.content.minigames.Dueling;
- import com.realting.world.content.minigames.Dueling.DuelRule;
- import com.realting.world.content.player.events.Achievements;
- import com.realting.world.content.player.events.Achievements.AchievementData;
- import com.realting.world.content.player.events.Consumables;
-
- import java.util.Arrays;
+import com.realting.engine.task.Task
+import com.realting.engine.task.TaskManager
+import com.realting.engine.task.impl.PlayerSpecialAmountTask
+import com.realting.engine.task.impl.StaffOfLightSpecialAttackTask
+import com.realting.model.*
+import com.realting.model.container.impl.Equipment
+import com.realting.model.definitions.WeaponInterfaces.WeaponInterface
+import com.realting.model.entity.character.CharacterEntity
+import com.realting.model.entity.character.npc.NPC
+import com.realting.model.entity.character.player.Player
+import com.realting.util.Misc
+import com.realting.world.content.combat.CombatContainer
+import com.realting.world.content.combat.CombatType
+import com.realting.world.content.combat.HitQueue.CombatHit
+import com.realting.world.content.combat.magic.Autocasting
+import com.realting.world.content.minigames.Dueling.Companion.checkRule
+import com.realting.world.content.minigames.Dueling.DuelRule
+import com.realting.world.content.player.events.Achievements.AchievementData
+import com.realting.world.content.player.events.Achievements.finishAchievement
+import com.realting.world.content.player.events.Consumables.drinkStatPotion
+import java.util.*
 
 /**
  * Holds constants that hold data for all of the special attacks that can be
  * used.
- * 
+ *
  * @author lare96
  */
-public enum CombatSpecial {
-	
-	/*
+enum class CombatSpecial
+/**
+ * Create a new [CombatSpecial].
+ *
+ * @param identifers
+ * the weapon ID's that perform this special when activated.
+ * @param drainAmount
+ * the amount of special energy this attack will drain.
+ * @param strengthBonus
+ * the strength bonus when performing this special attack.
+ * @param accuracyBonus
+ * the accuracy bonus when performing this special attack.
+ * @param combatType
+ * the combat type used when performing this special attack.
+ * @param weaponType
+ * the weapon interface used by the identifiers.
+ */(
+    /** The weapon ID's that perform this special when activated.  */
+    val identifiers: IntArray,
+    /** The amount of special energy this attack will drain.  */
+    val drainAmount: Int,
+    /** The strength bonus when performing this special attack.  */
+    val strengthBonus: Double,
+    /** The accuracy bonus when performing this special attack.  */
+    val accuracyBonus: Double,
+    /** The combat type used when performing this special attack.  */
+    val combatType: CombatType,
+    /** The weapon interface used by the identifiers.  */
+    val weaponType: WeaponInterface
+) {
+    /*
 	 private CombatSpecial(int[] identifiers, int drainAmount,
 			double strengthBonus, double accuracyBonus, CombatType combatType,
 			WeaponInterface weaponType) {
@@ -42,415 +69,358 @@ public enum CombatSpecial {
 		this.combatType = combatType;
 		this.weaponType = weaponType;
 	 */
+    DRAGON_DAGGER(intArrayOf(1215, 1231, 5680, 5698, 22039), 25, 1.16, 1.20, CombatType.MELEE, WeaponInterface.DAGGER) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(1062))
+            player.performGraphic(Graphic(252, GraphicHeight.HIGH))
+            return CombatContainer(
+                player, target, 2, CombatType.MELEE, true
+            )
+        }
+    },
+    KORASIS_SWORD(intArrayOf(19780), 60, 1.55, 8.0, CombatType.MELEE, WeaponInterface.SWORD) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(14788))
+            player.performGraphic(Graphic(1729))
+            return object : CombatContainer(player, target, 1, 1, CombatType.MAGIC, true) {
+                override fun onHit(damage: Int, accurate: Boolean) {
+                    target!!.performGraphic(Graphic(1730))
+                }
+            }
+        }
+    },
+    ARMADYL_CROSSBOW(intArrayOf(22034), 40, 1.01, 2.01, CombatType.RANGED, WeaponInterface.ARMADYLXBOW) {
+        //arma spec
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(4230))
+            player.performGraphic(Graphic(28, GraphicHeight.HIGH))
+            TaskManager.submit(object : Task(1, player, false) {
+                public override fun execute() {
+                    Projectile(player, target, 72, 44, 3, 0, 0, 0).sendProjectile()
+                    stop()
+                }
+            })
+            return CombatContainer(player, target, 1, CombatType.RANGED, true)
+        }
+    },
+    MORRIGANS_JAVELIN(intArrayOf(13879), 50, 1.40, 1.30, CombatType.RANGED, WeaponInterface.JAVELIN) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(10501))
+            player.performGraphic(Graphic(1836))
+            return CombatContainer(player, target, 1, CombatType.RANGED, true)
+        }
+    },
+    MORRIGANS_THROWNAXE(intArrayOf(13883), 50, 1.38, 1.30, CombatType.RANGED, WeaponInterface.THROWNAXE) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(10504))
+            player.performGraphic(Graphic(1838))
+            return CombatContainer(player, target, 1, CombatType.RANGED, true)
+        }
+    },
+    GRANITE_MAUL(intArrayOf(4153, 20084), 50, 1.21, 1.0, CombatType.MELEE, WeaponInterface.WARHAMMER) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(1667))
+            player.performGraphic(Graphic(337, GraphicHeight.HIGH))
+            player.combatBuilder.attackTimer = 1
+            return CombatContainer(
+                player, target, 1, CombatType.MELEE, true
+            )
+        }
+    },
+    SCYTHE(intArrayOf(1419), 50, 1.0, 1.0, CombatType.MELEE, WeaponInterface.HALBERD) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(2066))
+            player.performGraphic(Graphic(2959)) //2114
+            return CombatContainer(player, target, 1, CombatType.MELEE, true)
+        }
+    },
+    ABYSSAL_WHIP(
+        intArrayOf(4151, 21371, 15441, 15442, 15443, 15444, 22008), 50, 1.0, 1.0, CombatType.MELEE, WeaponInterface.WHIP
+    ) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(1658))
+            target!!.performGraphic(Graphic(341, GraphicHeight.HIGH))
+            if (target.isPlayer) {
+                val p = target as Player?
+                var totalRunEnergy = p!!.runEnergy - 25
+                if (totalRunEnergy < 0) totalRunEnergy = 0
+                p.runEnergy = totalRunEnergy
+                p.isRunning = false
+                p.packetSender.sendRunStatus()
+            }
+            return CombatContainer(
+                player, target, 1, CombatType.MELEE, false
+            )
+        }
+    },
+    DRAGON_LONGSWORD(intArrayOf(1305), 25, 1.15, 1.20, CombatType.MELEE, WeaponInterface.LONGSWORD) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(1058))
+            player.performGraphic(Graphic(248, GraphicHeight.HIGH))
+            return CombatContainer(
+                player, target, 1, CombatType.MELEE, true
+            )
+        }
+    },
+    STEEL_TEMPEST(intArrayOf(14018), 60, 1.62, 1.83, CombatType.MELEE, WeaponInterface.SCIMITAR) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(2876))
+            target!!.performGraphic(Graphic(1333, GraphicHeight.LOW))
+            return CombatContainer(
+                player, target, 1, CombatType.MELEE, true
+            )
+        }
+    },
+    SKULL_SCEPTRE(intArrayOf(9013), 100, 2.0, 2.0, CombatType.MELEE, WeaponInterface.BATTLEAXE) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            //player.performAnimation(new Animation(1058));
+            //player.performGraphic(new Graphic(248, GraphicHeight.HIGH));
+            player.performAnimation(Animation(1058))
+            player.performGraphic(Graphic(726, GraphicHeight.HIGH))
+            player.setHasVengeance(true)
+            player.packetSender.sendMessage("You cast @red@Vengeance@bla@.")
+            target!!.forceChat("Spooky!")
+            return CombatContainer(
+                player, target, 1, CombatType.MELEE, true
+            )
+        }
+    },
+    BARRELSCHEST_ANCHOR(intArrayOf(10887), 50, 1.21, 1.30, CombatType.MELEE, WeaponInterface.WARHAMMER) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(5870))
+            player.performGraphic(Graphic(1027, GraphicHeight.MIDDLE))
+            return CombatContainer(
+                player, target, 1, CombatType.MELEE, true
+            )
+        }
+    },
+    SARADOMIN_SWORD(intArrayOf(11730), 100, 1.35, 1.2, CombatType.MELEE, WeaponInterface.TWO_HANDED_SWORD) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(11993))
+            player.setEntityInteraction(target)
+            return object : CombatContainer(player, target, 2, CombatType.MAGIC, true) {
+                override fun onHit(damage: Int, accurate: Boolean) {
+                    target!!.performGraphic(Graphic(1194))
+                }
+            }
+        }
+    },
+    VESTAS_LONGSWORD(intArrayOf(13899, 13901), 25, 1.28, 1.25, CombatType.MELEE, WeaponInterface.LONGSWORD) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(10502))
+            return CombatContainer(player, target, 1, CombatType.MELEE, true)
+        }
+    },
+    VESTAS_SPEAR(intArrayOf(13905, 13907), 50, 1.26, 1.0, CombatType.MELEE, WeaponInterface.SPEAR) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(10499))
+            player.performGraphic(Graphic(1835))
+            player.combatBuilder.attackTimer = 1
+            return CombatContainer(
+                player, target, 1, CombatType.MELEE, true
+            )
+        }
+    },
+    STATIUS_WARHAMMER(intArrayOf(13902, 13904), 30, 1.25, 1.23, CombatType.MELEE, WeaponInterface.WARHAMMER) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(10505))
+            player.performGraphic(Graphic(1840))
+            return object : CombatContainer(player, target, 1, CombatType.MELEE, true) {
+                override fun onHit(damage: Int, accurate: Boolean) {
+                    if (target!!.isPlayer && accurate) {
+                        val t = target as Player?
+                        val currentDef = t!!.skillManager.getCurrentLevel(Skill.DEFENCE)
+                        val defDecrease = (currentDef * 0.11).toInt()
+                        if (currentDef - defDecrease <= 0 || currentDef <= 0) return
+                        t.skillManager.setCurrentLevel(Skill.DEFENCE, defDecrease)
+                        t.packetSender.sendMessage("Your opponent has reduced your Defence level.")
+                        player.packetSender.sendMessage("Your hammer forces some of your opponent's defences to break.")
+                    }
+                }
+            }
+        }
+    },
+    BARB_AXE(intArrayOf(22062), 75, 1.25, 1.23, CombatType.MELEE, WeaponInterface.BATTLEAXE) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(10505))
+            player.performGraphic(Graphic(1840))
+            return object : CombatContainer(player, target, 1, CombatType.MELEE, true) {
+                override fun onHit(damage: Int, accurate: Boolean) {
+                    if (target!!.isPlayer) {
+                        val t = target as Player?
+                        val currentHelth = t!!.skillManager.getCurrentLevel(Skill.CONSTITUTION) / 2
+                        player.dealDamage(Hit(player, currentHelth, Hitmask.DARK_PURPLE, CombatIcon.DEFLECT))
+                        //	t.getPacketSender().sendMessage("Your opponent has reduced your Defence level.");
+                        player.packetSender.sendMessage("You take recoil damage.")
+                    } else {
+                        val t = target as NPC?
+                        val currentHealth = t!!.constitution / 100
+                        player.dealDamage(Hit(player, currentHealth, Hitmask.DARK_PURPLE, CombatIcon.DEFLECT))
+                        player.packetSender.sendMessage("You take recoil damage.") //temp messages? possible think of better ones.
+                    }
+                }
+            }
+        }
+    },
+    MAGIC_SHORTBOW(intArrayOf(861), 55, 1.0, 1.2, CombatType.RANGED, WeaponInterface.SHORTBOW) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(1074))
+            player.performGraphic(Graphic(250, GraphicHeight.HIGH))
+            TaskManager.submit(object : Task(1, player, false) {
+                public override fun execute() {
+                    Projectile(player, target, 249, 44, 3, 43, 31, 0).sendProjectile()
+                    stop()
+                }
+            })
+            return CombatContainer(
+                player, target, 2, CombatType.RANGED, true
+            )
+        }
+    },
+    MAGIC_LONGBOW(intArrayOf(859), 35, 1.0, 5.0, CombatType.RANGED, WeaponInterface.LONGBOW) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(426))
+            player.performGraphic(Graphic(250, GraphicHeight.HIGH))
+            Projectile(player, target, 249, 44, 3, 43, 31, 0).sendProjectile()
+            return CombatContainer(
+                player, target, 1, CombatType.RANGED, true
+            )
+        }
+    },
+    DARK_BOW(intArrayOf(11235), 55, 1.45, 1.22, CombatType.RANGED, WeaponInterface.LONGBOW) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(426))
+            TaskManager.submit(object : Task(1, player, false) {
+                var tick = 0
+                public override fun execute() {
+                    if (tick == 0) {
+                        Projectile(player, target, 1099, 44, 3, 43, 31, 0).sendProjectile()
+                        Projectile(player, target, 1099, 60, 3, 43, 31, 0).sendProjectile()
+                    } else if (tick >= 1) {
+                        target!!.performGraphic(Graphic(1100, GraphicHeight.HIGH))
+                        stop()
+                    }
+                    tick++
+                }
+            })
+            return CombatContainer(
+                player, target, 2, CombatType.RANGED, true
+            )
+        }
+    },
+    HAND_CANNON(intArrayOf(15241), 45, 1.45, 1.15, CombatType.RANGED, WeaponInterface.SHORTBOW) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(12175))
+            player.combatBuilder.attackTimer = 8
+            TaskManager.submit(object : Task(1, player, false) {
+                public override fun execute() {
+                    player.performGraphic(Graphic(2141))
+                    Projectile(player, target, 2143, 44, 3, 43, 31, 0).sendProjectile()
+                    CombatHit(
+                        player.combatBuilder, CombatContainer(player, target, CombatType.RANGED, true)
+                    ).handleAttack()
+                    player.combatBuilder.attackTimer = 2
+                    stop()
+                }
+            })
+            return CombatContainer(
+                player, target, 1, 1, CombatType.RANGED, true
+            )
+        }
+    },
+    DRAGON_BATTLEAXE(intArrayOf(1377), 100, 1.0, 1.0, CombatType.MELEE, WeaponInterface.BATTLEAXE) {
+        override fun onActivation(player: Player, target: CharacterEntity?) {
+            player.performGraphic(Graphic(246, GraphicHeight.LOW))
+            player.performAnimation(Animation(1056))
+            player.forceChat("Raarrrrrgggggghhhhhhh!")
+            drain(player, drainAmount)
+            drinkStatPotion(player, -1, -1, -1, Skill.STRENGTH.ordinal, true)
+            player.skillManager.setCurrentLevel(Skill.ATTACK, player.skillManager.getCurrentLevel(Skill.ATTACK) - 7)
+            player.combatBuilder.cooldown(true)
+        }
 
-	DRAGON_DAGGER(new int[] { 1215, 1231, 5680, 5698, 22039 }, 25, 1.16, 1.20, CombatType.MELEE, WeaponInterface.DAGGER) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(1062));
-			player.performGraphic(new Graphic(252, GraphicHeight.HIGH));
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            throw UnsupportedOperationException(
+                "Dragon battleaxe does not have a special attack!"
+            )
+        }
+    },
+    STAFF_OF_LIGHT(
+        intArrayOf(14004, 14005, 14006, 14007, 15486), 100, 1.0, 1.0, CombatType.MELEE, WeaponInterface.LONGSWORD
+    ) {
+        override fun onActivation(player: Player, target: CharacterEntity?) {
+            player.performGraphic(Graphic(1958))
+            player.performAnimation(Animation(10516))
+            drain(player, drainAmount)
+            player.staffOfLightEffect = 200
+            TaskManager.submit(StaffOfLightSpecialAttackTask(player))
+            player.packetSender.sendMessage("You are shielded by the spirits of the Staff of light!")
+            player.combatBuilder.cooldown(true)
+        }
 
-			return new CombatContainer(player, target, 2, CombatType.MELEE,
-					true);
-		}
-	},
-	KORASIS_SWORD(new int[] { 19780 }, 60, 1.55, 8, CombatType.MELEE, WeaponInterface.SWORD) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			
-			player.performAnimation(new Animation(14788));
-			player.performGraphic(new Graphic(1729));
-			
-			return new CombatContainer(player, target, 1, 1, CombatType.MAGIC, true) {
-				@Override
-				public void onHit(int damage, boolean accurate) {
-					target.performGraphic(new Graphic(1730));
-				}
-			};
-		}
-	},
-	ARMADYL_CROSSBOW(new int[] { 22034 }, 40, 1.01, 2.01, CombatType.RANGED, WeaponInterface.ARMADYLXBOW) { //arma spec
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-
-			player.performAnimation(new Animation(4230));
-			player.performGraphic(new Graphic(28, GraphicHeight.HIGH));
-
-			TaskManager.submit(new Task(1, player, false) {
-				@Override
-				public void execute() {
-
-					new Projectile(player, target, 72, 44, 3, 0, 0, 0).sendProjectile();
-					this.stop();
-				}
-			});
-
-			return new CombatContainer(player, target, 1, CombatType.RANGED, true);
-		}
-	},
-	MORRIGANS_JAVELIN(new int[] { 13879	 }, 50, 1.40, 1.30, CombatType.RANGED, WeaponInterface.JAVELIN) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-
-			player.performAnimation(new Animation(10501));
-			player.performGraphic(new Graphic(1836));
-
-			return new CombatContainer(player, target, 1, CombatType.RANGED, true);
-		}
-	},
-	MORRIGANS_THROWNAXE(new int[] { 13883 }, 50, 1.38, 1.30, CombatType.RANGED, WeaponInterface.THROWNAXE) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-
-			player.performAnimation(new Animation(10504));
-			player.performGraphic(new Graphic(1838));
-
-			return new CombatContainer(player, target, 1, CombatType.RANGED, true);
-		}
-	},
-	GRANITE_MAUL(new int[] { 4153, 20084 }, 50, 1.21, 1, CombatType.MELEE, WeaponInterface.WARHAMMER) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(1667));
-			player.performGraphic(new Graphic(337, GraphicHeight.HIGH));
-			player.getCombatBuilder().setAttackTimer(1);
-			return new CombatContainer(player, target, 1, CombatType.MELEE,
-					true);
-		}
-	},
-	SCYTHE(new int[] { 1419 }, 50, 1, 1, CombatType.MELEE, WeaponInterface.HALBERD) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(2066));
-			player.performGraphic(new Graphic(2959)); //2114
-
-			return new CombatContainer(player, target, 1, CombatType.MELEE, true);
-		}
-	},
-	ABYSSAL_WHIP(new int[] { 4151, 21371, 15441, 15442, 15443, 15444, 22008 }, 50, 1, 1, CombatType.MELEE, WeaponInterface.WHIP) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(1658));
-			target.performGraphic(new Graphic(341, GraphicHeight.HIGH));
-			if(target.isPlayer()) {
-				Player p = (Player)target;
-				int totalRunEnergy = p.getRunEnergy() - 25;
-				if (totalRunEnergy < 0)
-					totalRunEnergy = 0;
-				p.setRunEnergy(totalRunEnergy);
-				p.setRunning(false);
-				p.getPacketSender().sendRunStatus();
-			}
-			return new CombatContainer(player, target, 1, CombatType.MELEE,
-					false);
-		}
-	},
-	DRAGON_LONGSWORD(new int[] { 1305 }, 25, 1.15, 1.20, CombatType.MELEE, WeaponInterface.LONGSWORD) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(1058));
-			player.performGraphic(new Graphic(248, GraphicHeight.HIGH));
-
-			return new CombatContainer(player, target, 1, CombatType.MELEE,
-					true);
-		}
-	},
-	STEEL_TEMPEST(new int[] { 14018 }, 60, 1.62, 1.83, CombatType.MELEE, WeaponInterface.SCIMITAR) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(2876));
-			target.performGraphic(new Graphic(1333, GraphicHeight.LOW));
-
-			return new CombatContainer(player, target, 1, CombatType.MELEE,
-					true);
-		}
-	},
-	SKULL_SCEPTRE(new int[] { 9013 }, 100, 2, 2, CombatType.MELEE, WeaponInterface.BATTLEAXE) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			//player.performAnimation(new Animation(1058));
-			//player.performGraphic(new Graphic(248, GraphicHeight.HIGH));
-			player.performAnimation(new Animation(1058));
-			player.performGraphic(new Graphic(726, GraphicHeight.HIGH));
-			player.setHasVengeance(true);
-			player.getPacketSender().sendMessage("You cast @red@Vengeance@bla@.");
-			target.forceChat("Spooky!");
-
-			return new CombatContainer(player, target, 1, CombatType.MELEE,
-					true);
-		}
-	},
-	BARRELSCHEST_ANCHOR(new int[] { 10887 }, 50, 1.21, 1.30, CombatType.MELEE, WeaponInterface.WARHAMMER) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(5870));
-			player.performGraphic(new Graphic(1027, GraphicHeight.MIDDLE));
-
-			return new CombatContainer(player, target, 1, CombatType.MELEE,
-					true);
-		}
-	},
-	SARADOMIN_SWORD(new int[] { 11730 }, 100, 1.35, 1.2, CombatType.MELEE, WeaponInterface.TWO_HANDED_SWORD) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-
-			player.performAnimation(new Animation(11993));
-			player.setEntityInteraction(target);
-			
-			return new CombatContainer(player, target, 2, CombatType.MAGIC,	true) {
-				@Override
-				public void onHit(int damage, boolean accurate) {
-					target.performGraphic(new Graphic(1194));
-				}
-			};
-		}
-	},
-	VESTAS_LONGSWORD(new int[] { 13899, 13901 }, 25, 1.28, 1.25, CombatType.MELEE, WeaponInterface.LONGSWORD) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(10502));
-
-			return new CombatContainer(player, target, 1, CombatType.MELEE, true);
-		}
-	},
-	VESTAS_SPEAR(new int[] { 13905, 13907 }, 50, 1.26, 1, CombatType.MELEE, WeaponInterface.SPEAR) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(10499));
-			player.performGraphic(new Graphic(1835));
-			player.getCombatBuilder().setAttackTimer(1);
-			return new CombatContainer(player, target, 1, CombatType.MELEE,
-					true);
-		}
-	},
-	STATIUS_WARHAMMER(new int[] { 13902, 13904 }, 30, 1.25, 1.23, CombatType.MELEE, WeaponInterface.WARHAMMER) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(10505));
-			player.performGraphic(new Graphic(1840));
-			return new CombatContainer(player, target, 1, CombatType.MELEE, true) {
-				@Override
-				public void onHit(int damage, boolean accurate) {
-					if(target.isPlayer() && accurate) {
-						Player t = (Player)target;
-						int currentDef = t.getSkillManager().getCurrentLevel(Skill.DEFENCE);
-						int defDecrease = (int) (currentDef * 0.11);
-						if((currentDef - defDecrease) <= 0 || currentDef <= 0)
-							return;
-						t.getSkillManager().setCurrentLevel(Skill.DEFENCE, defDecrease);
-						t.getPacketSender().sendMessage("Your opponent has reduced your Defence level.");
-						player.getPacketSender().sendMessage("Your hammer forces some of your opponent's defences to break.");
-					}
-				}
-			};
-		}
-	},
-	 BARB_AXE(new int[] { 22062 }, 75, 1.25, 1.23, CombatType.MELEE, WeaponInterface.BATTLEAXE) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(10505));
-			player.performGraphic(new Graphic(1840));
-			return new CombatContainer(player, target, 1, CombatType.MELEE, true) {
-				@Override
-				public void onHit(int damage, boolean accurate) {
-					if(target.isPlayer()) {
-						Player t = (Player) target;
-						int currentHelth = t.getSkillManager().getCurrentLevel(Skill.CONSTITUTION) / 2;
-						player.dealDamage(new Hit(player, currentHelth, Hitmask.DARK_PURPLE, CombatIcon.DEFLECT));
-					//	t.getPacketSender().sendMessage("Your opponent has reduced your Defence level.");
-						player.getPacketSender().sendMessage("You take recoil damage.");
-					} else {
-						NPC t = (NPC) target;
-						int currentHealth = t.getConstitution() / 100;
-						player.dealDamage(new Hit(player, currentHealth, Hitmask.DARK_PURPLE, CombatIcon.DEFLECT));
-						player.getPacketSender().sendMessage("You take recoil damage.");//temp messages? possible think of better ones.
-					}
-				}
-			};
-		}
-	},
-	MAGIC_SHORTBOW(new int[] { 861 }, 55, 1, 1.2, CombatType.RANGED, WeaponInterface.SHORTBOW) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-
-			player.performAnimation(new Animation(1074));
-			player.performGraphic(new Graphic(250, GraphicHeight.HIGH));
-
-			TaskManager.submit(new Task(1, player, false) {
-				@Override
-				public void execute() {
-
-					new Projectile(player, target, 249, 44, 3, 43, 31, 0).sendProjectile();
-					this.stop();
-				}
-			});
-
-			return new CombatContainer(player, target, 2, CombatType.RANGED,
-					true);
-		}
-	},
-	MAGIC_LONGBOW(new int[] { 859 }, 35, 1, 5, CombatType.RANGED, WeaponInterface.LONGBOW) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-
-			player.performAnimation(new Animation(426));
-			player.performGraphic(new Graphic(250, GraphicHeight.HIGH));
-			new Projectile(player, target, 249, 44, 3, 43, 31, 0).sendProjectile();
-
-			return new CombatContainer(player, target, 1, CombatType.RANGED,
-					true);
-		}
-	},
-	DARK_BOW(new int[] { 11235 }, 55, 1.45, 1.22, CombatType.RANGED, WeaponInterface.LONGBOW) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(426));
-
-			TaskManager.submit(new Task(1, player, false) {
-				int tick = 0;
-				@Override
-				public void execute() {
-					if(tick == 0) {
-						new Projectile(player, target, 1099, 44, 3, 43, 31, 0).sendProjectile();
-						new Projectile(player, target, 1099, 60, 3, 43, 31, 0).sendProjectile();
-					} else if(tick >= 1) {
-						target.performGraphic(new Graphic(1100, GraphicHeight.HIGH));
-						this.stop();
-					}
-					tick++;
-				}
-			});
-
-			return new CombatContainer(player, target, 2, CombatType.RANGED,
-					true);
-		}
-	},
-	HAND_CANNON(new int[] { 15241 }, 45, 1.45, 1.15, CombatType.RANGED, WeaponInterface.SHORTBOW) {
-		
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(12175));
-			player.getCombatBuilder().setAttackTimer(8);
-			
-			TaskManager.submit(new Task(1, player, false) {
-				@Override
-				public void execute() {
-					player.performGraphic(new Graphic(2141));
-					new Projectile(player, target, 2143, 44, 3, 43, 31, 0).sendProjectile();
-					new CombatHit(player.getCombatBuilder(), new CombatContainer(player, target, CombatType.RANGED, true)).handleAttack();
-					player.getCombatBuilder().setAttackTimer(2);
-					stop();
-				}
-			});
-			return new CombatContainer(player, target, 1, 1, CombatType.RANGED,
-					true);
-		}
-	},
-	DRAGON_BATTLEAXE(new int[] { 1377 }, 100, 1, 1, CombatType.MELEE, WeaponInterface.BATTLEAXE) {
-		@Override
-		public void onActivation(Player player, CharacterEntity target) {
-			player.performGraphic(new Graphic(246, GraphicHeight.LOW));
-			player.performAnimation(new Animation(1056));
-			player.forceChat("Raarrrrrgggggghhhhhhh!");
-			CombatSpecial.drain(player, DRAGON_BATTLEAXE.drainAmount);
-			Consumables.drinkStatPotion(player, -1, -1, -1, Skill.STRENGTH.ordinal(), true);
-			player.getSkillManager().setCurrentLevel(Skill.ATTACK, player.getSkillManager().getCurrentLevel(Skill.ATTACK) - 7);
-			player.getCombatBuilder().cooldown(true);
-		}
-
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			throw new UnsupportedOperationException(
-					"Dragon battleaxe does not have a special attack!");
-		}
-	},
-	STAFF_OF_LIGHT(new int[] { 14004, 14005, 14006, 14007, 15486 }, 100, 1, 1, CombatType.MELEE, WeaponInterface.LONGSWORD) {
-		@Override
-		public void onActivation(Player player, CharacterEntity target) {
-			player.performGraphic(new Graphic(1958));
-			player.performAnimation(new Animation(10516));
-			CombatSpecial.drain(player, STAFF_OF_LIGHT.drainAmount);
-			player.setStaffOfLightEffect(200);
-			TaskManager.submit(new StaffOfLightSpecialAttackTask(player));
-			player.getPacketSender().sendMessage("You are shielded by the spirits of the Staff of light!");
-			player.getCombatBuilder().cooldown(true);
-		}
-
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			throw new UnsupportedOperationException(
-					"Dragon battleaxe does not have a special attack!");
-		}
-	},
-	DRAGON_SPEAR(new int[] { 1249, 1263, 5716, 5730, 11716 }, 25, 1, 1, CombatType.MELEE, WeaponInterface.SPEAR) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(1064));
-			player.performGraphic(new Graphic(253));
-
-			return new CombatContainer(player, target, 1, CombatType.MELEE,
-					true) {
-				@Override
-				public void onHit(int damage, boolean accurate) {
-					if(target.isPlayer()) {
-						int moveX = target.getPosition().getX() - player.getPosition().getX();
-						int moveY = target.getPosition().getY() - player.getPosition().getY();
-						if (moveX > 0)
-							moveX = 1;
-						else if (moveX < 0)
-							moveX = -1;
-						if (moveY > 0)
-							moveY = 1;
-						else if (moveY < 0)
-							moveY = -1;
-						if(target.getMovementQueue().canWalk(moveX, moveY)) {
-							target.setEntityInteraction(player);
-							target.getMovementQueue().reset();
-							target.getMovementQueue().walkStep(moveX, moveY);
-						}
-					}
-					target.performGraphic(new Graphic(254, GraphicHeight.HIGH));
-					TaskManager.submit(new Task(1, false) {
-						@Override
-						public void execute() {
-							target.getMovementQueue().freeze(6);
-							stop();
-						}
-					});
-				}
-			};
-		}
-	},
-	DRAGON_MACE(new int[] { 1434 }, 25, 1.29, 1.25, CombatType.MELEE, WeaponInterface.MACE) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(1060));
-			player.performGraphic(new Graphic(251, GraphicHeight.HIGH));
-
-			return new CombatContainer(player, target, 1, CombatType.MELEE,
-					true);
-		}
-	},
-	DRAGON_SCIMITAR(new int[] { 4587 }, 55, 1.1, 1.1, CombatType.MELEE, WeaponInterface.SCIMITAR) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(1872));
-			player.performGraphic(new Graphic(347, GraphicHeight.HIGH));
-
-			return new CombatContainer(player, target, 1, CombatType.MELEE,
-					true);
-		}
-	},
-	DRAGON_2H_SWORD(new int[] { 7158 }, 60, 1, 1, CombatType.MELEE, WeaponInterface.TWO_HANDED_SWORD) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(3157));
-			player.performGraphic(new Graphic(559));
-
-			return new CombatContainer(player, target, 1, CombatType.MELEE,
-					false) {
-				@Override
-				public void onHit(int damage, boolean accurate) {
-					/*if (Location.inMulti(player)) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            throw UnsupportedOperationException(
+                "Dragon battleaxe does not have a special attack!"
+            )
+        }
+    },
+    DRAGON_SPEAR(intArrayOf(1249, 1263, 5716, 5730, 11716), 25, 1.0, 1.0, CombatType.MELEE, WeaponInterface.SPEAR) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(1064))
+            player.performGraphic(Graphic(253))
+            return object : CombatContainer(
+                player, target, 1, CombatType.MELEE, true
+            ) {
+                override fun onHit(damage: Int, accurate: Boolean) {
+                    if (target!!.isPlayer) {
+                        var moveX = target.position.x - player.position.x
+                        var moveY = target.position.y - player.position.y
+                        if (moveX > 0) moveX = 1 else if (moveX < 0) moveX = -1
+                        if (moveY > 0) moveY = 1 else if (moveY < 0) moveY = -1
+                        if (target.movementQueue.canWalk(moveX, moveY)) {
+                            target.setEntityInteraction(player)
+                            target.movementQueue.reset()
+                            target.movementQueue.walkStep(moveX, moveY)
+                        }
+                    }
+                    target.performGraphic(Graphic(254, GraphicHeight.HIGH))
+                    TaskManager.submit(object : Task(1, false) {
+                        public override fun execute() {
+                            target.movementQueue.freeze(6)
+                            stop()
+                        }
+                    })
+                }
+            }
+        }
+    },
+    DRAGON_MACE(intArrayOf(1434), 25, 1.29, 1.25, CombatType.MELEE, WeaponInterface.MACE) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(1060))
+            player.performGraphic(Graphic(251, GraphicHeight.HIGH))
+            return CombatContainer(
+                player, target, 1, CombatType.MELEE, true
+            )
+        }
+    },
+    DRAGON_SCIMITAR(intArrayOf(4587), 55, 1.1, 1.1, CombatType.MELEE, WeaponInterface.SCIMITAR) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(1872))
+            player.performGraphic(Graphic(347, GraphicHeight.HIGH))
+            return CombatContainer(
+                player, target, 1, CombatType.MELEE, true
+            )
+        }
+    },
+    DRAGON_2H_SWORD(intArrayOf(7158), 60, 1.0, 1.0, CombatType.MELEE, WeaponInterface.TWO_HANDED_SWORD) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(3157))
+            player.performGraphic(Graphic(559))
+            return object : CombatContainer(
+                player, target, 1, CombatType.MELEE, false
+            ) {
+                override fun onHit(damage: Int, accurate: Boolean) {
+                    /*if (Location.inMulti(player)) {
 						List<GameCharacter> localEntities;
 
 						if (target.isPlayer()) {
@@ -474,393 +444,330 @@ public enum CombatSpecial {
 							}
 						}
 					}*/
-				}
-			};
-		}
-	},
-	DRAGON_HALBERD(new int[] { 3204 }, 30, 1.07, 1.08, CombatType.MELEE, WeaponInterface.HALBERD) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(1203));
-			player.performGraphic(new Graphic(282, GraphicHeight.HIGH));
+                }
+            }
+        }
+    },
+    DRAGON_HALBERD(intArrayOf(3204), 30, 1.07, 1.08, CombatType.MELEE, WeaponInterface.HALBERD) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(1203))
+            player.performGraphic(Graphic(282, GraphicHeight.HIGH))
+            return CombatContainer(
+                player, target, 2, CombatType.MELEE, true
+            )
+        }
+    },
+    ARMADYL_GODSWORD(intArrayOf(11694), 50, 1.43, 1.63, CombatType.MELEE, WeaponInterface.TWO_HANDED_SWORD) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(11989))
+            player.performGraphic(Graphic(2113))
+            return CombatContainer(player, target, 1, CombatType.MELEE, true)
+        }
+    },
+    ZAMORAK_GODSWORD(intArrayOf(11700), 50, 1.25, 1.4, CombatType.MELEE, WeaponInterface.TWO_HANDED_SWORD) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(7070))
+            return object : CombatContainer(player, target, 1, CombatType.MELEE, true) {
+                override fun onHit(damage: Int, accurate: Boolean) {
+                    if (target != null && target.isPlayer && accurate) {
+                        val p = target as Player
+                        val dmgDrain = damage * 0.75
+                        val prayerDrain = dmgDrain.toInt()
+                        player.performGraphic(Graphic(1221))
+                        if (prayerDrain <= 0) return
+                        // player.getSkillManager().setCurrentLevel(Skill.PRAYER,
+                        // (p.getSkillManager().getCurrentLevel(Skill.PRAYER) +
+                        // prayerDrain));
+                        player.packetSender.sendMessage(
+                            "@bla@You have stolen @red@$prayerDrain @bla@prayer points from your target."
+                        )
+                        p.skillManager.setCurrentLevel(
+                            Skill.PRAYER, p.skillManager.getCurrentLevel(Skill.PRAYER) - prayerDrain
+                        )
+                        p.packetSender.sendMessage(
+                            "@bla@Your opponent has stolen @red@$prayerDrain @bla@prayer points from you."
+                        )
+                        // if
+                        // (player.getSkillManager().getCurrentLevel(Skill.PRAYER)
+                        // > player.getSkillManager().getMaxLevel(Skill.PRAYER))
+                        // {
+                        // player.getSkillManager().setCurrentLevel(Skill.PRAYER,
+                        // player.getSkillManager().getMaxLevel(Skill.PRAYER));
+                        // player.getPacketSender().sendMessage("You absorbed
+                        // more prayer points than you could hold!");
+                        // }
+                        if (p.skillManager.getCurrentLevel(Skill.PRAYER) == 0) {
+                            p.packetSender.sendMessage(
+                                "@red@Zamorak's wicked thoughts infect your mind and drop your prayer."
+                            )
+                            player.forceChat("...HAHAHAHA! Strength through Chaos!")
+                            player.packetSender.sendMessage(
+                                "@red@Zamorak's spiteful laughter indicates " + p.username + "'s prayer dropped."
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    },
+    BANDOS_GODSWORD(intArrayOf(11696), 100, 1.25, 1.4, CombatType.MELEE, WeaponInterface.TWO_HANDED_SWORD) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(11991))
+            player.performGraphic(Graphic(2114))
+            return object : CombatContainer(
+                player, target, 1, CombatType.MELEE, false
+            ) {
+                override fun onHit(damage: Int, accurate: Boolean) {
+                    if (target != null && target.isPlayer && accurate) {
+                        val skillDrain = 1
+                        val damageDrain = (damage * 0.1).toInt()
+                        if (damageDrain < 0) return
+                        (target as Player).skillManager.setCurrentLevel(
+                            Skill.forId(skillDrain),
+                            player.skillManager.getCurrentLevel(Skill.forId(skillDrain)) - damageDrain
+                        )
+                        if (target.skillManager.getCurrentLevel(Skill.forId(skillDrain)) < 1) target.skillManager.setCurrentLevel(
+                            Skill.forId(skillDrain), 1
+                        )
+                        player.packetSender.sendMessage(
+                            "You've drained " + target.username + "'s " + Misc.formatText(
+                                Skill.forId(skillDrain).toString().lowercase(Locale.getDefault())
+                            ) + " level by " + damageDrain + "."
+                        )
+                        target.packetSender.sendMessage(
+                            "Your " + Misc.formatText(
+                                Skill.forId(skillDrain).toString().lowercase(Locale.getDefault())
+                            ) + " level has been drained."
+                        )
+                    }
+                }
+            }
+        }
+    },
+    SARADOMIN_GODSWORD(intArrayOf(11698), 50, 1.25, 1.5, CombatType.MELEE, WeaponInterface.TWO_HANDED_SWORD) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(7071))
+            player.performGraphic(Graphic(1220))
+            return object : CombatContainer(player, target, 1, CombatType.MELEE, false) {
+                override fun onHit(dmg: Int, accurate: Boolean) {
+                    if (accurate) {
+                        val damageHeal = (dmg * 0.5).toInt()
+                        val damagePrayerHeal = (dmg * 0.25).toInt()
+                        player.heal(damageHeal)
+                        if (player.skillManager.getCurrentLevel(Skill.PRAYER) < player.skillManager.getMaxLevel(Skill.PRAYER)) {
+                            val level =
+                                if (player.skillManager.getCurrentLevel(Skill.PRAYER) + damagePrayerHeal > player.skillManager.getMaxLevel(
+                                        Skill.PRAYER
+                                    )
+                                ) player.skillManager.getMaxLevel(Skill.PRAYER) else player.skillManager.getCurrentLevel(
+                                    Skill.PRAYER
+                                ) + damagePrayerHeal
+                            player.skillManager.setCurrentLevel(Skill.PRAYER, level)
+                        }
+                    }
+                }
+            }
+        }
+    },
+    DRAGON_CLAWS(intArrayOf(14484, 13999), 50, 2.0, 1.8, CombatType.MELEE, WeaponInterface.CLAWS) {
+        override fun container(player: Player, target: CharacterEntity?): CombatContainer {
+            player.performAnimation(Animation(10961))
+            player.performGraphic(Graphic(1950))
+            return CombatContainer(player, target, 4, CombatType.MELEE, true)
+        }
+    };
+    /**
+     * Gets the weapon ID's that perform this special when activated.
+     *
+     * @return the weapon ID's that perform this special when activated.
+     */
+    /**
+     * Gets the amount of special energy this attack will drain.
+     *
+     * @return the amount of special energy this attack will drain.
+     */
+    /**
+     * Gets the strength bonus when performing this special attack.
+     *
+     * @return the strength bonus when performing this special attack.
+     */
+    /**
+     * Gets the accuracy bonus when performing this special attack.
+     *
+     * @return the accuracy bonus when performing this special attack.
+     */
+    /**
+     * Gets the combat type used when performing this special attack.
+     *
+     * @return the combat type used when performing this special attack.
+     */
+    /**
+     * Gets the weapon interface used by the identifiers.
+     *
+     * @return the weapon interface used by the identifiers.
+     */
 
-			return new CombatContainer(player, target, 2, CombatType.MELEE,
-					true);
-		}
-	},
-	ARMADYL_GODSWORD(new int[] { 11694 }, 50, 1.43, 1.63, CombatType.MELEE, WeaponInterface.TWO_HANDED_SWORD) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(11989));
-			player.performGraphic(new Graphic(2113));
+    /**
+     * Fired when the argued [Player] activates the special attack bar.
+     *
+     * @param player
+     * the player activating the special attack bar.
+     * @param target
+     * the target when activating the special attack bar, will be
+     * `null` if the player is not in combat while
+     * activating the special bar.
+     */
+    open fun onActivation(player: Player, target: CharacterEntity?) {}
 
-			return new CombatContainer(player, target, 1, CombatType.MELEE, true);
-		}
-	},
-	ZAMORAK_GODSWORD(new int[] { 11700 }, 50, 1.25, 1.4, CombatType.MELEE, WeaponInterface.TWO_HANDED_SWORD) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(7070));
+    /**
+     * Fired when the argued [Player] is about to attack the argued
+     * target.
+     *
+     * @param player
+     * the player about to attack the target.
+     * @param target
+     * the entity being attacked by the player.
+     * @return the combat container for this combat hook.
+     */
+    abstract fun container(player: Player, target: CharacterEntity?): CombatContainer
 
-			return new CombatContainer(player, target, 1, CombatType.MELEE, true) {
-				@Override
-				public void onHit(int damage, boolean accurate) {
-					if (target != null && target.isPlayer() && accurate) {
-						Player p = (Player) target;
-						double dmgDrain = (damage * 0.75);
-						int prayerDrain = (int) dmgDrain;
-						player.performGraphic(new Graphic(1221));
-						if (prayerDrain <= 0)
-							return;
-						// player.getSkillManager().setCurrentLevel(Skill.PRAYER,
-						// (p.getSkillManager().getCurrentLevel(Skill.PRAYER) +
-						// prayerDrain));
-						player.getPacketSender().sendMessage(
-								"@bla@You have stolen @red@" + prayerDrain + " @bla@prayer points from your target.");
-						p.getSkillManager().setCurrentLevel(Skill.PRAYER,
-								
-								(p.getSkillManager().getCurrentLevel(Skill.PRAYER) - prayerDrain));
+    companion object {
+        /**
+         * Drains the special bar for the argued [Player].
+         *
+         * @param player
+         * the player who's special bar will be drained.
+         * @param amount
+         * the amount of energy to drain from the special bar.
+         */
+        fun drain(player: Player, amount: Int) {
+            player.decrementSpecialPercentage(amount)
+            player.isSpecialActivated = false
+            updateBar(player)
+            if (!player.isRecoveringSpecialAttack) TaskManager.submit(PlayerSpecialAmountTask(player))
+            finishAchievement(player, AchievementData.PERFORM_A_SPECIAL_ATTACK)
+        }
 
-						p.getPacketSender().sendMessage(
-								"@bla@Your opponent has stolen @red@" + prayerDrain + " @bla@prayer points from you.");
-						// if
-						// (player.getSkillManager().getCurrentLevel(Skill.PRAYER)
-						// > player.getSkillManager().getMaxLevel(Skill.PRAYER))
-						// {
-						// player.getSkillManager().setCurrentLevel(Skill.PRAYER,
-						// player.getSkillManager().getMaxLevel(Skill.PRAYER));
-						// player.getPacketSender().sendMessage("You absorbed
-						// more prayer points than you could hold!");
-						// }
-						if (p.getSkillManager().getCurrentLevel(Skill.PRAYER) == 0) {
-							p.getPacketSender().sendMessage(
-									"@red@Zamorak's wicked thoughts infect your mind and drop your prayer.");
-							player.forceChat("...HAHAHAHA! Strength through Chaos!");
-							player.getPacketSender().sendMessage("@red@Zamorak's spiteful laughter indicates "
-									+ p.getUsername() + "'s prayer dropped.");
-						}
-					} 
-				}
-			};
-		}
-	},
-	BANDOS_GODSWORD(new int[] { 11696 }, 100, 1.25, 1.4, CombatType.MELEE, WeaponInterface.TWO_HANDED_SWORD) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(11991));
-			player.performGraphic(new Graphic(2114));
+        /**
+         * Restores the special bar for the argued [Player].
+         *
+         * @param player
+         * the player who's special bar will be restored.
+         * @param amount
+         * the amount of energy to restore to the special bar.
+         */
+        fun restore(player: Player, amount: Int) {
+            player.incrementSpecialPercentage(amount)
+            updateBar(player)
+        }
 
-			return new CombatContainer(player, target, 1, CombatType.MELEE,
-					false) {
-				@Override
-				public void onHit(int damage, boolean accurate) {
-					if(target != null && target.isPlayer() && accurate) {
-						int skillDrain = 1;
-						int damageDrain = (int) (damage * 0.1);
-						if(damageDrain < 0)
-							return;
-						((Player)target).getSkillManager().setCurrentLevel(Skill.forId(skillDrain), player.getSkillManager().getCurrentLevel(Skill.forId(skillDrain)) - damageDrain);
-						if(((Player)target).getSkillManager().getCurrentLevel(Skill.forId(skillDrain)) < 1)
-							((Player)target).getSkillManager().setCurrentLevel(Skill.forId(skillDrain), 1);
-						player.getPacketSender().sendMessage("You've drained "+((Player)target).getUsername()+"'s "+Misc.formatText(Skill.forId(skillDrain).toString().toLowerCase())+" level by "+damageDrain+".");
-						((Player)target).getPacketSender().sendMessage("Your "+Misc.formatText(Skill.forId(skillDrain).toString().toLowerCase())+" level has been drained.");
-					}
-				}
-			};
-		}
-	},
-	SARADOMIN_GODSWORD(new int[] { 11698 }, 50, 1.25, 1.5, CombatType.MELEE, WeaponInterface.TWO_HANDED_SWORD) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(7071));
-			player.performGraphic(new Graphic(1220));
+        /**
+         * Updates the special bar with the amount of special energy the argued
+         * [Player] has.
+         *
+         * @param player
+         * the player who's special bar will be updated.
+         */
+        @JvmStatic
+        fun updateBar(player: Player) {
+            if (player.weapon.specialBar == -1 || player.weapon.specialMeter == -1) {
+                return
+            }
+            var specialCheck = 10
+            var specialBar = player.weapon.specialMeter
+            val specialAmount = player.specialPercentage / 10
+            for (i in 0..9) {
+                player.packetSender.sendInterfaceComponentMoval(
+                    if (specialAmount >= specialCheck) 500 else 0, 0, --specialBar
+                )
+                specialCheck--
+            }
+            player.packetSender.updateSpecialAttackOrb().sendString(
+                player.weapon.specialMeter,
+                if (player.isSpecialActivated) "@yel@ Special Attack (" + player.specialPercentage + "%)" else "@bla@ Special Attack (" + player.specialPercentage + "%"
+            )
+        }
 
-			return new CombatContainer(player, target, 1, CombatType.MELEE, false) {
-				@Override
-				public void onHit(int dmg, boolean accurate) {
-					if(accurate) {
-						int damageHeal = (int) (dmg * 0.5);
-						int damagePrayerHeal = (int) (dmg * 0.25);
-						player.heal(damageHeal);
-						if(player.getSkillManager().getCurrentLevel(Skill.PRAYER) < player.getSkillManager().getMaxLevel(Skill.PRAYER)) {
-							int level = player.getSkillManager().getCurrentLevel(Skill.PRAYER) + damagePrayerHeal > player.getSkillManager().getMaxLevel(Skill.PRAYER) ? player.getSkillManager().getMaxLevel(Skill.PRAYER) : player.getSkillManager().getCurrentLevel(Skill.PRAYER) + damagePrayerHeal;
-							player.getSkillManager().setCurrentLevel(Skill.PRAYER, level);
-						}
-					}
-				}
-			};
-		}
-	},
-	DRAGON_CLAWS(new int[] { 14484, 13999 }, 50, 2, 1.8, CombatType.MELEE, WeaponInterface.CLAWS) {
-		@Override
-		public CombatContainer container(Player player, CharacterEntity target) {
-			player.performAnimation(new Animation(10961));
-			player.performGraphic(new Graphic(1950));
+        /**
+         * Assigns special bars to the attack style interface if needed.
+         *
+         * @param player
+         * the player to assign the special bar for.
+         */
+        @JvmStatic
+        fun assign(player: Player) {
+            if (player.weapon.specialBar == -1) {
+                //if(!player.isPerformingSpecialAttack()) {
+                player.isSpecialActivated = false
+                player.combatSpecial = null
+                updateBar(player)
+                //}
+                return
+            }
+            for (c in values()) {
+                if (player.weapon == c.weaponType) {
+                    if (Arrays.stream(c.identifiers)
+                            .anyMatch { id: Int -> player.equipment[Equipment.WEAPON_SLOT].id == id }
+                    ) {
+                        player.packetSender.sendInterfaceDisplayState(player.weapon.specialBar, false)
+                        player.combatSpecial = c
+                        return
+                    }
+                }
+            }
+            player.packetSender.sendInterfaceDisplayState(player.weapon.specialBar, true)
+            player.combatSpecial = null
+        }
 
-			return new CombatContainer(player, target, 4, CombatType.MELEE, true);
-		}
-};
-	/** The weapon ID's that perform this special when activated. */
-	private int[] identifiers;
-
-	/** The amount of special energy this attack will drain. */
-	private int drainAmount;
-
-	/** The strength bonus when performing this special attack. */
-	private double strengthBonus;
-
-	/** The accuracy bonus when performing this special attack. */
-	private double accuracyBonus;
-
-	/** The combat type used when performing this special attack. */
-	private CombatType combatType;
-
-	/** The weapon interface used by the identifiers. */
-	private WeaponInterface weaponType;
-
-	/**
-	 * Create a new {@link CombatSpecial}.
-	 * 
-	 * @param identifers
-	 *            the weapon ID's that perform this special when activated.
-	 * @param drainAmount
-	 *            the amount of special energy this attack will drain.
-	 * @param strengthBonus
-	 *            the strength bonus when performing this special attack.
-	 * @param accuracyBonus
-	 *            the accuracy bonus when performing this special attack.
-	 * @param combatType
-	 *            the combat type used when performing this special attack.
-	 * @param weaponType
-	 *            the weapon interface used by the identifiers.
-	 */
-	private CombatSpecial(int[] identifiers, int drainAmount,
-			double strengthBonus, double accuracyBonus, CombatType combatType,
-			WeaponInterface weaponType) {
-		this.identifiers = identifiers;
-		this.drainAmount = drainAmount;
-		this.strengthBonus = strengthBonus;
-		this.accuracyBonus = accuracyBonus;
-		this.combatType = combatType;
-		this.weaponType = weaponType;
-	}
-
-	/**
-	 * Fired when the argued {@link Player} activates the special attack bar.
-	 * 
-	 * @param player
-	 *            the player activating the special attack bar.
-	 * @param target
-	 *            the target when activating the special attack bar, will be
-	 *            <code>null</code> if the player is not in combat while
-	 *            activating the special bar.
-	 */
-	public void onActivation(Player player, CharacterEntity target) {
-
-	}
-
-	/**
-	 * Fired when the argued {@link Player} is about to attack the argued
-	 * target.
-	 * 
-	 * @param player
-	 *            the player about to attack the target.
-	 * @param target
-	 *            the entity being attacked by the player.
-	 * @return the combat container for this combat hook.
-	 */
-	public abstract CombatContainer container(Player player, CharacterEntity target);
-
-	/**
-	 * Drains the special bar for the argued {@link Player}.
-	 * 
-	 * @param player
-	 *            the player who's special bar will be drained.
-	 * @param amount
-	 *            the amount of energy to drain from the special bar.
-	 */
-	public static void drain(Player player, int amount) {
-		player.decrementSpecialPercentage(amount);
-		player.setSpecialActivated(false);
-		CombatSpecial.updateBar(player);
-		if(!player.isRecoveringSpecialAttack())
-			TaskManager.submit(new PlayerSpecialAmountTask(player));
-		Achievements.finishAchievement(player, AchievementData.PERFORM_A_SPECIAL_ATTACK);
-	}
-
-	/**
-	 * Restores the special bar for the argued {@link Player}.
-	 * 
-	 * @param player
-	 *            the player who's special bar will be restored.
-	 * @param amount
-	 *            the amount of energy to restore to the special bar.
-	 */
-	public static void restore(Player player, int amount) {
-		player.incrementSpecialPercentage(amount);
-		CombatSpecial.updateBar(player);
-	}
-
-	/**
-	 * Updates the special bar with the amount of special energy the argued
-	 * {@link Player} has.
-	 * 
-	 * @param player
-	 *            the player who's special bar will be updated.
-	 */
-	public static void updateBar(Player player) {
-		if (player.getWeapon().getSpecialBar() == -1 || player.getWeapon().getSpecialMeter() == -1) {
-			return;
-		}
-		int specialCheck = 10;
-		int specialBar = player.getWeapon().getSpecialMeter();
-		int specialAmount = player.getSpecialPercentage() / 10;
-
-		for (int i = 0; i < 10; i++) {
-			player.getPacketSender().sendInterfaceComponentMoval(specialAmount >= specialCheck ? 500 : 0, 0, --specialBar);
-			specialCheck--;
-		}
-		player.getPacketSender().updateSpecialAttackOrb().sendString(player.getWeapon().getSpecialMeter(), player.isSpecialActivated() ? ("@yel@ Special Attack (" + player.getSpecialPercentage() + "%)") : ("@bla@ Special Attack (" +player.getSpecialPercentage()+ "%"));
-
-	}
-
-	/**
-	 * Assigns special bars to the attack style interface if needed.
-	 * 
-	 * @param player
-	 *            the player to assign the special bar for.
-	 */
-	public static void assign(Player player) {
-		if (player.getWeapon().getSpecialBar() == -1) {
-			//if(!player.isPerformingSpecialAttack()) {
-			player.setSpecialActivated(false);
-			player.setCombatSpecial(null);
-			CombatSpecial.updateBar(player);
-			//}
-
-			return;
-		}
-
-		for (CombatSpecial c : CombatSpecial.values()) {
-			if (player.getWeapon() == c.getWeaponType()) {
-				if (Arrays.stream(c.getIdentifiers()).anyMatch(
-						id -> player.getEquipment().get(Equipment.WEAPON_SLOT).getId() == id)) {
-					player.getPacketSender().sendInterfaceDisplayState(player.getWeapon().getSpecialBar(), false);
-					player.setCombatSpecial(c);
-					return;
-				}
-			}
-		}
-
-		player.getPacketSender().sendInterfaceDisplayState(player.getWeapon().getSpecialBar(), true);
-		player.setCombatSpecial(null);
-	}
-
-	public static void activate(Player player) {
-		if(Dueling.checkRule(player, DuelRule.NO_SPECIAL_ATTACKS)) {
-			player.getPacketSender().sendMessage("Special Attacks have been turned off in this duel.");
-			return;
-		}
-		if (player.getCombatSpecial() == null) {
-			return;
-		}
-		if (player.isSpecialActivated()) {
-			player.setSpecialActivated(false);
-			CombatSpecial.updateBar(player);
-		} else {
-			if (player.getSpecialPercentage() < player.getCombatSpecial().getDrainAmount()) {
-				player.getPacketSender().sendMessage(
-						"You do not have enough special attack energy left!");
-				return;
-			}
-			
-			final CombatSpecial spec = player.getCombatSpecial();
-			boolean instantSpecial = spec == CombatSpecial.GRANITE_MAUL || spec == CombatSpecial.DRAGON_BATTLEAXE || spec == CombatSpecial.STAFF_OF_LIGHT;
-			
-			if(spec != CombatSpecial.STAFF_OF_LIGHT && player.isAutocast()) {
-				Autocasting.resetAutocast(player, true);
-			} else if (spec == CombatSpecial.STAFF_OF_LIGHT && player.hasStaffOfLightEffect()) {
-				player.getPacketSender().sendMessage("You are already being protected by the Staff of Light!");
-				return;
-			}
-			
-			player.setSpecialActivated(true);
-			if(instantSpecial) {
-				spec.onActivation(player, player.getCombatBuilder().getVictim());
-				if(spec == CombatSpecial.GRANITE_MAUL && player.getCombatBuilder().isAttacking() && !player.getCombatBuilder().isCooldown()) {
-					player.getCombatBuilder().setAttackTimer(0);
-					player.getCombatBuilder().attack(player.getCombatBuilder().getVictim());
-					player.getCombatBuilder().instant();
-				} else
-					CombatSpecial.updateBar(player);
-			} else {
-				CombatSpecial.updateBar(player);
-				TaskManager.submit(new Task(1, false) {
-					@Override
-					public void execute() {
-						if (!player.isSpecialActivated()) {
-							this.stop();
-							return;
-						}						
-						spec.onActivation(player, player.getCombatBuilder().getVictim());					
-						this.stop();
-					}
-				}.bind(player));
-			}
-		}
-	}
-
-	/**
-	 * Gets the weapon ID's that perform this special when activated.
-	 * 
-	 * @return the weapon ID's that perform this special when activated.
-	 */
-	public int[] getIdentifiers() {
-		return identifiers;
-	}
-
-	/**
-	 * Gets the amount of special energy this attack will drain.
-	 * 
-	 * @return the amount of special energy this attack will drain.
-	 */
-	public int getDrainAmount() {
-		return drainAmount;
-	}
-
-	/**
-	 * Gets the strength bonus when performing this special attack.
-	 * 
-	 * @return the strength bonus when performing this special attack.
-	 */
-	public double getStrengthBonus() {
-		return strengthBonus;
-	}
-
-	/**
-	 * Gets the accuracy bonus when performing this special attack.
-	 * 
-	 * @return the accuracy bonus when performing this special attack.
-	 */
-	public double getAccuracyBonus() {
-		return accuracyBonus;
-	}
-
-	/**
-	 * Gets the combat type used when performing this special attack.
-	 * 
-	 * @return the combat type used when performing this special attack.
-	 */
-	public CombatType getCombatType() {
-		return combatType;
-	}
-
-	/**
-	 * Gets the weapon interface used by the identifiers.
-	 * 
-	 * @return the weapon interface used by the identifiers.
-	 */
-	public WeaponInterface getWeaponType() {
-		return weaponType;
-	}
+        @JvmStatic
+        fun activate(player: Player) {
+            if (checkRule(player, DuelRule.NO_SPECIAL_ATTACKS)) {
+                player.packetSender.sendMessage("Special Attacks have been turned off in this duel.")
+                return
+            }
+            if (player.combatSpecial == null) {
+                return
+            }
+            if (player.isSpecialActivated) {
+                player.isSpecialActivated = false
+                updateBar(player)
+            } else {
+                if (player.specialPercentage < player.combatSpecial.drainAmount) {
+                    player.packetSender.sendMessage(
+                        "You do not have enough special attack energy left!"
+                    )
+                    return
+                }
+                val spec = player.combatSpecial
+                val instantSpecial = spec === GRANITE_MAUL || spec === DRAGON_BATTLEAXE || spec === STAFF_OF_LIGHT
+                if (spec !== STAFF_OF_LIGHT && player.isAutocast) {
+                    Autocasting.resetAutocast(player, true)
+                } else if (spec === STAFF_OF_LIGHT && player.hasStaffOfLightEffect()) {
+                    player.packetSender.sendMessage("You are already being protected by the Staff of Light!")
+                    return
+                }
+                player.isSpecialActivated = true
+                if (instantSpecial) {
+                    spec.onActivation(player, player.combatBuilder.victim)
+                    if (spec === GRANITE_MAUL && player.combatBuilder.isAttacking && !player.combatBuilder.isCooldown) {
+                        player.combatBuilder.attackTimer = 0
+                        player.combatBuilder.attack(player.combatBuilder.victim)
+                        player.combatBuilder.instant()
+                    } else updateBar(player)
+                } else {
+                    updateBar(player)
+                    TaskManager.submit(object : Task(1, false) {
+                        public override fun execute() {
+                            if (!player.isSpecialActivated) {
+                                stop()
+                                return
+                            }
+                            spec.onActivation(player, player.combatBuilder.victim)
+                            stop()
+                        }
+                    }.bind(player))
+                }
+            }
+        }
+    }
 }

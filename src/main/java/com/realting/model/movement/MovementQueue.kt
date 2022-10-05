@@ -48,8 +48,7 @@ class MovementQueue(
         val direction: Direction
     ) {
         override fun toString(): String {
-            return (Point::class.java.name + " [direction=" + direction
-                    + ", position=" + position + "]")
+            return (Point::class.java.name + " [direction=" + direction + ", position=" + position + "]")
         }
     }
 
@@ -149,9 +148,7 @@ class MovementQueue(
     fun canWalk(deltaX: Int, deltaY: Int): Boolean {
         val to = Position(character.position.x + deltaX, character.position.y + deltaY, character.position.z)
         return if (character.position.z == -1 && to.z == -1 && character.isNpc && !(character as NPC).isSummoningNpc || character.location === Locations.Location.RECIPE_FOR_DISASTER) true else canWalk(
-            character.position,
-            to,
-            character.size
+            character.position, to, character.size
         )
     }
     /*
@@ -240,10 +237,8 @@ class MovementQueue(
         get() = points.size == 0
 
     fun handleRegionChange() {
-        val diffX = (character.position.x
-                - character.lastKnownRegion.regionX * 8)
-        val diffY = (character.position.y
-                - character.lastKnownRegion.regionY * 8)
+        val diffX = (character.position.x - character.lastKnownRegion.regionX * 8)
+        val diffY = (character.position.y - character.lastKnownRegion.regionY * 8)
         var regionChanged = false
         if (diffX < 16) regionChanged = true else if (diffX >= 88) regionChanged = true
         if (diffY < 16) regionChanged = true else if (diffY >= 88) regionChanged = true
@@ -270,8 +265,7 @@ class MovementQueue(
                     if (!Locations.Location.ignoreFollowDistance(character)) {
                         val summNpc = followCharacter!!.isPlayer && character.isNpc && (character as NPC).isSummoningNpc
                         if (!character.position.isWithinDistance(
-                                followCharacter!!.position,
-                                if (summNpc) 10 else if (combatFollowing) 40 else 20
+                                followCharacter!!.position, if (summNpc) 10 else if (combatFollowing) 40 else 20
                             )
                         ) {
                             character.setEntityInteraction(null)
@@ -300,7 +294,6 @@ class MovementQueue(
 
                     // Check if we are within distance to attack for combat.
                     if (combatFollowing) {
-                        //if (character.isPlayer()) {
                         if (character.combatBuilder.strategy == null) {
                             character.combatBuilder.determineStrategy()
                         }
@@ -454,27 +447,35 @@ class MovementQueue(
          * @param character The gamecharacter to step away from
          */
         fun stepAway(character: CharacterEntity) {
-            if (character.movementQueue.canWalk(-1, 0)) character.movementQueue.walkStep(
-                -1,
-                0
-            ) else if (character.movementQueue.canWalk(1, 0)) character.movementQueue.walkStep(
-                1,
-                0
-            ) else if (character.movementQueue.canWalk(0, -1)) character.movementQueue.walkStep(
-                0,
-                -1
-            ) else if (character.movementQueue.canWalk(0, 1)) character.movementQueue.walkStep(0, 1)
+            when {
+                character.movementQueue.canWalk(-1, 0) -> {
+                    character.movementQueue.walkStep(-1, 0)
+                }
+                character.movementQueue.canWalk(1, 0) -> {
+                    character.movementQueue.walkStep(1, 0)
+                }
+                character.movementQueue.canWalk(0, -1) -> {
+                    character.movementQueue.walkStep(0, -1)
+                }
+                character.movementQueue.canWalk(0, 1) -> {
+                    character.movementQueue.walkStep(0, 1)
+                }
+            }
         }
 
         fun getMove(x: Int, p2: Int, size: Int): Int {
-            if (x - p2 == 0) {
-                return 0
-            } else if (x - p2 < 0) {
-                return size
-            } else if (x - p2 > 0) {
-                return -size
+            when {
+                x - p2 == 0 -> {
+                    return 0
+                }
+                x - p2 < 0 -> {
+                    return size
+                }
+                x - p2 > 0 -> {
+                    return -size
+                }
+                else -> return 0
             }
-            return 0
         }
     }
 }

@@ -1,22 +1,22 @@
 package com.realting.world.content.combat;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import com.realting.model.DamageDealer;
+import com.realting.model.entity.Entity;
+import com.realting.model.entity.character.CharacterEntity;
+import com.realting.model.entity.character.npc.NPC;
+import com.realting.model.entity.character.player.Player;
 import com.realting.util.Misc;
 import com.realting.util.Stopwatch;
 import com.realting.world.World;
 import com.realting.world.content.PlayerLogs;
 import com.realting.world.content.combat.CombatContainer.ContainerHit;
 import com.realting.world.content.combat.strategy.CombatStrategy;
-import com.realting.model.entity.Entity;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.player.Player;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Holds methods for running the entire combat process.
@@ -146,7 +146,8 @@ public class CombatBuilder {
 			return;
 
 
-		cooldown = 10;
+		//TODO:: the antileech that was fking up combat
+		cooldown = 1;
 
 		character.getMovementQueue().setFollowCharacter(null);
 		character.setEntityInteraction(null);
