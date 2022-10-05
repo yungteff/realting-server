@@ -21,9 +21,9 @@ import com.realting.world.content.Artifacts;
 import com.realting.world.content.BankPin;
 import com.realting.world.content.CustomObjects;
 import com.realting.world.content.Effigies;
-import com.realting.world.content.Gambling.FlowersData;
+import com.realting.world.content.player.events.Gambling.FlowersData;
 import com.realting.world.content.KillsTracker;
-import com.realting.world.content.Lottery;
+import com.realting.world.content.player.events.Lottery;
 import com.realting.world.content.LoyaltyProgramme;
 import com.realting.world.content.PkSets;
 import com.realting.world.content.PlayerPanel;
@@ -1151,7 +1151,7 @@ public class DialogueOptions {
 					player.getPacketSender().sendInterfaceRemoval();
 					if(player.getInteractingObject() != null && player.getInteractingObject().getDefinition() != null && player.getInteractingObject().getDefinition().getName().equalsIgnoreCase("flowers")) {
 						if(CustomObjects.objectExists(player.getInteractingObject().getPosition())) {
-							player.getInventory().add(FlowersData.forObject(player.getInteractingObject().getId()).itemId, 1);
+							player.getInventory().add(FlowersData.forObject(player.getInteractingObject().getId()).getItemId(), 1);
 							CustomObjects.deleteGlobalObject(player.getInteractingObject());
 							player.setInteractingObject(null);
 						}

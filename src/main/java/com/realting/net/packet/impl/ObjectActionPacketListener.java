@@ -29,7 +29,7 @@ import com.realting.world.World;
 import com.realting.world.clip.region.RegionClipping;
 import com.realting.world.content.CrystalChest;
 import com.realting.world.content.CustomObjects;
-import com.realting.world.content.WildernessObelisks;
+import com.realting.world.content.player.events.WildernessObelisks;
 import com.realting.world.content.combat.magic.Autocasting;
 import com.realting.world.content.combat.prayer.CurseHandler;
 import com.realting.world.content.combat.prayer.PrayerHandler;

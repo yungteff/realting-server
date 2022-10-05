@@ -22,7 +22,7 @@ import com.realting.world.content.Consumables;
 import com.realting.world.content.Digging;
 import com.realting.world.content.Effigies;
 import com.realting.world.content.ExperienceLamps;
-import com.realting.world.content.Gambling;
+import com.realting.world.content.player.events.Gambling;
 import com.realting.world.content.ItemDegrading;
 import com.realting.world.content.MemberScrolls;
 import com.realting.world.content.MoneyPouch;

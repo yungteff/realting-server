@@ -24,7 +24,7 @@ import com.realting.net.security.ConnectionHandler;
 import com.realting.util.FileUtils;
 import com.realting.world.clip.region.RegionClipping;
 import com.realting.world.content.CustomObjects;
-import com.realting.world.content.Lottery;
+import com.realting.world.content.player.events.Lottery;
 import com.realting.world.content.PlayerPunishment;
 import com.realting.world.content.Scoreboards;
 import com.realting.world.content.WellOfGoodwill;

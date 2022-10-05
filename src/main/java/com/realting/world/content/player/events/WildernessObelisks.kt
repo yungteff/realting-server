@@ -1,109 +1,132 @@
-package com.realting.world.content;
+package com.realting.world.content.player.events
 
-import com.realting.engine.task.Task;
-import com.realting.engine.task.TaskManager;
-import com.realting.model.GameObject;
-import com.realting.model.Locations;
-import com.realting.model.Locations.Location;
-import com.realting.model.Position;
-import com.realting.util.Misc;
-import com.realting.world.World;
-import com.realting.model.entity.character.player.Player;
+import com.realting.engine.task.Task
+import com.realting.engine.task.TaskManager
+import com.realting.model.GameObject
+import com.realting.model.Locations
+import com.realting.model.Position
+import com.realting.util.Misc
+import com.realting.world.World
+import com.realting.world.content.CustomObjects
 
 /**
  * Handles the Wilderness teleport obelisks.
  * @author Gabriel Hannason
  */
-public class WildernessObelisks {
+object WildernessObelisks {
+    /**
+     * Activates the Wilderness obelisks.
+     * @param objectId        The object id
+     * @return                true if the object is an obelisk
+     */
+    @JvmStatic
+    fun handleObelisk(objectId: Int): Boolean {
+        val index = getObeliskIndex(objectId)
+        if (index >= 0) {
+            if (!OBELISK_ACTIVATED[index]) {
+                OBELISK_ACTIVATED[index] = true
+                obelisks[0] = GameObject(
+                    14825, Position(
+                        OBELISK_COORDS[index][0], OBELISK_COORDS[index][1]
+                    )
+                )
+                obelisks[1] = GameObject(
+                    14825, Position(
+                        OBELISK_COORDS[index][0] + 4, OBELISK_COORDS[index][1]
+                    )
+                )
+                obelisks[2] = GameObject(
+                    14825, Position(
+                        OBELISK_COORDS[index][0], OBELISK_COORDS[index][1] + 4
+                    )
+                )
+                obelisks[3] = GameObject(
+                    14825, Position(
+                        OBELISK_COORDS[index][0] + 4, OBELISK_COORDS[index][1] + 4
+                    )
+                )
+                var obeliskX: Int
+                var obeliskY: Int
+                for (i in obelisks.indices) {
+                    obeliskX = if (i == 1 || i == 3) OBELISK_COORDS[index][0] + 4 else OBELISK_COORDS[index][0]
+                    obeliskY = if (i >= 2) OBELISK_COORDS[index][1] + 4 else OBELISK_COORDS[index][1]
+                    CustomObjects.globalObjectRespawnTask(
+                        obelisks[i], GameObject(
+                            OBELISK_IDS[index], Position(obeliskX, obeliskY)
+                        ), 8
+                    )
+                }
+                TaskManager.submit(object : Task(8, false) {
+                    public override fun execute() {
+                        handleTeleport(index)
+                        stop()
+                    }
 
-	/**
-	 * Activates the Wilderness obelisks.
-	 * @param objectId		The object id
-	 * @return				true if the object is an obelisk
-	 */
-	public static boolean handleObelisk(int objectId) {
-		final int index = getObeliskIndex(objectId);
-		if (index >= 0) {
-			if (!OBELISK_ACTIVATED[index]) {
-				OBELISK_ACTIVATED[index] = true;
-				obelisks[0] = new GameObject(14825, new Position(OBELISK_COORDS[index][0], OBELISK_COORDS[index][1]));
-				obelisks[1] = new GameObject(14825, new Position(OBELISK_COORDS[index][0] + 4, OBELISK_COORDS[index][1]));
-				obelisks[2] = new GameObject(14825, new Position(OBELISK_COORDS[index][0], OBELISK_COORDS[index][1] + 4));
-				obelisks[3] = new GameObject(14825, new Position(OBELISK_COORDS[index][0] + 4, OBELISK_COORDS[index][1] + 4));
-				int obeliskX, obeliskY;
-				for (int i = 0; i < obelisks.length; i++) {
-					obeliskX = i == 1 || i == 3 ? OBELISK_COORDS[index][0] + 4 : OBELISK_COORDS[index][0];
-					obeliskY = i >= 2 ? OBELISK_COORDS[index][1] + 4 : OBELISK_COORDS[index][1];
-					CustomObjects.globalObjectRespawnTask(obelisks[i], new GameObject(OBELISK_IDS[index], new Position(obeliskX, obeliskY)), 8);
-				}
-				TaskManager.submit(new Task(8, false) {
-					@Override
-					public void execute() {
-						handleTeleport(index);
-						stop();
-					}
+                    override fun stop() {
+                        setEventRunning(false)
+                        OBELISK_ACTIVATED[index] = false
+                    }
+                })
+            }
+            return true
+        }
+        return false
+    }
 
-					@Override
-					public void stop() {
-						setEventRunning(false);
-						OBELISK_ACTIVATED[index] = false;
-					}
-				});
-			}
-			return true;
-		}
-		return false;
-	}
+    fun handleTeleport(index: Int) {
+        var random = Misc.getRandom(5)
+        while (random == index) random = Misc.getRandom(5)
+        for (player in World.getPlayers()) {
+            if (player == null || player.location == null || player.location !== Locations.Location.WILDERNESS) continue
+            if (Locations.goodDistance(
+                    player.position.copy(), Position(
+                        OBELISK_COORDS[index][0] + 2, OBELISK_COORDS[index][1] + 2
+                    ), 1
+                )
+            ) player.moveTo(
+                Position(
+                    OBELISK_COORDS[random][0] + 2, OBELISK_COORDS[random][1] + 2
+                )
+            )
+        }
+    }
 
-	public static void handleTeleport(int index) {
-		int random = Misc.getRandom(5);
-		while (random == index)
-			random = Misc.getRandom(5);
-		for(Player player : World.getPlayers()) {
-			if(player == null || player.getLocation() == null || player.getLocation() != Location.WILDERNESS)
-				continue;
-			if(Locations.goodDistance(player.getPosition().copy(), new Position(OBELISK_COORDS[index][0] + 2, OBELISK_COORDS[index][1] + 2), 1))
-				player.moveTo(new Position(OBELISK_COORDS[random][0] + 2, OBELISK_COORDS[random][1] + 2));
-		}
-	}
-	
-	/*
+    /*
 	 * Gets the array index for an obelisk
 	 */
-	public static int getObeliskIndex(int id) {
-		for (int j = 0; j < OBELISK_IDS.length; j++) {
-			if (OBELISK_IDS[j] == id)
-				return j;
-		}
-		return -1;
-	}
+    fun getObeliskIndex(id: Int): Int {
+        for (j in OBELISK_IDS.indices) {
+            if (OBELISK_IDS[j] == id) return j
+        }
+        return -1
+    }
 
-	/*
+    /*
 	 * Obelisk ids
 	 */
-	private static final int[] OBELISK_IDS = { 
-		14829, 14830, 
-		14827, 14828,
-		14826, 14831 
-	};
+    private val OBELISK_IDS = intArrayOf(
+        14829, 14830, 14827, 14828, 14826, 14831
+    )
 
-	/*
+    /*
 	 * The obelisks
 	 */
-	public static final GameObject[] obelisks = new GameObject[4];
-	
-	/*
+    val obelisks = arrayOfNulls<GameObject>(4)
+
+    /*
 	 * Are the obelisks activated?
 	 */
-	private static final boolean[] OBELISK_ACTIVATED = new boolean[OBELISK_IDS.length];
-	
-	/*
+    private val OBELISK_ACTIVATED = BooleanArray(OBELISK_IDS.size)
+
+    /*
 	 * Obelisk coords
 	 */
-	private static final int[][] OBELISK_COORDS = {
-		{ 3154, 3618 }, { 3225, 3665 }, 
-		{ 3033, 3730 }, { 3104, 3792 }, 
-		{ 2978, 3864 }, { 3305, 3914 } 
-	};
-
+    private val OBELISK_COORDS = arrayOf(
+        intArrayOf(3154, 3618),
+        intArrayOf(3225, 3665),
+        intArrayOf(3033, 3730),
+        intArrayOf(3104, 3792),
+        intArrayOf(2978, 3864),
+        intArrayOf(3305, 3914)
+    )
 }

@@ -34,7 +34,7 @@ import com.realting.world.World;
 import com.realting.world.clip.region.RegionClipping;
 import com.realting.world.content.Achievements;
 import com.realting.world.content.BonusManager;
-import com.realting.world.content.Lottery;
+import com.realting.world.content.player.events.Lottery;
 import com.realting.world.content.PlayerLogs;
 import com.realting.world.content.PlayerPanel;
 import com.realting.world.content.PlayersOnlineInterface;
