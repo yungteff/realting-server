@@ -304,22 +304,31 @@ object DesolaceFormulas {
     fun getMagicDefence(plr: Player): Int {
         var defenceLevel =
             plr.skillManager.getCurrentLevel(Skill.DEFENCE) / 2 + plr.skillManager.getCurrentLevel(Skill.MAGIC) / 2
-        if (plr.prayerActive[PrayerHandler.THICK_SKIN]) {
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.05).toInt()
-        } else if (plr.prayerActive[PrayerHandler.ROCK_SKIN]) {
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.1).toInt()
-        } else if (plr.prayerActive[PrayerHandler.STEEL_SKIN]) {
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.15).toInt()
-        } else if (plr.prayerActive[PrayerHandler.CHIVALRY]) {
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.2).toInt()
-        } else if (plr.prayerActive[PrayerHandler.PIETY]) {
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.25).toInt()
-        } else if (plr.prayerActive[PrayerHandler.RIGOUR]) {
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.25).toInt()
-        } else if (plr.prayerActive[PrayerHandler.AUGURY]) {
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.25).toInt()
-        } else if (plr.curseActive[CurseHandler.TURMOIL]) { // turmoil
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.20 + plr.leechedBonuses[0]).toInt()
+        when {
+            plr.prayerActive[PrayerHandler.THICK_SKIN] -> {
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.05).toInt()
+            }
+            plr.prayerActive[PrayerHandler.ROCK_SKIN] -> {
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.1).toInt()
+            }
+            plr.prayerActive[PrayerHandler.STEEL_SKIN] -> {
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.15).toInt()
+            }
+            plr.prayerActive[PrayerHandler.CHIVALRY] -> {
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.2).toInt()
+            }
+            plr.prayerActive[PrayerHandler.PIETY] -> {
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.25).toInt()
+            }
+            plr.prayerActive[PrayerHandler.RIGOUR] -> {
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.25).toInt()
+            }
+            plr.prayerActive[PrayerHandler.AUGURY] -> {
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.25).toInt()
+            }
+            plr.curseActive[CurseHandler.TURMOIL] -> { // turmoil
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.20 + plr.leechedBonuses[0]).toInt()
+            }
         }
         return (defenceLevel + plr.bonusManager.defenceBonus[3] + plr.bonusManager.defenceBonus[3] / 3).toInt()
     }
@@ -382,6 +391,8 @@ object DesolaceFormulas {
         return damage
     }
 
+
+    //TODO::attack delays
     fun getAttackDelay(plr: Player): Int {
         val id = plr.equipment.items[Equipment.WEAPON_SLOT].id
         val s = ItemDefinition.forId(id).name.lowercase(Locale.getDefault())
