@@ -1115,7 +1115,7 @@ class CombatFactory private constructor() {
          * @param builder
          * the builder to apply prayer effects to.
          */
-        protected fun applyPrayerProtection(container: CombatContainer, builder: CombatBuilder) {
+        fun applyPrayerProtection(container: CombatContainer, builder: CombatBuilder) {
 
             // If we aren't checking the accuracy, then don't bother doing any of
             // this.
@@ -1313,7 +1313,7 @@ class CombatFactory private constructor() {
          * @param damage
          * the total amount of damage dealt.
          */
-        protected fun giveExperience(
+        fun giveExperience(
             builder: CombatBuilder, container: CombatContainer, damage: Int
         ) {
 
@@ -1346,7 +1346,7 @@ class CombatFactory private constructor() {
          * @param attacker
          * the person who's attacking with a degradable weapon
          */
-        protected fun handleDegradingWeapons(attacker: Player?) {
+        fun handleDegradingWeapons(attacker: Player?) {
             //System.out.println("Called handleDegradingWeapons at "+System.currentTimeMillis());
             if (attacker == null) return
             if (attacker.location === Locations.Location.FREE_FOR_ALL_ARENA || attacker.location === Locations.Location.DUEL_ARENA) {
@@ -1368,7 +1368,7 @@ class CombatFactory private constructor() {
          * @param victim
          * the person who's being attacked with degradable non-weapons
          */
-        protected fun handleDegradingArmor(victim: Player?) {
+        fun handleDegradingArmor(victim: Player?) {
             //System.out.println("Called handleDegradingArmor at "+System.currentTimeMillis());
             if (victim == null) return
             if (victim.location === Locations.Location.FREE_FOR_ALL_ARENA || victim.location === Locations.Location.DUEL_ARENA) {
@@ -1395,7 +1395,7 @@ class CombatFactory private constructor() {
          * the total amount of damage dealt.
          */
         // TODO: Use abstraction for this, will need it when more effects are added.
-        protected fun handleArmorEffects(
+        fun handleArmorEffects(
             attacker: CharacterEntity, target: CharacterEntity?, damage: Int, combatType: CombatType?
         ) {
             if (attacker.constitution > 0 && damage > 0) {
@@ -1516,7 +1516,7 @@ class CombatFactory private constructor() {
          * @param damage
          * the total amount of damage dealt.
          */
-        protected fun handlePrayerEffects(
+        fun handlePrayerEffects(
             attacker: CharacterEntity?, target: CharacterEntity?, damage: Int, combatType: CombatType
         ) {
             if (attacker == null || target == null) return
@@ -1776,26 +1776,30 @@ class CombatFactory private constructor() {
             }
         }
 
-        protected fun handleSpellEffects(
-            attacker: CharacterEntity, target: CharacterEntity, damage: Int, combatType: CombatType?
+        fun handleSpellEffects(
+            attacker: CharacterEntity, target: CharacterEntity?, damage: Int, combatType: CombatType?
         ) {
             if (damage <= 0) return
-            if (target.isPlayer) {
-                val t = target as Player
-                if (t.hasVengeance()) {
-                    t.setHasVengeance(false)
-                    t.forceChat("Taste Vengeance!")
-                    var returnDamage = (damage * 0.75).toInt()
-                    if (attacker.constitution < returnDamage) returnDamage = attacker.constitution
-                    attacker.dealDamage(Hit(target, returnDamage, Hitmask.RED, CombatIcon.MAGIC))
+            if (target != null) {
+                if (target.isPlayer) {
+                    val t = target as Player
+                    if (t.hasVengeance()) {
+                        t.setHasVengeance(false)
+                        t.forceChat("Taste Vengeance!")
+                        var returnDamage = (damage * 0.75).toInt()
+                        if (attacker.constitution < returnDamage) returnDamage = attacker.constitution
+                        attacker.dealDamage(Hit(target, returnDamage, Hitmask.RED, CombatIcon.MAGIC))
+                    }
                 }
             }
-            if (target.isNpc && attacker.isPlayer) {
-                val player = attacker as Player
-                val npc = target as NPC
-                if (npc.id == 2043) { //zulrah red form
-                    player.minigameAttributes.zulrahAttributes.setRedFormDamage(damage, true)
-                    //System.out.println("Added "+damage+" to player's zulrah attributes. Current total: "+player.getMinigameAttributes().getZulrahAttributes().getRedFormDamage());
+            if (target != null) {
+                if (target.isNpc && attacker.isPlayer) {
+                    val player = attacker as Player
+                    val npc = target as NPC
+                    if (npc.id == 2043) { //zulrah red form
+                        player.minigameAttributes.zulrahAttributes.setRedFormDamage(damage, true)
+                        //System.out.println("Added "+damage+" to player's zulrah attributes. Current total: "+player.getMinigameAttributes().getZulrahAttributes().getRedFormDamage());
+                    }
                 }
             }
         }
