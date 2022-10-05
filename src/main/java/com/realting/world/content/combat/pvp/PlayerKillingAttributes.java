@@ -1,17 +1,17 @@
 package com.realting.world.content.combat.pvp;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.realting.model.Locations.Location;
+import com.realting.model.entity.character.player.Player;
 import com.realting.util.Misc;
-import com.realting.world.content.Achievements;
-import com.realting.world.content.Achievements.AchievementData;
-import com.realting.world.content.Artifacts;
 import com.realting.world.content.LoyaltyProgramme;
 import com.realting.world.content.LoyaltyProgramme.LoyaltyTitles;
 import com.realting.world.content.PlayerPanel;
-import com.realting.model.entity.character.player.Player;
+import com.realting.world.content.player.events.Achievements;
+import com.realting.world.content.player.events.Achievements.AchievementData;
+import com.realting.world.content.player.events.Artifacts;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlayerKillingAttributes {
 

@@ -9,11 +9,11 @@ import com.realting.model.container.StackType;
 import com.realting.model.definitions.ItemDefinition;
 import com.realting.model.definitions.WeaponAnimations;
 import com.realting.model.definitions.WeaponInterfaces;
+import com.realting.model.entity.character.player.Player;
 import com.realting.model.input.impl.ItemSearch;
 import com.realting.world.content.BankPin;
-import com.realting.world.content.BonusManager;
+import com.realting.world.content.player.events.BonusManager;
 import com.realting.world.content.player.skill.dungeoneering.Dungeoneering;
-import com.realting.model.entity.character.player.Player;
 
 /**
  * 100% safe Bank System

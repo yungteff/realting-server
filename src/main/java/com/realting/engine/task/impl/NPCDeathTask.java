@@ -5,10 +5,10 @@ import com.realting.engine.task.TaskManager;
 import com.realting.model.Animation;
 import com.realting.model.DamageDealer;
 import com.realting.model.Locations.Location;
+import com.realting.model.entity.character.npc.NPC;
 import com.realting.model.entity.character.npc.NpcItemDropping;
+import com.realting.model.entity.character.player.Player;
 import com.realting.world.World;
-import com.realting.world.content.Achievements;
-import com.realting.world.content.Achievements.AchievementData;
 import com.realting.world.content.KillsTracker;
 import com.realting.world.content.KillsTracker.KillsEntry;
 import com.realting.world.content.PlayerPanel;
@@ -16,8 +16,8 @@ import com.realting.world.content.Wildywyrm;
 import com.realting.world.content.combat.strategy.impl.bosses.KalphiteQueen;
 import com.realting.world.content.combat.strategy.impl.bosses.Nex;
 import com.realting.world.content.combat.strategy.impl.bosses.ZulrahLogic;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.player.Player;
+import com.realting.world.content.player.events.Achievements;
+import com.realting.world.content.player.events.Achievements.AchievementData;
 
 /**
  * Represents an npc's death task, which handles everything

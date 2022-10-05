@@ -1,8 +1,5 @@
 package com.realting.world.content.combat.prayer;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.realting.engine.task.Task;
 import com.realting.engine.task.TaskManager;
 import com.realting.model.Animation;
@@ -11,17 +8,20 @@ import com.realting.model.Locations.Location;
 import com.realting.model.Prayerbook;
 import com.realting.model.Skill;
 import com.realting.model.container.impl.Equipment;
+import com.realting.model.entity.character.CharacterEntity;
+import com.realting.model.entity.character.player.Player;
 import com.realting.util.Misc;
 import com.realting.util.NameUtils;
-import com.realting.world.content.BonusManager;
 import com.realting.world.content.ItemsKeptOnDeath;
 import com.realting.world.content.Sounds;
 import com.realting.world.content.Sounds.Sound;
 import com.realting.world.content.combat.CombatType;
 import com.realting.world.content.minigames.Dueling;
 import com.realting.world.content.minigames.Dueling.DuelRule;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.player.Player;
+import com.realting.world.content.player.events.BonusManager;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CurseHandler {
 

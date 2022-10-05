@@ -2,9 +2,9 @@ package com.realting.engine.task.impl;
 
 import com.realting.engine.task.Task;
 import com.realting.model.Skill;
-import com.realting.world.content.BonusManager;
-import com.realting.world.content.combat.prayer.CurseHandler;
 import com.realting.model.entity.character.player.Player;
+import com.realting.world.content.combat.prayer.CurseHandler;
+import com.realting.world.content.player.events.BonusManager;
 
 /**
  * Represents a player's skill normalizing task, this handles the skills'

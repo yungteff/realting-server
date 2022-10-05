@@ -1,6 +1,6 @@
 package com.realting.model;
 
-import com.realting.world.content.BonusManager;
+import com.realting.world.content.player.events.BonusManager;
 
 /**
  * Item bonuses.

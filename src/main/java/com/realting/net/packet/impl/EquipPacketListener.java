@@ -1,23 +1,18 @@
 package com.realting.net.packet.impl;
 
 import com.realting.GameSettings;
-import com.realting.model.Flag;
-import com.realting.model.GameMode;
-import com.realting.model.Item;
+import com.realting.model.*;
 import com.realting.model.Locations.Location;
-import com.realting.model.PlayerRights;
-import com.realting.model.Skill;
-import com.realting.model.SkillLevel;
 import com.realting.model.container.impl.Equipment;
 import com.realting.model.container.impl.Inventory;
 import com.realting.model.definitions.ItemDefinition;
 import com.realting.model.definitions.WeaponAnimations;
 import com.realting.model.definitions.WeaponInterfaces;
+import com.realting.model.entity.character.player.Player;
 import com.realting.net.packet.Packet;
 import com.realting.net.packet.PacketListener;
 import com.realting.util.Misc;
 import com.realting.world.World;
-import com.realting.world.content.BonusManager;
 import com.realting.world.content.PlayerLogs;
 import com.realting.world.content.PlayerPunishment.Jail;
 import com.realting.world.content.Sounds;
@@ -27,8 +22,8 @@ import com.realting.world.content.combat.weapon.CombatSpecial;
 import com.realting.world.content.dialogue.DialogueManager;
 import com.realting.world.content.minigames.Dueling;
 import com.realting.world.content.minigames.Dueling.DuelRule;
+import com.realting.world.content.player.events.BonusManager;
 import com.realting.world.content.player.skill.dungeoneering.Dungeoneering;
-import com.realting.model.entity.character.player.Player;
 
 /**
  * This packet listener manages the equip action a player

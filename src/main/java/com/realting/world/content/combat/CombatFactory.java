@@ -1,30 +1,20 @@
 package com.realting.world.content.combat;
 
-import java.util.Optional;
-
 import com.realting.GameSettings;
 import com.realting.engine.task.Task;
 import com.realting.engine.task.TaskManager;
 import com.realting.engine.task.impl.CombatSkullEffect;
-import com.realting.model.Animation;
-import com.realting.model.CombatIcon;
-import com.realting.model.Flag;
-import com.realting.model.Graphic;
-import com.realting.model.GraphicHeight;
-import com.realting.model.Hit;
-import com.realting.model.Hitmask;
-import com.realting.model.Item;
-import com.realting.model.Locations;
+import com.realting.model.*;
 import com.realting.model.Locations.Location;
-import com.realting.model.Position;
-import com.realting.model.Projectile;
-import com.realting.model.Skill;
 import com.realting.model.container.impl.Equipment;
+import com.realting.model.entity.character.CharacterEntity;
+import com.realting.model.entity.character.npc.NPC;
+import com.realting.model.entity.character.npc.NPCMovementCoordinator.CoordinateState;
+import com.realting.model.entity.character.player.Player;
 import com.realting.model.movement.MovementQueue;
 import com.realting.model.movement.PathFinder;
 import com.realting.util.Misc;
 import com.realting.world.clip.region.RegionClipping;
-import com.realting.world.content.BonusManager;
 import com.realting.world.content.ItemDegrading;
 import com.realting.world.content.ItemDegrading.DegradingItem;
 import com.realting.world.content.Kraken.KrakenInstance;
@@ -40,12 +30,11 @@ import com.realting.world.content.combat.strategy.impl.bosses.Nex;
 import com.realting.world.content.combat.strategy.impl.bosses.Scorpia;
 import com.realting.world.content.combat.weapon.CombatSpecial;
 import com.realting.world.content.combat.weapon.FightStyle;
+import com.realting.world.content.player.events.BonusManager;
 import com.realting.world.content.transportation.TeleportHandler;
 import com.realting.world.content.transportation.TeleportType;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.npc.NPCMovementCoordinator.CoordinateState;
-import com.realting.model.entity.character.player.Player;
+
+import java.util.Optional;
 
 /**
  * A static factory class containing all miscellaneous methods related to, and

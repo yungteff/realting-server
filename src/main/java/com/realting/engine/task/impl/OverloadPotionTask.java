@@ -1,15 +1,10 @@
 package com.realting.engine.task.impl;
 
 import com.realting.engine.task.Task;
-import com.realting.model.Animation;
-import com.realting.model.CombatIcon;
-import com.realting.model.Hit;
-import com.realting.model.Hitmask;
+import com.realting.model.*;
 import com.realting.model.Locations.Location;
-import com.realting.model.PlayerRights;
-import com.realting.model.Skill;
-import com.realting.world.content.Consumables;
 import com.realting.model.entity.character.player.Player;
+import com.realting.world.content.player.events.Consumables;
 
 public class OverloadPotionTask extends Task {
 

@@ -1,34 +1,27 @@
  package com.realting.world.content.combat.weapon;
 
- import java.util.Arrays;
-
  import com.realting.engine.task.Task;
  import com.realting.engine.task.TaskManager;
  import com.realting.engine.task.impl.PlayerSpecialAmountTask;
  import com.realting.engine.task.impl.StaffOfLightSpecialAttackTask;
- import com.realting.model.Animation;
- import com.realting.model.CombatIcon;
- import com.realting.model.Graphic;
- import com.realting.model.GraphicHeight;
- import com.realting.model.Hit;
- import com.realting.model.Hitmask;
- import com.realting.model.Projectile;
- import com.realting.model.Skill;
+ import com.realting.model.*;
  import com.realting.model.container.impl.Equipment;
  import com.realting.model.definitions.WeaponInterfaces.WeaponInterface;
+ import com.realting.model.entity.character.CharacterEntity;
+ import com.realting.model.entity.character.npc.NPC;
+ import com.realting.model.entity.character.player.Player;
  import com.realting.util.Misc;
- import com.realting.world.content.Achievements;
- import com.realting.world.content.Achievements.AchievementData;
- import com.realting.world.content.Consumables;
  import com.realting.world.content.combat.CombatContainer;
  import com.realting.world.content.combat.CombatType;
  import com.realting.world.content.combat.HitQueue.CombatHit;
  import com.realting.world.content.combat.magic.Autocasting;
  import com.realting.world.content.minigames.Dueling;
  import com.realting.world.content.minigames.Dueling.DuelRule;
- import com.realting.model.entity.character.CharacterEntity;
- import com.realting.model.entity.character.npc.NPC;
- import com.realting.model.entity.character.player.Player;
+ import com.realting.world.content.player.events.Achievements;
+ import com.realting.world.content.player.events.Achievements.AchievementData;
+ import com.realting.world.content.player.events.Consumables;
+
+ import java.util.Arrays;
 
 /**
  * Holds constants that hold data for all of the special attacks that can be

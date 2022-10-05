@@ -1,187 +1,148 @@
-package com.realting.world.content;
+package com.realting.world.content.player.events
 
-import com.realting.model.BonusValue;
-import com.realting.model.Item;
-import com.realting.model.Prayerbook;
-import com.realting.model.definitions.ItemDefinition;
-import com.realting.world.content.combat.prayer.CurseHandler;
-import com.realting.model.entity.character.player.Player;
+import com.realting.model.Prayerbook
+import com.realting.model.definitions.ItemDefinition
+import com.realting.model.entity.character.player.Player
+import com.realting.world.content.combat.prayer.CurseHandler
 
-public class BonusManager {
+class BonusManager {
+    val attackBonus = DoubleArray(5)
+    val defenceBonus = DoubleArray(9)
+    val otherBonus = DoubleArray(4)
 
-	public static void update(Player player) {
-		double[] bonuses = new double[18];
-		for (Item item : player.getEquipment().getItems()) {
-			ItemDefinition definition = ItemDefinition.forId(item.getId());
-			for (BonusValue bonus : definition.getBonuses()) {
-				bonuses[bonus.getBonus().ordinal()] += bonus.getValue();
-			}
-		}
-		for (int i = 0; i < STRING_ID.length; i++) {
-			if (i <= 4) {
-				player.getBonusManager().attackBonus[i] = bonuses[i];
-			} else if (i <= 13) {
-				int index = i - 5;
-				player.getBonusManager().defenceBonus[index] = bonuses[i];
-			} else if (i <= 17) {
-				int index = i - 14;
-				player.getBonusManager().otherBonus[index] = bonuses[i];
-			}
+    companion object {
+        @JvmStatic
+        fun update(player: Player) {
+            val bonuses = DoubleArray(18)
+            for (item in player.equipment.items) {
+                val definition = ItemDefinition.forId(item.id)
+                for (bonus in definition.bonuses) {
+                    bonuses[bonus.bonus.ordinal] += bonus.value
+                }
+            }
+            for (i in STRING_ID.indices) {
+                if (i <= 4) {
+                    player.bonusManager.attackBonus[i] = bonuses[i]
+                } else if (i <= 13) {
+                    val index = i - 5
+                    player.bonusManager.defenceBonus[index] = bonuses[i]
+                } else if (i <= 17) {
+                    val index = i - 14
+                    player.bonusManager.otherBonus[index] = bonuses[i]
+                }
+                val interfaceId = Integer.valueOf(STRING_ID[i][0])
+                if (interfaceId == 18895) {
+                    // Magic damage boost
+                    player.packetSender.sendString(interfaceId, STRING_ID[i][1] + ": " + bonuses[i] + "%")
+                } else {
+                    player.packetSender.sendString(interfaceId, STRING_ID[i][1] + ": " + bonuses[i])
+                }
+            }
+        }
 
-			int interfaceId = Integer.valueOf(STRING_ID[i][0]);
+        private val STRING_ID = arrayOf(
+            arrayOf("1675", "Stab"),
+            arrayOf("1676", "Slash"),
+            arrayOf("1677", "Crush"),
+            arrayOf("1678", "Magic"),
+            arrayOf("1679", "Range"),
+            arrayOf("1680", "Stab"),
+            arrayOf("1681", "Slash"),
+            arrayOf("1682", "Crush"),
+            arrayOf("1683", "Magic"),
+            arrayOf("1684", "Range"),
+            arrayOf("18890", "Summoning"),
+            arrayOf("18891", "Absorb Melee"),
+            arrayOf("18892", "Absorb Magic"),
+            arrayOf("18893", "Absorb Ranged"),
+            arrayOf("1686", "Strength"),
+            arrayOf("18894", "Ranged Strength"),
+            arrayOf("1687", "Prayer"),
+            arrayOf("18895", "Magic Damage")
+        )
+        const val ATTACK_STAB = 0
+        const val ATTACK_SLASH = 1
+        const val ATTACK_CRUSH = 2
+        const val ATTACK_MAGIC = 3
+        const val ATTACK_RANGE = 4
+        const val DEFENCE_STAB = 0
+        const val DEFENCE_SLASH = 1
+        const val DEFENCE_CRUSH = 2
+        const val DEFENCE_MAGIC = 3
+        const val DEFENCE_RANGE = 4
+        const val DEFENCE_SUMMONING = 5
+        const val ABSORB_MELEE = 6
+        const val ABSORB_MAGIC = 7
+        const val ABSORB_RANGED = 8
+        const val BONUS_STRENGTH = 0
+        const val RANGED_STRENGTH = 1
+        const val BONUS_PRAYER = 2
+        const val MAGIC_DAMAGE = 3
 
-			if (interfaceId == 18895) {
-				// Magic damage boost
-				player.getPacketSender().sendString(interfaceId, STRING_ID[i][1] + ": " + bonuses[i] + "%");
-			} else {
-				player.getPacketSender().sendString(interfaceId, STRING_ID[i][1] + ": " + bonuses[i]);
-			}
+        /** CURSES  */
+        @JvmStatic
+        fun sendCurseBonuses(p: Player) {
+            if (p.prayerbook == Prayerbook.CURSES) {
+                sendAttackBonus(p)
+                sendDefenceBonus(p)
+                sendStrengthBonus(p)
+                sendRangedBonus(p)
+                sendMagicBonus(p)
+            }
+        }
 
-		}
-	}
+        fun sendAttackBonus(p: Player) {
+            val boost = p.leechedBonuses[0].toDouble()
+            var bonus = 0
+            if (p.curseActive[CurseHandler.LEECH_ATTACK]) {
+                bonus = 5
+            } else if (p.curseActive[CurseHandler.TURMOIL]) bonus = 15
+            bonus += boost.toInt()
+            if (bonus < -25) bonus = -25
+            p.packetSender.sendString(690, "" + getColor(bonus) + "" + bonus + "%")
+        }
 
-	public double[] getAttackBonus() {
-		return attackBonus;
-	}
+        fun sendRangedBonus(p: Player) {
+            val boost = p.leechedBonuses[4].toDouble()
+            var bonus = 0
+            if (p.curseActive[CurseHandler.LEECH_RANGED]) bonus = 5
+            bonus += boost.toInt()
+            if (bonus < -25) bonus = -25
+            p.packetSender.sendString(693, "" + getColor(bonus) + "" + bonus + "%")
+        }
 
-	public double[] getDefenceBonus() {
-		return defenceBonus;
-	}
+        fun sendMagicBonus(p: Player) {
+            val boost = p.leechedBonuses[6].toDouble()
+            var bonus = 0
+            if (p.curseActive[CurseHandler.LEECH_MAGIC]) bonus = 5
+            bonus += boost.toInt()
+            if (bonus < -25) bonus = -25
+            p.packetSender.sendString(694, "" + getColor(bonus) + "" + bonus + "%")
+        }
 
-	public double[] getOtherBonus() {
-		return otherBonus;
-	}
+        fun sendDefenceBonus(p: Player) {
+            val boost = p.leechedBonuses[1].toDouble()
+            var bonus = 0
+            if (p.curseActive[CurseHandler.LEECH_DEFENCE]) bonus =
+                5 else if (p.curseActive[CurseHandler.TURMOIL]) bonus = 15
+            bonus += boost.toInt()
+            if (bonus < -25) bonus = -25
+            p.packetSender.sendString(692, "" + getColor(bonus) + "" + bonus + "%")
+        }
 
-	private double[] attackBonus = new double[5];
+        fun sendStrengthBonus(p: Player) {
+            val boost = p.leechedBonuses[2].toDouble()
+            var bonus = 0
+            if (p.curseActive[CurseHandler.LEECH_STRENGTH]) bonus =
+                5 else if (p.curseActive[CurseHandler.TURMOIL]) bonus = 23
+            bonus += boost.toInt()
+            if (bonus < -25) bonus = -25
+            p.packetSender.sendString(691, "" + getColor(bonus) + "" + bonus + "%")
+        }
 
-	private double[] defenceBonus = new double[9];
-
-	private double[] otherBonus = new double[4];
-
-	private static final String[][] STRING_ID = {
-		{"1675", "Stab"},
-		{"1676", "Slash"},
-		{"1677", "Crush"},
-		{"1678", "Magic"},
-		{"1679", "Range"},
-
-		{"1680", "Stab"},
-		{"1681", "Slash"},
-		{"1682", "Crush"},
-		{"1683", "Magic"},
-		{"1684", "Range"},
-		{"18890", "Summoning"},
-		{"18891", "Absorb Melee"},
-		{"18892", "Absorb Magic"},
-		{"18893", "Absorb Ranged"},
-
-		{"1686", "Strength"},
-		{"18894", "Ranged Strength"},
-		{"1687", "Prayer"},
-		{"18895", "Magic Damage"}
-
-	};
-
-	public static final int
-	ATTACK_STAB = 0, 
-	ATTACK_SLASH = 1,
-	ATTACK_CRUSH = 2, 
-	ATTACK_MAGIC = 3, 
-	ATTACK_RANGE = 4, 
-
-	DEFENCE_STAB = 0, 
-	DEFENCE_SLASH = 1, 
-	DEFENCE_CRUSH = 2, 
-	DEFENCE_MAGIC = 3,
-	DEFENCE_RANGE = 4, 
-	DEFENCE_SUMMONING = 5,
-	ABSORB_MELEE = 6, 
-	ABSORB_MAGIC = 7, 
-	ABSORB_RANGED = 8,
-
-	BONUS_STRENGTH = 0, 
-	RANGED_STRENGTH = 1,
-	BONUS_PRAYER = 2,
-	MAGIC_DAMAGE = 3;
-
-	/** CURSES **/
-
-	public static void sendCurseBonuses(final Player p) {
-		if(p.getPrayerbook() == Prayerbook.CURSES) {
-			sendAttackBonus(p);
-			sendDefenceBonus(p);
-			sendStrengthBonus(p);
-			sendRangedBonus(p);
-			sendMagicBonus(p);
-		}
-	}
-
-	public static void sendAttackBonus(Player p) {
-		double boost = p.getLeechedBonuses()[0];
-		int bonus = 0;
-		if(p.getCurseActive()[CurseHandler.LEECH_ATTACK]) {
-			bonus = 5;
-		} else if(p.getCurseActive()[CurseHandler.TURMOIL])
-			bonus = 15;
-		bonus += boost;
-		if(bonus < -25)
-			bonus = -25;
-		p.getPacketSender().sendString(690, ""+getColor(bonus)+""+bonus+"%");
-	}
-
-	public static void sendRangedBonus(Player p) {
-		double boost = p.getLeechedBonuses()[4];
-		int bonus = 0;
-		if(p.getCurseActive()[CurseHandler.LEECH_RANGED])
-			bonus = 5;
-		bonus += boost;
-		if(bonus < -25)
-			bonus = -25;
-		p.getPacketSender().sendString(693, ""+getColor(bonus)+""+bonus+"%");
-	}
-
-	public static void sendMagicBonus(Player p) {
-		double boost = p.getLeechedBonuses()[6];
-		int bonus = 0;
-		if(p.getCurseActive()[CurseHandler.LEECH_MAGIC])
-			bonus = 5;
-		bonus += boost;
-		if(bonus < -25)
-			bonus = -25;
-		p.getPacketSender().sendString(694, ""+getColor(bonus)+""+bonus+"%");
-	}
-
-	public static void sendDefenceBonus(Player p) {
-		double boost = p.getLeechedBonuses()[1];
-		int bonus = 0;		
-		if(p.getCurseActive()[CurseHandler.LEECH_DEFENCE])
-			bonus = 5;
-		else if(p.getCurseActive()[CurseHandler.TURMOIL])
-			bonus = 15;
-		bonus += boost;
-		if(bonus < -25)
-			bonus = -25;
-		p.getPacketSender().sendString(692, ""+getColor(bonus)+""+bonus+"%");
-	}
-
-	public static void sendStrengthBonus(Player p) {
-		double boost = p.getLeechedBonuses()[2];
-		int bonus = 0;
-		if(p.getCurseActive()[CurseHandler.LEECH_STRENGTH])
-			bonus = 5;
-		else if(p.getCurseActive()[CurseHandler.TURMOIL])
-			bonus = 23;
-		bonus += boost;
-		if(bonus < -25) 
-			bonus = -25;
-		p.getPacketSender().sendString(691, ""+getColor(bonus)+""+bonus+"%");
-	}
-
-	public static String getColor(int i) {
-		if(i > 0)
-			return "@gre@+";
-		if(i < 0)
-			return "@red@";
-		return "";
-	}
+        fun getColor(i: Int): String {
+            if (i > 0) return "@gre@+"
+            return if (i < 0) "@red@" else ""
+        }
+    }
 }

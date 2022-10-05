@@ -1,13 +1,12 @@
 package com.realting.world.content.player.skill.agility
 
-import com.realting.model.Skill
-import com.realting.world.content.player.skill.agility.ObstacleData
-import com.realting.world.content.Achievements
-import com.realting.world.content.Achievements.AchievementData
-import com.realting.model.container.impl.Equipment
 import com.realting.model.GameObject
+import com.realting.model.Skill
+import com.realting.model.container.impl.Equipment
 import com.realting.model.entity.character.player.Player
 import com.realting.util.Misc
+import com.realting.world.content.player.events.Achievements
+import com.realting.world.content.player.events.Achievements.AchievementData
 
 object Agility {
     @JvmStatic

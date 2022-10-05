@@ -1,6 +1,6 @@
 package com.realting.world.content.combat.weapon;
 
-import com.realting.world.content.BonusManager;
+import com.realting.world.content.player.events.BonusManager;
 
 /**
  * A collection of constants that each represent a different fighting type.

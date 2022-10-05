@@ -2,22 +2,19 @@ package com.realting.world.content.minigames
 
 import com.realting.engine.task.Task
 import com.realting.engine.task.TaskManager
-import com.realting.world.World
-import com.realting.world.content.dialogue.DialogueManager
-import com.realting.world.content.PlayerPanel
 import com.realting.model.*
-import com.realting.world.content.minigames.Dueling
-import com.realting.world.content.BankPin
-import com.realting.world.content.minigames.Dueling.DuelRule
 import com.realting.model.container.impl.Equipment
 import com.realting.model.container.impl.Inventory
-import com.realting.world.content.PlayerLogs
-import com.realting.world.content.BonusManager
-import java.util.concurrent.CopyOnWriteArrayList
-import java.util.Locale
 import com.realting.model.definitions.ItemDefinition
 import com.realting.model.entity.character.player.Player
 import com.realting.util.Misc
+import com.realting.world.World
+import com.realting.world.content.BankPin
+import com.realting.world.content.PlayerLogs
+import com.realting.world.content.PlayerPanel
+import com.realting.world.content.player.events.BonusManager
+import java.util.*
+import java.util.concurrent.CopyOnWriteArrayList
 
 open class Dueling(var player: Player) {
     fun challengePlayer(playerToDuel: Player) {
