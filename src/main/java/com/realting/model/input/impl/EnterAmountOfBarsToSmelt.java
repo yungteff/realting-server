@@ -1,8 +1,8 @@
 package com.realting.model.input.impl;
 
 import com.realting.model.input.EnterAmount;
-import com.realting.world.content.skill.smithing.Smelting;
-import com.realting.world.content.skill.smithing.SmithingData;
+import com.realting.world.content.player.skill.smithing.Smelting;
+import com.realting.world.content.player.skill.smithing.SmithingData;
 import com.realting.model.entity.character.player.Player;
 
 public class EnterAmountOfBarsToSmelt extends EnterAmount {

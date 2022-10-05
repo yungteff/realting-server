@@ -30,8 +30,8 @@ import com.realting.world.content.PlayerLogs;
 import com.realting.world.content.clan.ClanChatManager;
 import com.realting.world.content.cluescrolls.ClueScroll;
 import com.realting.world.content.minigames.WarriorsGuild;
-import com.realting.world.content.skill.prayer.BonesData;
-import com.realting.world.content.skill.summoning.CharmingImp;
+import com.realting.world.content.player.skill.prayer.BonesData;
+import com.realting.world.content.player.skill.summoning.CharmingImp;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 public class NpcItemDropping {

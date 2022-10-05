@@ -38,9 +38,9 @@ import com.realting.world.content.grandexchange.GrandExchange;
 import com.realting.world.content.grandexchange.GrandExchangeOffer;
 import com.realting.world.content.minigames.Dueling;
 import com.realting.world.content.minigames.Dueling.DuelRule;
-import com.realting.world.content.skill.crafting.Jewelry;
-import com.realting.world.content.skill.smithing.EquipmentMaking;
-import com.realting.world.content.skill.smithing.SmithingData;
+import com.realting.world.content.player.skill.crafting.Jewelry;
+import com.realting.world.content.player.skill.smithing.EquipmentMaking;
+import com.realting.world.content.player.skill.smithing.SmithingData;
 import com.realting.world.content.transportation.JewelryTeleporting;
 import com.realting.model.entity.character.player.Player;
 

@@ -51,8 +51,8 @@ import com.realting.world.content.combat.range.DwarfMultiCannon;
 import com.realting.world.content.combat.weapon.CombatSpecial;
 import com.realting.world.content.dialogue.DialogueManager;
 import com.realting.world.content.minigames.Barrows;
-import com.realting.world.content.skill.hunter.Hunter;
-import com.realting.world.content.skill.slayer.Slayer;
+import com.realting.world.content.player.skill.hunter.Hunter;
+import com.realting.world.content.player.skill.slayer.Slayer;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.mindrot.jbcrypt.BCrypt;
 

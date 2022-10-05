@@ -1,8 +1,8 @@
 package com.realting.model.input.impl;
 
 import com.realting.model.input.EnterAmount;
-import com.realting.world.content.skill.crafting.LeatherMaking;
-import com.realting.world.content.skill.crafting.leatherData;
+import com.realting.world.content.player.skill.crafting.LeatherMaking;
+import com.realting.world.content.player.skill.crafting.leatherData;
 import com.realting.model.entity.character.player.Player;
 
 public class EnterAmountOfLeatherToCraft extends EnterAmount {

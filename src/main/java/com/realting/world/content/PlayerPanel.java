@@ -4,7 +4,7 @@ import com.realting.util.Misc;
 import com.realting.world.World;
 import com.realting.world.content.randomevents.EvilTree;
 import com.realting.world.content.randomevents.ShootingStar;
-import com.realting.world.content.skill.slayer.SlayerTasks;
+import com.realting.world.content.player.skill.slayer.SlayerTasks;
 import com.realting.model.entity.character.player.Player;
 
 public class PlayerPanel {

@@ -12,9 +12,9 @@ import com.realting.net.packet.Packet;
 import com.realting.net.packet.PacketListener;
 import com.realting.world.content.combat.magic.MagicSpells;
 import com.realting.world.content.combat.magic.Spell;
-import com.realting.world.content.skill.dungeoneering.UltimateIronmanHandler;
-import com.realting.world.content.skill.magic.Magic;
-import com.realting.world.content.skill.smithing.Smelting;
+import com.realting.world.content.player.skill.dungeoneering.UltimateIronmanHandler;
+import com.realting.world.content.player.skill.magic.Magic;
+import com.realting.world.content.player.skill.smithing.Smelting;
 import com.realting.model.entity.character.player.Player;
 
 /**

@@ -12,7 +12,7 @@ import com.realting.net.packet.PacketListener;
 import com.realting.world.content.PlayerLogs;
 import com.realting.world.content.Sounds;
 import com.realting.world.content.Sounds.Sound;
-import com.realting.world.content.skill.dungeoneering.ItemBinding;
+import com.realting.world.content.player.skill.dungeoneering.ItemBinding;
 import com.realting.model.entity.character.GroundItemManager;
 import com.realting.model.entity.character.player.Player;
 

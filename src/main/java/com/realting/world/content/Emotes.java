@@ -12,7 +12,7 @@ import com.realting.model.Item;
 import com.realting.model.Skill;
 import com.realting.model.container.impl.Equipment;
 import com.realting.util.Misc;
-import com.realting.world.content.skill.SkillManager;
+import com.realting.world.content.player.skill.SkillManager;
 import com.realting.model.entity.character.player.Player;
 
 /**

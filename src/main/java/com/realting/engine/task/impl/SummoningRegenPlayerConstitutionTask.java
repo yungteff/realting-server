@@ -5,7 +5,7 @@ import com.realting.model.Animation;
 import com.realting.model.Graphic;
 import com.realting.model.Locations.Location;
 import com.realting.model.Skill;
-import com.realting.world.content.skill.summoning.SummoningData;
+import com.realting.world.content.player.skill.summoning.SummoningData;
 import com.realting.model.entity.character.npc.NPC;
 import com.realting.model.entity.character.player.Player;
  

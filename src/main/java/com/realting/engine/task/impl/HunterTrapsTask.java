@@ -4,9 +4,9 @@ import java.util.Iterator;
 
 import com.realting.engine.task.Task;
 import com.realting.engine.task.TaskManager;
-import com.realting.world.content.skill.hunter.Hunter;
-import com.realting.world.content.skill.hunter.Trap;
-import com.realting.world.content.skill.hunter.TrapExecution;
+import com.realting.world.content.player.skill.hunter.Hunter;
+import com.realting.world.content.player.skill.hunter.Trap;
+import com.realting.world.content.player.skill.hunter.TrapExecution;
 
 public class HunterTrapsTask extends Task {
 	

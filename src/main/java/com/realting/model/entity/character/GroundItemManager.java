@@ -13,8 +13,8 @@ import com.realting.world.World;
 import com.realting.world.content.PlayerLogs;
 import com.realting.world.content.Sounds;
 import com.realting.world.content.Sounds.Sound;
-import com.realting.world.content.skill.dungeoneering.Dungeoneering;
-import com.realting.world.content.skill.dungeoneering.UltimateIronmanHandler;
+import com.realting.world.content.player.skill.dungeoneering.Dungeoneering;
+import com.realting.world.content.player.skill.dungeoneering.UltimateIronmanHandler;
 import com.realting.model.entity.character.player.Player;
 
 public class GroundItemManager {

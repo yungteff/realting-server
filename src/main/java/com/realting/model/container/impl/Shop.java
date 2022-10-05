@@ -28,8 +28,8 @@ import com.realting.world.World;
 import com.realting.world.content.PlayerLogs;
 import com.realting.world.content.PlayerPanel;
 import com.realting.world.content.minigames.RecipeForDisaster;
-import com.realting.world.content.skill.dungeoneering.UltimateIronmanHandler;
-import com.realting.world.content.skill.summoning.BossPets.BossPet;
+import com.realting.world.content.player.skill.dungeoneering.UltimateIronmanHandler;
+import com.realting.world.content.player.skill.summoning.BossPets.BossPet;
 import com.realting.model.entity.character.player.Player;
 
 /**

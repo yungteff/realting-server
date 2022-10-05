@@ -4,7 +4,7 @@ import com.realting.engine.task.Task;
 import com.realting.model.Position;
 import com.realting.util.Misc;
 import com.realting.world.World;
-import com.realting.world.content.skill.hunter.Hunter;
+import com.realting.world.content.player.skill.hunter.Hunter;
 import com.realting.model.entity.character.npc.NPC;
 
 public class NPCRespawnTask extends Task {

@@ -19,7 +19,7 @@ import com.realting.world.content.minigames.Nomad;
 import com.realting.world.content.minigames.PestControl;
 import com.realting.world.content.minigames.RecipeForDisaster;
 import com.realting.world.content.minigames.TheSix;
-import com.realting.world.content.skill.dungeoneering.Dungeoneering;
+import com.realting.world.content.player.skill.dungeoneering.Dungeoneering;
 import com.realting.model.entity.Entity;
 import com.realting.model.entity.character.CharacterEntity;
 import com.realting.model.entity.character.npc.NPC;

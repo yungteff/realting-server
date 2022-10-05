@@ -8,7 +8,7 @@ import com.realting.model.Position;
 import com.realting.world.content.Kraken;
 import com.realting.world.content.Sounds;
 import com.realting.world.content.Sounds.Sound;
-import com.realting.world.content.skill.dungeoneering.Dungeoneering;
+import com.realting.world.content.player.skill.dungeoneering.Dungeoneering;
 import com.realting.model.entity.character.player.Player;
 
 

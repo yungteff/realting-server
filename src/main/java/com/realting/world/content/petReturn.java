@@ -4,7 +4,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.realting.model.definitions.ItemDefinition;
-import com.realting.world.content.skill.summoning.BossPets.BossPet;
+import com.realting.world.content.player.skill.summoning.BossPets.BossPet;
 import com.realting.model.entity.character.player.Player;
 
 public class petReturn  implements Runnable{

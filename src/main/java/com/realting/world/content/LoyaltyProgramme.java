@@ -4,7 +4,7 @@ import com.realting.model.Flag;
 import com.realting.model.PlayerRights;
 import com.realting.model.Skill;
 import com.realting.util.Misc;
-import com.realting.world.content.skill.SkillManager;
+import com.realting.world.content.player.skill.SkillManager;
 import com.realting.model.entity.character.player.Player;
 
 public class LoyaltyProgramme {

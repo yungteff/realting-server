@@ -8,7 +8,7 @@ import com.realting.util.Misc;
 import com.realting.world.World;
 import com.realting.world.content.PlayerLogs;
 import com.realting.world.content.combat.CombatFactory;
-import com.realting.world.content.skill.dungeoneering.UltimateIronmanHandler;
+import com.realting.world.content.player.skill.dungeoneering.UltimateIronmanHandler;
 import com.realting.model.entity.character.player.Player;
 
 /**

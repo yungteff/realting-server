@@ -6,7 +6,7 @@ import com.realting.net.packet.PacketListener;
 import com.realting.world.clip.region.RegionClipping;
 import com.realting.world.content.CustomObjects;
 import com.realting.world.content.Sounds;
-import com.realting.world.content.skill.hunter.Hunter;
+import com.realting.world.content.player.skill.hunter.Hunter;
 import com.realting.model.entity.character.GroundItemManager;
 import com.realting.model.entity.character.player.Player;
 

@@ -4,7 +4,7 @@ import com.realting.model.RegionInstance.RegionInstanceType;
 import com.realting.model.entity.character.GroundItemManager;
 import com.realting.world.content.LoyaltyProgramme;
 import com.realting.world.content.combat.pvp.BountyHunter;
-import com.realting.world.content.skill.construction.House;
+import com.realting.world.content.player.skill.construction.House;
 
 public class PlayerProcess {
 

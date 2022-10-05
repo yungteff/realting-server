@@ -2,7 +2,7 @@ package com.realting.model;
 
 import com.realting.world.content.dialogue.DialogueManager;
 import com.realting.world.content.dialogue.impl.Tutorial;
-import com.realting.world.content.skill.dungeoneering.UltimateIronmanHandler;
+import com.realting.world.content.player.skill.dungeoneering.UltimateIronmanHandler;
 import com.realting.model.entity.character.player.Player;
 
 public enum GameMode {

@@ -27,7 +27,7 @@ import com.realting.world.content.combat.weapon.CombatSpecial;
 import com.realting.world.content.dialogue.DialogueManager;
 import com.realting.world.content.minigames.Dueling;
 import com.realting.world.content.minigames.Dueling.DuelRule;
-import com.realting.world.content.skill.dungeoneering.Dungeoneering;
+import com.realting.world.content.player.skill.dungeoneering.Dungeoneering;
 import com.realting.model.entity.character.player.Player;
 
 /**

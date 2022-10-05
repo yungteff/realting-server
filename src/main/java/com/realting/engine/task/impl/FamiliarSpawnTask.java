@@ -3,8 +3,8 @@ package com.realting.engine.task.impl;
 
 import com.realting.engine.task.Task;
 import com.realting.model.Item;
-import com.realting.world.content.skill.summoning.BossPets.BossPet;
-import com.realting.world.content.skill.summoning.FamiliarData;
+import com.realting.world.content.player.skill.summoning.BossPets.BossPet;
+import com.realting.world.content.player.skill.summoning.FamiliarData;
 import com.realting.model.entity.character.player.Player;
 
 /**

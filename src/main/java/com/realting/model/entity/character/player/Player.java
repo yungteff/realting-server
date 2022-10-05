@@ -85,14 +85,14 @@ import com.realting.world.content.dialogue.Dialogue;
 import com.realting.world.content.grandexchange.GrandExchangeSlot;
 import com.realting.world.content.minigames.MinigameAttributes;
 import com.realting.world.content.minigames.Dueling;
-import com.realting.world.content.skill.SkillManager;
-import com.realting.world.content.skill.construction.HouseFurniture;
-import com.realting.world.content.skill.construction.Portal;
-import com.realting.world.content.skill.construction.Room;
-import com.realting.world.content.skill.farming.Farming;
-import com.realting.world.content.skill.slayer.Slayer;
-import com.realting.world.content.skill.summoning.Pouch;
-import com.realting.world.content.skill.summoning.Summoning;
+import com.realting.world.content.player.skill.SkillManager;
+import com.realting.world.content.player.skill.construction.HouseFurniture;
+import com.realting.world.content.player.skill.construction.Portal;
+import com.realting.world.content.player.skill.construction.Room;
+import com.realting.world.content.player.skill.farming.Farming;
+import com.realting.world.content.player.skill.slayer.Slayer;
+import com.realting.world.content.player.skill.summoning.Pouch;
+import com.realting.world.content.player.skill.summoning.Summoning;
 
 
 public class Player extends CharacterEntity {

@@ -4,7 +4,7 @@ import com.realting.model.Locations;
 import com.realting.model.Locations.Location;
 import com.realting.world.content.combat.CombatFactory;
 import com.realting.world.content.combat.strategy.impl.bosses.Nex;
-import com.realting.world.content.skill.dungeoneering.Dungeoneering;
+import com.realting.world.content.player.skill.dungeoneering.Dungeoneering;
 import com.realting.model.entity.character.player.Player;
 
 /**

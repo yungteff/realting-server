@@ -31,9 +31,9 @@ import com.realting.world.content.LoyaltyProgramme.LoyaltyTitles;
 import com.realting.world.content.combat.magic.CombatSpells;
 import com.realting.world.content.combat.weapon.FightType;
 import com.realting.world.content.grandexchange.GrandExchangeSlot;
-import com.realting.world.content.skill.SkillManager.Skills;
-import com.realting.world.content.skill.slayer.SlayerMaster;
-import com.realting.world.content.skill.slayer.SlayerTasks;
+import com.realting.world.content.player.skill.SkillManager.Skills;
+import com.realting.world.content.player.skill.slayer.SlayerMaster;
+import com.realting.world.content.player.skill.slayer.SlayerTasks;
 import org.mindrot.jbcrypt.BCrypt;
 
 

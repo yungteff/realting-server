@@ -1,7 +1,7 @@
 package com.realting.model.input.impl;
 
 import com.realting.model.input.EnterAmount;
-import com.realting.world.content.skill.summoning.PouchMaking;
+import com.realting.world.content.player.skill.summoning.PouchMaking;
 import com.realting.model.entity.character.player.Player;
 
 public class EnterAmountToInfuse extends EnterAmount {

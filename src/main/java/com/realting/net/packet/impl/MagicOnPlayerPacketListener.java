@@ -9,7 +9,7 @@ import com.realting.net.packet.PacketListener;
 import com.realting.world.World;
 import com.realting.world.content.combat.magic.CombatSpell;
 import com.realting.world.content.combat.magic.CombatSpells;
-import com.realting.world.content.skill.dungeoneering.UltimateIronmanHandler;
+import com.realting.world.content.player.skill.dungeoneering.UltimateIronmanHandler;
 import com.realting.model.entity.character.player.Player;
 
 public class MagicOnPlayerPacketListener implements PacketListener {

@@ -5,7 +5,7 @@ import com.realting.model.definitions.ItemDefinition;
 import com.realting.net.packet.Packet;
 import com.realting.net.packet.PacketListener;
 import com.realting.util.Misc;
-import com.realting.world.content.skill.herblore.FinishedPotions;
+import com.realting.world.content.player.skill.herblore.FinishedPotions;
 import com.realting.model.entity.character.player.Player;
 
 public class ExamineItemPacketListener implements PacketListener {

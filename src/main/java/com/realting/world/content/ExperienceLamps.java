@@ -2,7 +2,7 @@ package com.realting.world.content;
 
 import com.realting.model.Skill;
 import com.realting.util.Misc;
-import com.realting.world.content.skill.SkillManager;
+import com.realting.world.content.player.skill.SkillManager;
 import com.realting.model.entity.character.player.Player;
 
 public class ExperienceLamps {

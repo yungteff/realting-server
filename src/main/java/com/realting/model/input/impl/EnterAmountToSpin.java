@@ -1,7 +1,7 @@
 package com.realting.model.input.impl;
 
 import com.realting.model.input.EnterAmount;
-import com.realting.world.content.skill.crafting.Flax;
+import com.realting.world.content.player.skill.crafting.Flax;
 import com.realting.model.entity.character.player.Player;
 
 public class EnterAmountToSpin extends EnterAmount {

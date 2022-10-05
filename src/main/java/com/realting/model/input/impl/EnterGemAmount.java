@@ -1,7 +1,7 @@
 package com.realting.model.input.impl;
 
 import com.realting.model.input.EnterAmount;
-import com.realting.world.content.skill.fletching.Fletching;
+import com.realting.world.content.player.skill.fletching.Fletching;
 import com.realting.model.entity.character.player.Player;
 
 /**

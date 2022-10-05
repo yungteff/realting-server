@@ -12,7 +12,7 @@ import com.realting.model.definitions.WeaponInterfaces;
 import com.realting.model.input.impl.ItemSearch;
 import com.realting.world.content.BankPin;
 import com.realting.world.content.BonusManager;
-import com.realting.world.content.skill.dungeoneering.Dungeoneering;
+import com.realting.world.content.player.skill.dungeoneering.Dungeoneering;
 import com.realting.model.entity.character.player.Player;
 
 /**

@@ -16,7 +16,7 @@ import com.realting.model.definitions.ItemDefinition;
 import com.realting.world.content.Sounds.Sound;
 import com.realting.world.content.minigames.Dueling;
 import com.realting.world.content.minigames.Dueling.DuelRule;
-import com.realting.world.content.skill.SkillManager;
+import com.realting.world.content.player.skill.SkillManager;
 import com.realting.model.entity.character.player.Player;
 
 /**

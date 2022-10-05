@@ -3,7 +3,7 @@ package com.realting.model.container.impl;
 import com.realting.model.Item;
 import com.realting.model.container.ItemContainer;
 import com.realting.model.container.StackType;
-import com.realting.world.content.skill.summoning.SummoningData;
+import com.realting.world.content.player.skill.summoning.SummoningData;
 import com.realting.model.entity.character.player.Player;
 
 public class BeastOfBurden extends ItemContainer {

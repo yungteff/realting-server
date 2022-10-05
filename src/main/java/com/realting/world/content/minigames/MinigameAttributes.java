@@ -1,6 +1,6 @@
 package com.realting.world.content.minigames;
 
-import com.realting.world.content.skill.dungeoneering.DungeoneeringParty;
+import com.realting.world.content.player.skill.dungeoneering.DungeoneeringParty;
 
 /**
  * Holds different minigame attributes for a player
