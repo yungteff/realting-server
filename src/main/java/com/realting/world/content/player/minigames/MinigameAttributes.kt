@@ -200,8 +200,8 @@ class MinigameAttributes {
     }
 
     inner class DungeoneeringAttributes {
-        lateinit var party: DungeoneeringParty
-        lateinit var partyInvitation: DungeoneeringParty
+        var party: DungeoneeringParty? = null
+        var partyInvitation: DungeoneeringParty? = null
         var lastInvitation: Long = 0
         var boundItems = IntArray(5)
         var damageDealt = 0

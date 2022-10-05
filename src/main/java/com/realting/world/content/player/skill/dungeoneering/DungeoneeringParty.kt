@@ -1,16 +1,16 @@
 package com.realting.world.content.player.skill.dungeoneering
 
-import com.realting.world.content.dialogue.DialogueManager
 import com.realting.GameSettings
 import com.realting.model.*
-import com.realting.world.World
 import com.realting.model.entity.character.GroundItemManager
-import java.util.concurrent.CopyOnWriteArrayList
-import com.realting.world.content.dialogue.impl.DungPartyInvitation
-import com.realting.world.content.PlayerPanel
 import com.realting.model.entity.character.npc.NPC
 import com.realting.model.entity.character.player.Player
 import com.realting.util.Misc
+import com.realting.world.World
+import com.realting.world.content.PlayerPanel
+import com.realting.world.content.dialogue.DialogueManager
+import com.realting.world.content.dialogue.impl.DungPartyInvitation
+import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * @author Gabriel Hannason
@@ -118,10 +118,10 @@ class DungeoneeringParty(val ownerPlayer: Player) {
                 }
             }
             if (hasEnteredDungeon) {
-                for (npc in p.minigameAttributes.dungeoneeringAttributes.party.npcs) {
+                for (npc in p.minigameAttributes.dungeoneeringAttributes.party!!.npcs) {
                     if (npc != null && npc.position.z == p.position.z) World.deregister(npc)
                 }
-                for (groundItem in p.minigameAttributes.dungeoneeringAttributes.party.groundItems) {
+                for (groundItem in p.minigameAttributes.dungeoneeringAttributes.party!!.groundItems) {
                     if (groundItem != null) GroundItemManager.remove(groundItem, true)
                 }
             }
@@ -273,10 +273,10 @@ class DungeoneeringParty(val ownerPlayer: Player) {
             }
             if (p.minigameAttributes.dungeoneeringAttributes.party == null) p.minigameAttributes.dungeoneeringAttributes.party =
                 DungeoneeringParty(p)
-            p.minigameAttributes.dungeoneeringAttributes.party.dungeoneeringFloor = DungeoneeringFloor.FIRST_FLOOR
-            p.minigameAttributes.dungeoneeringAttributes.party.complexity = 1
+            p.minigameAttributes.dungeoneeringAttributes.party!!.dungeoneeringFloor = DungeoneeringFloor.FIRST_FLOOR
+            p.minigameAttributes.dungeoneeringAttributes.party!!.complexity = 1
             p.packetSender.sendMessage("<img=10> <col=660000>You've created a Dungeoneering party. Perhaps you should invite a few players?")
-            p.minigameAttributes.dungeoneeringAttributes.party.refreshInterface()
+            p.minigameAttributes.dungeoneeringAttributes.party!!.refreshInterface()
             p.packetSender.sendTabInterface(GameSettings.QUESTS_TAB, Dungeoneering.PARTY_INTERFACE)
             p.packetSender.sendDungeoneeringTabIcon(true)
             p.packetSender.sendTab(GameSettings.QUESTS_TAB).sendInterfaceRemoval()

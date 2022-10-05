@@ -1,18 +1,18 @@
 package com.realting.world.content.player.skill.dungeoneering
 
-import com.realting.world.content.dialogue.DialogueManager
-import com.realting.world.content.combat.prayer.PrayerHandler
-import com.realting.world.content.combat.prayer.CurseHandler
-import com.realting.engine.task.TaskManager
 import com.realting.GameSettings
 import com.realting.engine.task.Task
+import com.realting.engine.task.TaskManager
 import com.realting.model.*
-import com.realting.world.World
 import com.realting.model.entity.character.GroundItemManager
 import com.realting.model.entity.character.npc.NPC
 import com.realting.model.entity.character.player.Player
 import com.realting.util.Misc
+import com.realting.world.World
 import com.realting.world.content.CustomObjects
+import com.realting.world.content.combat.prayer.CurseHandler
+import com.realting.world.content.combat.prayer.PrayerHandler
+import com.realting.world.content.dialogue.DialogueManager
 
 /**
  * yeye
@@ -29,7 +29,7 @@ object Dungeoneering {
             DialogueManager.start(p, 111)
             return
         }
-        val party = p.minigameAttributes.dungeoneeringAttributes.party
+        val party = p.minigameAttributes.dungeoneeringAttributes.party!!
         if (party.hasEnteredDungeon()) return
         if (party.dungeoneeringFloor == null) {
             DialogueManager.start(p, 112)
@@ -124,7 +124,7 @@ object Dungeoneering {
     @JvmStatic
     fun leave(p: Player, resetTab: Boolean, leaveParty: Boolean) {
         if (p.minigameAttributes.dungeoneeringAttributes.party != null) {
-            p.minigameAttributes.dungeoneeringAttributes.party.remove(p, resetTab, leaveParty)
+            p.minigameAttributes.dungeoneeringAttributes.party!!.remove(p, resetTab, leaveParty)
             p.isInDung = false
         } else if (resetTab) {
             p.packetSender.sendTabInterface(GameSettings.QUESTS_TAB, if (p.isKillsTrackerOpen) 55000 else 639)
@@ -157,13 +157,13 @@ object Dungeoneering {
 
     @JvmStatic
     fun doingDungeoneering(p: Player): Boolean {
-        return p.minigameAttributes.dungeoneeringAttributes.party != null && p.minigameAttributes.dungeoneeringAttributes.party.hasEnteredDungeon()
+        return p.minigameAttributes.dungeoneeringAttributes.party != null && p.minigameAttributes.dungeoneeringAttributes.party!!.hasEnteredDungeon()
     }
 
     @JvmStatic
     fun handlePlayerDeath(player: Player) {
         player.minigameAttributes.dungeoneeringAttributes.incrementDeaths()
-        val party = player.minigameAttributes.dungeoneeringAttributes.party
+        val party = player.minigameAttributes.dungeoneeringAttributes.party!!
         val pos = party.dungeoneeringFloor!!.entrance
         player.moveTo(Position(pos.x, pos.y, player.position.z))
         party.sendMessage("@red@" + player.username + " has died and been moved to the starting room.")
@@ -193,7 +193,7 @@ object Dungeoneering {
     @JvmStatic
     fun handleNpcDeath(p: Player, n: NPC) {
         if (n.position.z == p.position.z) {
-            val party = p.minigameAttributes.dungeoneeringAttributes.party
+            val party = p.minigameAttributes.dungeoneeringAttributes.party!!
             if (!party.npcs.contains(n)) return
             party.npcs.remove(n)
             party.kills = party.kills + 1
