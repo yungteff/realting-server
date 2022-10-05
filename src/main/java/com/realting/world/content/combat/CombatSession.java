@@ -2,13 +2,13 @@ package com.realting.world.content.combat;
 
 import com.realting.engine.task.Task;
 import com.realting.model.container.impl.Equipment;
+import com.realting.model.entity.character.npc.NPC;
+import com.realting.model.entity.character.player.Player;
 import com.realting.world.content.Sounds;
 import com.realting.world.content.combat.HitQueue.CombatHit;
 import com.realting.world.content.combat.range.CombatRangedAmmo.RangedWeaponData;
 import com.realting.world.content.combat.strategy.impl.DefaultRangedCombatStrategy;
 import com.realting.world.content.combat.weapon.CombatSpecial;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.player.Player;
 
 /**
  * A {@link Task} implementation that handles every combat 'hook' or 'turn'
@@ -25,7 +25,7 @@ public class CombatSession {
 	 * Create a new {@link CombatSession}.
 	 * 
 	 * @param builder
-	 *            the builder assigned to this task.
+	 * the builder assigned to this task.
 	 */
 	public CombatSession(CombatBuilder builder) {
 		this.builder = builder;
@@ -126,12 +126,12 @@ public class CombatSession {
 					}
 				}
 
-			/*	if(container.getHitDelay() == 0) { //An instant attack
-					new CombatHitTask(builder, container).handleAttack();
-				} else {
-					TaskManager.submit(new CombatHitTask(builder, container, container.getHitDelay(), false));
-				}
-				*/
+//				if(container.getHitDelay() == 0) { //An instant attack
+//					new CombatHitTask(builder, container).handleAttack();
+//				} else {
+//					TaskManager.submit(new CombatHitTask(builder, container, container.getHitDelay(), false));
+//				}
+
 				builder.getHitQueue().append(new CombatHit(builder, container, container.getHitDelay()));
 
 				builder.setContainer(null); //Fetch a brand new container on next attack
