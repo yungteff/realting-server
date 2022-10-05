@@ -117,7 +117,7 @@ public class DialogueOptions {
 					break;
 				case 48:
 					for (int index = 0; index < JewelryTeleports.values().length; index++) {
-						if (index == JewelryTeleports.jewelIndex(player.getStrippedJewelryName()) && player.getClickDelay().elapsed(4500) && !player.getMovementQueue().isLockMovement()) {
+						if (index == JewelryTeleports.jewelIndex(player.getStrippedJewelryName()) && player.getClickDelay().elapsed(4500) && !player.getMovementQueue().isLockedMovement()) {
 							for (int i = 0; i < JewelryTeleports.values()[index].getItemId().length; i++) {
 								if (player.getSelectedSkillingItem() == JewelryTeleports.values()[index].getItemIdIndex(i) && player.getSelectedSkillingItemTwo() == JewelryTeleports.values()[index].getItemIdIndex(i+1)) {
 									player.getInventory().delete(player.getSelectedSkillingItem(), 1);
@@ -269,7 +269,7 @@ public class DialogueOptions {
 					break;
 				case 48:
 					for (int index = 0; index < JewelryTeleports.values().length; index++) {
-						if (index == JewelryTeleports.jewelIndex(player.getStrippedJewelryName()) && player.getClickDelay().elapsed(4500) && !player.getMovementQueue().isLockMovement()) {
+						if (index == JewelryTeleports.jewelIndex(player.getStrippedJewelryName()) && player.getClickDelay().elapsed(4500) && !player.getMovementQueue().isLockedMovement()) {
 							for (int i = 0; i < JewelryTeleports.values()[index].getItemId().length; i++) {
 								if (player.getSelectedSkillingItem() == JewelryTeleports.values()[index].getItemIdIndex(i) && player.getSelectedSkillingItemTwo() == JewelryTeleports.values()[index].getItemIdIndex(i+1)) {
 									player.getInventory().delete(player.getSelectedSkillingItem(), 1);
@@ -422,7 +422,7 @@ public class DialogueOptions {
 					break;
 				case 48:
 					for (int index = 0; index < JewelryTeleports.values().length; index++) {
-						if (index == JewelryTeleports.jewelIndex(player.getStrippedJewelryName()) && player.getClickDelay().elapsed(4500) && !player.getMovementQueue().isLockMovement()) {
+						if (index == JewelryTeleports.jewelIndex(player.getStrippedJewelryName()) && player.getClickDelay().elapsed(4500) && !player.getMovementQueue().isLockedMovement()) {
 							for (int i = 0; i < JewelryTeleports.values()[index].getItemId().length; i++) {
 								if (player.getSelectedSkillingItem() == JewelryTeleports.values()[index].getItemIdIndex(i) && player.getSelectedSkillingItemTwo() == JewelryTeleports.values()[index].getItemIdIndex(i+1)) {
 									player.getInventory().delete(player.getSelectedSkillingItem(), 1);
@@ -535,7 +535,7 @@ public class DialogueOptions {
 					break;
 				case 48:
 					for (int index = 0; index < JewelryTeleports.values().length; index++) {
-						if (index == JewelryTeleports.jewelIndex(player.getStrippedJewelryName()) && player.getClickDelay().elapsed(4500) && !player.getMovementQueue().isLockMovement()) {
+						if (index == JewelryTeleports.jewelIndex(player.getStrippedJewelryName()) && player.getClickDelay().elapsed(4500) && !player.getMovementQueue().isLockedMovement()) {
 							for (int i = 0; i < JewelryTeleports.values()[index].getItemId().length; i++) {
 								if (player.getSelectedSkillingItem() == JewelryTeleports.values()[index].getItemIdIndex(i) && player.getSelectedSkillingItemTwo() == JewelryTeleports.values()[index].getItemIdIndex(i+1)) {
 									player.getInventory().delete(player.getSelectedSkillingItem(), 1);
@@ -1014,7 +1014,7 @@ public class DialogueOptions {
 					break;
 				case 198:
 					for (int index = 0; index < JewelryTeleports.values().length; index++) {
-						if (index == JewelryTeleports.jewelIndex(player.getStrippedJewelryName()) && player.getClickDelay().elapsed(4500) && !player.getMovementQueue().isLockMovement()) {
+						if (index == JewelryTeleports.jewelIndex(player.getStrippedJewelryName()) && player.getClickDelay().elapsed(4500) && !player.getMovementQueue().isLockedMovement()) {
 							for (int i = 0; i < JewelryTeleports.values()[index].getItemId().length; i++) {
 								if (player.getSelectedSkillingItem() == JewelryTeleports.values()[index].getItemIdIndex(i) && player.getSelectedSkillingItemTwo() == JewelryTeleports.values()[index].getItemIdIndex(i+1)) {
 									player.getInventory().delete(player.getSelectedSkillingItem(), 1);
@@ -1301,7 +1301,7 @@ public class DialogueOptions {
 			switch(player.getDialogueActionId()) {
 				case 196:
 					for (int index = 0; index < JewelryTeleports.values().length; index++) {
-						if (index == JewelryTeleports.jewelIndex(player.getStrippedJewelryName()) && player.getClickDelay().elapsed(4500) && !player.getMovementQueue().isLockMovement()) {
+						if (index == JewelryTeleports.jewelIndex(player.getStrippedJewelryName()) && player.getClickDelay().elapsed(4500) && !player.getMovementQueue().isLockedMovement()) {
 							for (int i = 0; i < JewelryTeleports.values()[index].getItemId().length; i++) {
 								if (player.getSelectedSkillingItem() == JewelryTeleports.values()[index].getItemIdIndex(i) && player.getSelectedSkillingItemTwo() == JewelryTeleports.values()[index].getItemIdIndex(i+1)) {
 									player.getInventory().delete(player.getSelectedSkillingItem(), 1);
@@ -1318,7 +1318,7 @@ public class DialogueOptions {
 					break;
 				case 197:
 					for (int index = 0; index < JewelryTeleports.values().length; index++) {
-						if (index == JewelryTeleports.jewelIndex(player.getStrippedJewelryName()) && player.getClickDelay().elapsed(4500) && !player.getMovementQueue().isLockMovement()) {
+						if (index == JewelryTeleports.jewelIndex(player.getStrippedJewelryName()) && player.getClickDelay().elapsed(4500) && !player.getMovementQueue().isLockedMovement()) {
 							for (int i = 0; i < JewelryTeleports.values()[index].getItemId().length; i++) {
 								if (player.getSelectedSkillingItem() == JewelryTeleports.values()[index].getItemIdIndex(i) && player.getSelectedSkillingItemTwo() == JewelryTeleports.values()[index].getItemIdIndex(i+1)) {
 									player.getInventory().delete(player.getSelectedSkillingItem(), 1);
@@ -1420,7 +1420,7 @@ public class DialogueOptions {
 			switch(player.getDialogueActionId()) {
 				case 196:
 					for (int index = 0; index < JewelryTeleports.values().length; index++) {
-						if (index == JewelryTeleports.jewelIndex(player.getStrippedJewelryName()) && player.getClickDelay().elapsed(4500) && !player.getMovementQueue().isLockMovement()) {
+						if (index == JewelryTeleports.jewelIndex(player.getStrippedJewelryName()) && player.getClickDelay().elapsed(4500) && !player.getMovementQueue().isLockedMovement()) {
 							for (int i = 0; i < JewelryTeleports.values()[index].getItemId().length; i++) {
 								if (player.getSelectedSkillingItem() == JewelryTeleports.values()[index].getItemIdIndex(i) && player.getSelectedSkillingItemTwo() == JewelryTeleports.values()[index].getItemIdIndex(i+1)) {
 									player.getInventory().delete(player.getSelectedSkillingItem(), 1);
@@ -1437,7 +1437,7 @@ public class DialogueOptions {
 					break;
 				case 197:
 					for (int index = 0; index < JewelryTeleports.values().length; index++) {
-						if (index == JewelryTeleports.jewelIndex(player.getStrippedJewelryName()) && player.getClickDelay().elapsed(4500) && !player.getMovementQueue().isLockMovement()) {
+						if (index == JewelryTeleports.jewelIndex(player.getStrippedJewelryName()) && player.getClickDelay().elapsed(4500) && !player.getMovementQueue().isLockedMovement()) {
 							for (int i = 0; i < JewelryTeleports.values()[index].getItemId().length; i++) {
 								if (player.getSelectedSkillingItem() == JewelryTeleports.values()[index].getItemIdIndex(i) && player.getSelectedSkillingItemTwo() == JewelryTeleports.values()[index].getItemIdIndex(i+1)) {
 									player.getInventory().delete(player.getSelectedSkillingItem(), 1);

@@ -36,7 +36,7 @@ public class DwarfMultiCannon {
 		c.getMovementQueue().reset();
 		c.setSettingUpCannon(true);
 		c.getSkillManager().stopSkilling();
-		final boolean movementLock = c.getMovementQueue().isLockMovement();
+		final boolean movementLock = c.getMovementQueue().isLockedMovement();
 		c.getMovementQueue().setLockMovement(true);
 		final GameObject object = new GameObject(CANNON_BASE, c.getPosition().copy());
 		final GameObject object2 = new GameObject(CANNON_STAND, c.getPosition().copy());

@@ -22,7 +22,7 @@ import com.realting.world.content.player.skill.dungeoneering.Dungeoneering
 object Firemaking {
     @JvmStatic
     fun lightFire(player: Player, log: Int, addingToFire: Boolean, amount: Int) {
-        if (!player.clickDelay.elapsed(2000) || player.movementQueue.isLockMovement) return
+        if (!player.clickDelay.elapsed(2000) || player.movementQueue.isLockedMovement) return
         if (!player.location.isFiremakingAllowed) {
             player.packetSender.sendMessage("You can not light a fire in this area.")
             return
@@ -57,7 +57,7 @@ object Firemaking {
         if (!addingToFire) {
             player.packetSender.sendMessage("You attempt to light a fire..")
             player.performAnimation(Animation(733))
-            player.movementQueue.isLockMovement = true
+            player.movementQueue.isLockedMovement = true
         }
         player.currentTask = object : Task(if (addingToFire) 2 else cycle, player, if (addingToFire) true else false) {
             var added = 0
@@ -82,7 +82,7 @@ object Firemaking {
                     player.packetSender.sendMessage("You add some logs to the fire..")
                 } else {
                     if (!player.movementQueue.isMoving) {
-                        player.movementQueue.isLockMovement = false
+                        player.movementQueue.isLockedMovement = false
                         player.performAnimation(Animation(65535))
                         MovementQueue.stepAway(player)
                     }
@@ -117,7 +117,7 @@ object Firemaking {
             override fun stop() {
                 setEventRunning(false)
                 player.performAnimation(Animation(65535))
-                player.movementQueue.isLockMovement = false
+                player.movementQueue.isLockedMovement = false
             }
         }
         TaskManager.submit(player.currentTask)

@@ -3,11 +3,11 @@ package com.realting.net.packet.impl;
 import com.realting.model.Animation;
 import com.realting.model.PlayerRights;
 import com.realting.model.Position;
+import com.realting.model.entity.character.player.Player;
 import com.realting.net.packet.Packet;
 import com.realting.net.packet.PacketListener;
 import com.realting.world.content.minigames.Dueling;
 import com.realting.world.content.minigames.Dueling.DuelRule;
-import com.realting.model.entity.character.player.Player;
 
 /**
  * This packet listener is called when a player has clicked on 
@@ -119,7 +119,7 @@ public class MovementPacketListener implements PacketListener {
 		if(player.isNeedsPlacement()) {
 			return false;
 		}
-		return !player.getMovementQueue().isLockMovement();
+		return !player.getMovementQueue().isLockedMovement();
 	}
 
 	public static final int TELEPORT_MOVEMENT_OPCODE = 242;

@@ -1,15 +1,11 @@
-package com.realting.model.movement;
+package com.realting.model.movement
 
 /**
  * Represents a player's movement status, whether they are standing still,
  * moving, frozen or stunned.
- * 
+ *
  * @author relex lawl
  */
-public enum MovementStatus {
-	NONE,
-	MOVING,
-	FROZEN,
-	STUNNED,
-	CANNOT_MOVE;
+enum class MovementStatus {
+    NONE, MOVING, FROZEN, STUNNED, CANNOT_MOVE
 }

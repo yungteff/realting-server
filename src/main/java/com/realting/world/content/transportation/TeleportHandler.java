@@ -5,11 +5,11 @@ import com.realting.engine.task.TaskManager;
 import com.realting.model.Animation;
 import com.realting.model.Graphic;
 import com.realting.model.Position;
+import com.realting.model.entity.character.player.Player;
 import com.realting.world.content.Kraken;
 import com.realting.world.content.Sounds;
 import com.realting.world.content.Sounds.Sound;
 import com.realting.world.content.player.skill.dungeoneering.Dungeoneering;
-import com.realting.model.entity.character.player.Player;
 
 
 public class TeleportHandler {
@@ -20,7 +20,7 @@ public class TeleportHandler {
 				return;
 			}
 		}
-		if(!player.getClickDelay().elapsed(4500) || player.getMovementQueue().isLockMovement())
+		if(!player.getClickDelay().elapsed(4500) || player.getMovementQueue().isLockedMovement())
 			return;
 		player.setTeleporting(true).getMovementQueue().setLockMovement(true).reset();
 		cancelCurrentActions(player);

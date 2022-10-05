@@ -3,8 +3,8 @@ package com.realting.world.content.transportation;
 import com.realting.model.Item;
 import com.realting.model.Position;
 import com.realting.model.container.impl.Equipment;
-import com.realting.world.content.dialogue.DialogueManager;
 import com.realting.model.entity.character.player.Player;
+import com.realting.world.content.dialogue.DialogueManager;
 
 public class JewelryTeleporting {
 
@@ -20,7 +20,7 @@ public class JewelryTeleporting {
 		if(!TeleportHandler.checkReqs(player, location)) {
 			return;
 		}
-		if(!player.getClickDelay().elapsed(4500) || player.getMovementQueue().isLockMovement())
+		if(!player.getClickDelay().elapsed(4500) || player.getMovementQueue().isLockedMovement())
 			return;
 		int pItem = player.getSelectedSkillingItem();
 		if(!player.getInventory().contains(pItem) && !player.getEquipment().contains(pItem)) {

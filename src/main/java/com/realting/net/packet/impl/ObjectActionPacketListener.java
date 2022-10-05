@@ -5,21 +5,11 @@ import com.realting.engine.task.Task;
 import com.realting.engine.task.TaskManager;
 import com.realting.engine.task.impl.WalkToTask;
 import com.realting.engine.task.impl.WalkToTask.FinalizedMovementTask;
-import com.realting.model.Animation;
-import com.realting.model.Direction;
-import com.realting.model.DwarfCannon;
-import com.realting.model.Flag;
-import com.realting.model.GameObject;
-import com.realting.model.Graphic;
-import com.realting.model.GraphicHeight;
+import com.realting.model.*;
 import com.realting.model.Locations.Location;
-import com.realting.model.MagicSpellbook;
-import com.realting.model.PlayerRights;
-import com.realting.model.Position;
-import com.realting.model.Prayerbook;
-import com.realting.model.Skill;
 import com.realting.model.container.impl.Equipment;
 import com.realting.model.definitions.GameObjectDefinition;
+import com.realting.model.entity.character.player.Player;
 import com.realting.model.input.impl.DonateToWell;
 import com.realting.model.input.impl.EnterAmountOfLogsToAdd;
 import com.realting.net.packet.Packet;
@@ -29,7 +19,6 @@ import com.realting.world.World;
 import com.realting.world.clip.region.RegionClipping;
 import com.realting.world.content.CrystalChest;
 import com.realting.world.content.CustomObjects;
-import com.realting.world.content.player.events.WildernessObelisks;
 import com.realting.world.content.combat.magic.Autocasting;
 import com.realting.world.content.combat.prayer.CurseHandler;
 import com.realting.world.content.combat.prayer.PrayerHandler;
@@ -39,17 +28,9 @@ import com.realting.world.content.dialogue.DialogueManager;
 import com.realting.world.content.grandexchange.GrandExchange;
 import com.realting.world.content.holidayevents.christmas2016;
 import com.realting.world.content.holidayevents.easter2017data;
-import com.realting.world.content.minigames.Barrows;
-import com.realting.world.content.minigames.Dueling;
+import com.realting.world.content.minigames.*;
 import com.realting.world.content.minigames.Dueling.DuelRule;
-import com.realting.world.content.minigames.FightCave;
-import com.realting.world.content.minigames.FightPit;
-import com.realting.world.content.minigames.Nomad;
-import com.realting.world.content.minigames.PestControl;
-import com.realting.world.content.minigames.RecipeForDisaster;
-import com.realting.world.content.minigames.WarriorsGuild;
-import com.realting.world.content.portal.portal;
-import com.realting.world.content.randomevents.EvilTree.EvilTreeDef;
+import com.realting.world.content.player.events.WildernessObelisks;
 import com.realting.world.content.player.skill.agility.Agility;
 import com.realting.world.content.player.skill.construction.Construction;
 import com.realting.world.content.player.skill.construction.ConstructionActions;
@@ -71,10 +52,11 @@ import com.realting.world.content.player.skill.thieving.Stalls;
 import com.realting.world.content.player.skill.woodcutting.Woodcutting;
 import com.realting.world.content.player.skill.woodcutting.WoodcuttingData;
 import com.realting.world.content.player.skill.woodcutting.WoodcuttingData.Hatchet;
+import com.realting.world.content.portal.portal;
+import com.realting.world.content.randomevents.EvilTree.EvilTreeDef;
 import com.realting.world.content.transportation.TeleportHandler;
 import com.realting.world.content.transportation.TeleportLocations;
 import com.realting.world.content.transportation.TeleportType;
-import com.realting.model.entity.character.player.Player;
 
 /**
  * This packet listener is called when a player clicked
@@ -114,7 +96,7 @@ public class ObjectActionPacketListener implements PacketListener {
 		if (size <= 0)
 			size = 1;
 		gameObject.setSize(size);
-		if(player.getMovementQueue().isLockMovement())
+		if(player.getMovementQueue().isLockedMovement())
 			return;
 		if(player.getRights() == PlayerRights.DEVELOPER)
 			player.getPacketSender().sendMessage("First click object id; [id, position] : [" + id + ", " + position.toString() + "]");
@@ -1562,7 +1544,7 @@ public class ObjectActionPacketListener implements PacketListener {
 
 	@Override
 	public void handleMessage(Player player, Packet packet) {
-		if(player.isTeleporting() || player.isPlayerLocked() || player.getMovementQueue().isLockMovement())
+		if(player.isTeleporting() || player.isPlayerLocked() || player.getMovementQueue().isLockedMovement())
 			return;
 		switch (packet.getOpcode()) {
 		case FIRST_CLICK:

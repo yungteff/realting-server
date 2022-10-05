@@ -1,109 +1,80 @@
-package com.realting.model.movement;
+package com.realting.model.movement
 
-import com.realting.engine.task.Task;
-import com.realting.engine.task.TaskManager;
-import com.realting.model.Direction;
-import com.realting.model.Locations;
-import com.realting.model.Locations.Location;
-import com.realting.model.Position;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.player.Player;
-import com.realting.world.clip.region.RegionClipping;
-import com.realting.world.content.EnergyHandler;
-import com.realting.world.content.combat.CombatFactory;
-
-import java.util.ArrayDeque;
-import java.util.Deque;
+import com.realting.engine.task.Task
+import com.realting.engine.task.TaskManager
+import com.realting.model.Direction
+import com.realting.model.Locations
+import com.realting.model.Position
+import com.realting.model.entity.character.CharacterEntity
+import com.realting.model.entity.character.npc.NPC
+import com.realting.model.entity.character.player.Player
+import com.realting.model.movement.PathFinder.findPath
+import com.realting.world.clip.region.RegionClipping
+import com.realting.world.content.EnergyHandler
+import com.realting.world.content.combat.CombatFactory.Companion.checkAttackDistance
+import java.util.*
 
 /**
- * A queue of {@link Direction}s which a {@link CharacterEntity} will follow.
+ * A queue of [Direction]s which a [CharacterEntity] will follow.
  *
  * @author Graham Edgecombe
  * Edited by Gabbe
  */
-public final class MovementQueue {
-
+class MovementQueue(
+    /**
+     * The character whose walking queue this is.
+     */
+    private val character: CharacterEntity
+) {
     /**
      * Represents a single point in the queue.
      *
      * @author Graham Edgecombe
      */
-    private static final class Point {
-
+    private class Point
+    /**
+     * Creates a point.
+     *
+     * @param position  The position.
+     * @param direction The direction.
+     */(
         /**
          * The point's position.
          */
-        private final Position position;
-
+        val position: Position,
         /**
          * The direction to walk to this point.
          */
-        private final Direction direction;
-
-        /**
-         * Creates a point.
-         *
-         * @param position  The position.
-         * @param direction The direction.
-         */
-        public Point(Position position, Direction direction) {
-            this.position = position;
-            this.direction = direction;
+        val direction: Direction
+    ) {
+        override fun toString(): String {
+            return (Point::class.java.name + " [direction=" + direction
+                    + ", position=" + position + "]")
         }
-
-        @Override
-        public String toString() {
-            return Point.class.getName() + " [direction=" + direction
-                    + ", position=" + position + "]";
-        }
-
     }
-
-    /**
-     * The maximum size of the queue. If any additional steps are added, they
-     * are discarded.
-     */
-    private static final int MAXIMUM_SIZE = 100;
-
-    /**
-     * The character whose walking queue this is.
-     */
-    private final CharacterEntity character;
 
     /**
      * The queue of directions.
      */
-    private final Deque<Point> points = new ArrayDeque<Point>();
+    private val points: Deque<Point> = ArrayDeque()
 
     /**
      * The following task
      */
-    private Task followTask;
-    private CharacterEntity followCharacter;
-
-    /**
-     * Creates a walking queue for the specified character.
-     *
-     * @param character The character.
-     */
-    public MovementQueue(CharacterEntity character) {
-        this.character = character;
-        this.isPlayer = character.isPlayer();
-    }
-
-    private final boolean isPlayer;
+    private var followTask: Task? = null
+    internal var followCharacter: CharacterEntity? = null
+    private val isPlayer: Boolean = character.isPlayer
 
     /**
      * Sets a character to follow
      */
-    public void setFollowCharacter(CharacterEntity followCharacter) {
-        this.followCharacter = followCharacter;
-        startFollow();
+    fun setFollowCharacter(followCharacter: CharacterEntity?) {
+        this.followCharacter = followCharacter
+        startFollow()
     }
 
-    public CharacterEntity getFollowCharacter() {
-        return followCharacter;
+    fun getFollowCharacter(): CharacterEntity? {
+        return followCharacter
     }
 
     /**
@@ -111,13 +82,13 @@ public final class MovementQueue {
      * client position by looking at the previous queue.
      *
      * @param clientConnectionPosition The first step.
-     * @return {@code true} if the queues could be connected correctly,
-     * {@code false} if not.
+     * @return `true` if the queues could be connected correctly,
+     * `false` if not.
      */
-    public boolean addFirstStep(Position clientConnectionPosition) {
-        reset();
-        addStep(clientConnectionPosition);
-        return true;
+    fun addFirstStep(clientConnectionPosition: Position): Boolean {
+        reset()
+        addStep(clientConnectionPosition)
+        return true
     }
 
     /**
@@ -125,13 +96,13 @@ public final class MovementQueue {
      *
      * @param x       X to walk to
      * @param y       Y to walk to
-     * @param clipped Can the step walk through objects?
+     * //     * @param clipped Can the step walk through objects?
      */
-    public void walkStep(int x, int y) {
-        Position position = character.getPosition().copy();
-        position.setX(position.getX() + x);
-        position.setY(position.getY() + y);
-        addStep(position);
+    fun walkStep(x: Int, y: Int) {
+        val position = character.position.copy()
+        position.x = position.x + x
+        position.y = position.y + y
+        addStep(position)
     }
 
     /**
@@ -140,22 +111,18 @@ public final class MovementQueue {
      * @param x           The x coordinate of this step.
      * @param y           The y coordinate of this step.
      * @param heightLevel
-     * @param flag
+     * //     * @param flag
      */
-    private void addStep(int x, int y, int heightLevel) {
-        if (character.getMovementQueue().isLockMovement() || character.isFrozen() || character.isStunned()) {
-            return;
+    private fun addStep(x: Int, y: Int, heightLevel: Int) {
+        if (character.movementQueue.isLockedMovement || character.isFrozen || character.isStunned) {
+            return
         }
-
-        if (points.size() >= MAXIMUM_SIZE)
-            return;
-
-        final Point last = getLast();
-        final int deltaX = x - last.position.getX();
-        final int deltaY = y - last.position.getY();
-        final Direction direction = Direction.fromDeltas(deltaX, deltaY);
-        if (direction != Direction.NONE)
-            points.add(new Point(new Position(x, y, heightLevel), direction));
+        if (points.size >= MAXIMUM_SIZE) return
+        val last = last
+        val deltaX = x - last.position.x
+        val deltaY = y - last.position.y
+        val direction = Direction.fromDeltas(deltaX, deltaY)
+        if (direction != Direction.NONE) points.add(Point(Position(x, y, heightLevel), direction))
     }
 
     /**
@@ -164,40 +131,29 @@ public final class MovementQueue {
      * @param step The step to add.
      * @oaram flag
      */
-    public void addStep(Position step) {
-        if (character.isFrozen() || lockMovement || character.isStunned())
-            return;
-        final Point last = getLast();
-        final int x = step.getX();
-        final int y = step.getY();
-        int deltaX = x - last.position.getX();
-        int deltaY = y - last.position.getY();
-        final int max = Math.max(Math.abs(deltaX), Math.abs(deltaY));
-        for (int i = 0; i < max; i++) {
-            if (deltaX < 0)
-                deltaX++;
-            else if (deltaX > 0)
-                deltaX--;
-            if (deltaY < 0)
-                deltaY++;
-            else if (deltaY > 0)
-                deltaY--;
-            addStep(x - deltaX, y - deltaY, step.getZ());
+    fun addStep(step: Position) {
+        if (character.isFrozen || isLockedMovement || character.isStunned) return
+        val last = last
+        val x = step.x
+        val y = step.y
+        var deltaX = x - last.position.x
+        var deltaY = y - last.position.y
+        val max = Math.max(Math.abs(deltaX), Math.abs(deltaY))
+        for (i in 0 until max) {
+            if (deltaX < 0) deltaX++ else if (deltaX > 0) deltaX--
+            if (deltaY < 0) deltaY++ else if (deltaY > 0) deltaY--
+            addStep(x - deltaX, y - deltaY, step.z)
         }
     }
 
-    public boolean canWalk(int deltaX, int deltaY) {
-        final Position to = new Position(character.getPosition().getX() + deltaX, character.getPosition().getY() + deltaY, character.getPosition().getZ());
-        if (character.getPosition().getZ() == -1 && to.getZ() == -1 && character.isNpc() && !((NPC) character).isSummoningNpc() || character.getLocation() == Location.RECIPE_FOR_DISASTER)
-            return true;
-        return canWalk(character.getPosition(), to, character.getSize());
+    fun canWalk(deltaX: Int, deltaY: Int): Boolean {
+        val to = Position(character.position.x + deltaX, character.position.y + deltaY, character.position.z)
+        return if (character.position.z == -1 && to.z == -1 && character.isNpc && !(character as NPC).isSummoningNpc || character.location === Locations.Location.RECIPE_FOR_DISASTER) true else canWalk(
+            character.position,
+            to,
+            character.size
+        )
     }
-
-    public static boolean canWalk(Position from, Position to, int size) {
-        return RegionClipping.canMove(from, to, size, size);
-    }
-
-
     /*
      * public boolean checkBarricade(int x, int y) { Position position =
      * character.getPosition(); if(character.isPlayer()) {
@@ -207,211 +163,196 @@ public final class MovementQueue {
      * "The path is blocked by a Barricade."); reset(true); return true; } } }
      * return false; }
      */
-
     /**
      * Gets the last point.
      *
      * @return The last point.
      */
-    private Point getLast() {
-        final Point last = points.peekLast();
-        if (last == null)
-            return new Point(character.getPosition(), Direction.NONE);
-        return last;
-    }
+    private val last: Point
+        get() = points.peekLast() ?: Point(character.position, Direction.NONE)
 
     /**
      * @return true if the character is moving.
      */
-    public boolean isMoving() {
-        return !points.isEmpty();
-    }
+    val isMoving: Boolean
+        get() = !points.isEmpty()
 
     /**
      * Called every 600ms, updates the queue.
      */
-    public void sequence() {
-
-        boolean movement = !lockMovement && !character.isFrozen() && !character.isStunned();
-
+    fun sequence() {
+        val movement = !isLockedMovement && !character.isFrozen && !character.isStunned
         if (movement) {
-            Point walkPoint = null;
-            Point runPoint = null;
-
-            walkPoint = points.poll();
-            if (isRunToggled()) {
-                runPoint = points.poll();
+            var walkPoint: Point? = null
+            var runPoint: Point? = null
+            walkPoint = points.poll()
+            if (isRunToggled) {
+                runPoint = points.poll()
             }
-
-            if (character.isNeedsPlacement()) {
-                reset();
-                return;
+            if (character.isNeedsPlacement) {
+                reset()
+                return
             }
-
             if (walkPoint != null && walkPoint.direction != Direction.NONE) {
-
                 if (followCharacter != null) {
-                    if (walkPoint.equals(followCharacter.getPosition())) {
-                        return;
+                    if (walkPoint.position == followCharacter!!.position) {
+                        return
                     } else {
-                        if (!followCharacter.getMovementQueue().isRunToggled()) {
-                            if (character.getPosition().isWithinDistance(followCharacter.getPosition(), 2)) {
-                                runPoint = null;
+                        if (!followCharacter!!.movementQueue.isRunToggled) {
+                            if (character.position.isWithinDistance(followCharacter!!.position, 2)) {
+                                runPoint = null
                             }
                         }
                     }
                 }
-
-                if (!isPlayer && !character.getCombatBuilder().isAttacking()) {
-                    if (((NPC) character).isSummoningNpc() && !((NPC) character).summoningCombat()) {
+                if (!isPlayer && !character.combatBuilder.isAttacking) {
+                    if ((character as NPC).isSummoningNpc && !character.summoningCombat()) {
                         if (!canWalk(character.getPosition(), walkPoint.position, character.getSize())) {
-                            return;
+                            return
                         }
                     }
                 }
-
-                character.setPosition(walkPoint.position);
-                character.setPrimaryDirection(walkPoint.direction);
-                character.setLastDirection(walkPoint.direction);
+                character.position = walkPoint.position
+                character.primaryDirection = walkPoint.direction
+                character.lastDirection = walkPoint.direction
             }
             if (runPoint != null && runPoint.direction != Direction.NONE) {
                 if (followCharacter != null) {
-                    if (walkPoint.equals(followCharacter.getPosition())) {
-                        return;
+                    if (walkPoint.position == followCharacter!!.position) {
+                        return
                     }
                 }
-                character.setPosition(runPoint.position);
-                character.setSecondaryDirection(runPoint.direction);
-                character.setLastDirection(runPoint.direction);
+                character.position = runPoint.position
+                character.secondaryDirection = runPoint.direction
+                character.lastDirection = runPoint.direction
                 if (isPlayer) {
-                    handleRegionChange();
+                    handleRegionChange()
                 }
             }
         }
-
         if (isPlayer) {
-            Locations.process(character);
-            EnergyHandler.processPlayerEnergy((Player) character);
+            Locations.process(character)
+            EnergyHandler.processPlayerEnergy(character as Player)
         }
     }
 
-    public boolean isMovementDone() {
-        return points.size() == 0;
-    }
+    val isMovementDone: Boolean
+        get() = points.size == 0
 
-    public void handleRegionChange() {
-        final int diffX = character.getPosition().getX()
-                - character.getLastKnownRegion().getRegionX() * 8;
-        final int diffY = character.getPosition().getY()
-                - character.getLastKnownRegion().getRegionY() * 8;
-        boolean regionChanged = false;
-        if (diffX < 16)
-            regionChanged = true;
-        else if (diffX >= 88)
-            regionChanged = true;
-        if (diffY < 16)
-            regionChanged = true;
-        else if (diffY >= 88)
-            regionChanged = true;
+    fun handleRegionChange() {
+        val diffX = (character.position.x
+                - character.lastKnownRegion.regionX * 8)
+        val diffY = (character.position.y
+                - character.lastKnownRegion.regionY * 8)
+        var regionChanged = false
+        if (diffX < 16) regionChanged = true else if (diffX >= 88) regionChanged = true
+        if (diffY < 16) regionChanged = true else if (diffY >= 88) regionChanged = true
         if (regionChanged) {
-            ((Player) character).getPacketSender().sendMapRegion();
+            (character as Player).packetSender.sendMapRegion()
         }
     }
 
-    public void startFollow() {
-
-        if (followCharacter == null && (followTask == null || !followTask.isRunning()))
-            return;
-
-        if (followTask == null || !followTask.isRunning()) {
+    fun startFollow() {
+        if (followCharacter == null && (followTask == null || !followTask!!.isRunning)) return
+        if (followTask == null || !followTask!!.isRunning) {
 
             // Build the task that will be scheduled when following.
-            followTask = new Task(1, character, true) {
-                @Override
-                public void execute() {
+            followTask = object : Task(1, character, true) {
+                public override fun execute() {
 
                     // Check if we can still follow the leader.
-                    if (followCharacter == null || followCharacter.getConstitution() <= 0 || !followCharacter.isRegistered() || character.getConstitution() <= 0 || !character.isRegistered()) {
-                        character.setEntityInteraction(null);
-                        this.stop();
-                        return;
+                    if (followCharacter == null || followCharacter!!.constitution <= 0 || !followCharacter!!.isRegistered || character.constitution <= 0 || !character.isRegistered) {
+                        character.setEntityInteraction(null)
+                        stop()
+                        return
                     }
-
-                    boolean combatFollowing = character.getCombatBuilder().isAttacking();
-                    if (!Location.ignoreFollowDistance(character)) {
-                        boolean summNpc = followCharacter.isPlayer() && character.isNpc() && ((NPC) character).isSummoningNpc();
-                        if (!character.getPosition().isWithinDistance(followCharacter.getPosition(), summNpc ? 10 : combatFollowing ? 40 : 20)) {
-                            character.setEntityInteraction(null);
-                            this.stop();
-                            if (summNpc)
-                                ((Player) followCharacter).getSummoning().moveFollower(true);
-                            return;
+                    val combatFollowing = character.combatBuilder.isAttacking
+                    if (!Locations.Location.ignoreFollowDistance(character)) {
+                        val summNpc = followCharacter!!.isPlayer && character.isNpc && (character as NPC).isSummoningNpc
+                        if (!character.position.isWithinDistance(
+                                followCharacter!!.position,
+                                if (summNpc) 10 else if (combatFollowing) 40 else 20
+                            )
+                        ) {
+                            character.setEntityInteraction(null)
+                            stop()
+                            if (summNpc) (followCharacter as Player).summoning.moveFollower(true)
+                            return
                         }
                     }
 
                     // Block if our movement is locked.
-                    if (character.getMovementQueue().isLockMovement() || character.isFrozen() || character.isStunned()) {
-                        return;
+                    if (character.movementQueue.isLockedMovement || character.isFrozen || character.isStunned) {
+                        return
                     }
 
                     // If we are on the same position as the leader then move
                     // away.
 
                     //If combat follow, let the combat factory handle it
-
-                    if (character.getPosition().equals(followCharacter.getPosition())) {
-                        character.getMovementQueue().reset();
-                        if (followCharacter.getMovementQueue().isMovementDone())
-                            MovementQueue.stepAway(character);
-                        return;
+                    if (character.position == followCharacter!!.position) {
+                        character.movementQueue.reset()
+                        if (followCharacter!!.movementQueue.isMovementDone) stepAway(
+                            character
+                        )
+                        return
                     }
 
                     // Check if we are within distance to attack for combat.
                     if (combatFollowing) {
                         //if (character.isPlayer()) {
-                        if (character.getCombatBuilder().getStrategy() == null) {
-                            character.getCombatBuilder().determineStrategy();
+                        if (character.combatBuilder.strategy == null) {
+                            character.combatBuilder.determineStrategy()
                         }
                         //TODO: notsure what it does
-                        if (CombatFactory.checkAttackDistance(character, followCharacter)) {
-                            return;
+                        if (checkAttackDistance(character, followCharacter!!)) {
+                            return
                         }
                     } else {
-                        if (character.getInteractingEntity() != followCharacter) {
-                            character.setEntityInteraction(followCharacter);
+                        if (character.interactingEntity !== followCharacter) {
+                            character.setEntityInteraction(followCharacter)
                         }
                     }
 
                     // If we are within 1 square we don't need to move.
-                    if (Locations.goodDistance(character.getPosition(), followCharacter.getPosition(), 1)) {
-                        return;
+                    if (Locations.goodDistance(character.position, followCharacter!!.position, 1)) {
+                        return
                     }
-
-                    if (character.isNpc() && ((NPC) character).isSummoningNpc() && (followCharacter.getLocation() == Location.HOME_BANK || followCharacter.getLocation() == Location.EDGEVILLE || followCharacter.getLocation() == Location.VARROCK)) {
-                        character.getMovementQueue().walkStep(getMove(character.getPosition().getX(), followCharacter.getPosition().getX(), 1), getMove(character.getPosition().getY() - 1, followCharacter.getPosition().getY(), 1));
+                    if (character.isNpc && (character as NPC).isSummoningNpc && (followCharacter!!.location === Locations.Location.HOME_BANK || followCharacter!!.location === Locations.Location.EDGEVILLE || followCharacter!!.location === Locations.Location.VARROCK)) {
+                        character.getMovementQueue().walkStep(
+                            getMove(character.getPosition().x, followCharacter!!.position.x, 1), getMove(
+                                character.getPosition().y - 1, followCharacter!!.position.y, 1
+                            )
+                        )
                     } else {
-                        PathFinder.findPath(character, followCharacter.getPosition().getX(), followCharacter.getPosition().getY() - character.getSize(), true, character.getSize(), character.getSize());
+                        findPath(
+                            character,
+                            followCharacter!!.position.x,
+                            followCharacter!!.position.y - character.size,
+                            true,
+                            character.size,
+                            character.size
+                        )
                     }
                 }
 
-                @Override
-                public void stop() {
-                    setEventRunning(false);
-                    followTask = null;
+                override fun stop() {
+                    setEventRunning(false)
+                    followTask = null
                 }
-            };
+            }
 
             // Then submit the actual task.
-            TaskManager.submit(followTask);
+            TaskManager.submit(followTask)
         }
     }
 
     /**
      * Stops the movement.
      */
-    public MovementQueue reset() {
-        points.clear();
-        return this;
+    fun reset(): MovementQueue {
+        points.clear()
+        return this
     }
 
     /**
@@ -419,112 +360,121 @@ public final class MovementQueue {
      *
      * @return The size of the queue.
      */
-    public int size() {
-        return points.size();
+    fun size(): Int {
+        return points.size
     }
 
-    /**
-     * The force movement array index values.
-     */
-    public static final int FIRST_MOVEMENT_X = 0, FIRST_MOVEMENT_Y = 1,
-            SECOND_MOVEMENT_X = 2, SECOND_MOVEMENT_Y = 3,
-            MOVEMENT_SPEED = 4, MOVEMENT_REVERSE_SPEED = 5,
-            MOVEMENT_DIRECTION = 6;
-
-    /**
-     * Steps away from a Gamecharacter
-     *
-     * @param character The gamecharacter to step away from
-     */
-    public static void stepAway(CharacterEntity character) {
-        if (character.getMovementQueue().canWalk(-1, 0))
-            character.getMovementQueue().walkStep(-1, 0);
-        else if (character.getMovementQueue().canWalk(1, 0))
-            character.getMovementQueue().walkStep(1, 0);
-        else if (character.getMovementQueue().canWalk(0, -1))
-            character.getMovementQueue().walkStep(0, -1);
-        else if (character.getMovementQueue().canWalk(0, 1))
-            character.getMovementQueue().walkStep(0, 1);
-    }
-
-    public void stun(int delay) {
-        character.setStunDelay(delay);
-        if (character.isPlayer()) {
-            ((Player) character).getPacketSender().sendMessage("You have been stunned!");
+    fun stun(delay: Int) {
+        character.stunDelay = delay
+        if (character.isPlayer) {
+            (character as Player).packetSender.sendMessage("You have been stunned!")
         }
-        reset();
-        TaskManager.submit(new Task(2, character, true) {
-            @Override
-            protected void execute() {
-                if (!character.isRegistered() || character.getConstitution() <= 0) {
-                    stop();
-                    return;
+        reset()
+        TaskManager.submit(object : Task(2, character, true) {
+            override fun execute() {
+                if (!character.isRegistered || character.constitution <= 0) {
+                    stop()
+                    return
                 }
                 if (character.decrementAndGetStunDelay() == 0) {
-                    stop();
+                    stop()
                 }
             }
-        });
+        })
     }
 
-    public void freeze(int delay) {
-        if (character.isFrozen())
-            return;
-        character.setFreezeDelay(delay);
-        if (character.isPlayer()) {
-            ((Player) character).getPacketSender().sendMessage("You have been frozen!");
+    fun freeze(delay: Int) {
+        if (character.isFrozen) return
+        character.freezeDelay = delay
+        if (character.isPlayer) {
+            (character as Player).packetSender.sendMessage("You have been frozen!")
         }
-        reset();
-        TaskManager.submit(new Task(2, character, true) {
-            @Override
-            protected void execute() {
-                if (!character.isRegistered() || character.getConstitution() <= 0) {
-                    stop();
-                    return;
+        reset()
+        TaskManager.submit(object : Task(2, character, true) {
+            override fun execute() {
+                if (!character.isRegistered || character.constitution <= 0) {
+                    stop()
+                    return
                 }
                 if (character.decrementAndGetFreezeDelay() == 0) {
-                    stop();
+                    stop()
                 }
             }
-        });
+        })
     }
-
-    public static int getMove(int x, int p2, int size) {
-        if ((x - p2) == 0) {
-            return 0;
-        } else if ((x - p2) < 0) {
-            return size;
-        } else if ((x - p2) > 0) {
-            return -size;
-        }
-        return 0;
-    }
-
-    /**
-     * If this entity's movement is locked.
-     */
-    private boolean lockMovement;
-
     /**
      * Gets whether or not this entity is 'frozen'.
      *
      * @return true if this entity cannot move.
      */
-    public boolean isLockMovement() {
-        return lockMovement;
-    }
+    /**
+     * If this entity's movement is locked.
+     */
+    public var isLockedMovement = false
 
     /**
      * Sets if this entity can move or not.
      *
      * @param lockMovement true if this entity cannot move.
      */
-    public MovementQueue setLockMovement(boolean lockMovement) {
-        this.lockMovement = lockMovement;
-        return this;
+    fun setLockMovement(lockMovement: Boolean): MovementQueue {
+        isLockedMovement = lockMovement
+        return this
     }
 
-    public boolean isRunToggled() {
-        return character.isPlayer() && ((Player) character).isRunning() && !((Player) character).isCrossingObstacle();
+    val isRunToggled: Boolean
+        get() = character.isPlayer && (character as Player).isRunning && !character.isCrossingObstacle
+
+    companion object {
+        /**
+         * The maximum size of the queue. If any additional steps are added, they
+         * are discarded.
+         */
+        private const val MAXIMUM_SIZE = 100
+
+        @JvmStatic
+        fun canWalk(from: Position?, to: Position?, size: Int): Boolean {
+            return RegionClipping.canMove(from, to, size, size)
+        }
+
+        /**
+         * The force movement array index values.
+         */
+        const val FIRST_MOVEMENT_X = 0
+        const val FIRST_MOVEMENT_Y = 1
+        const val SECOND_MOVEMENT_X = 2
+        const val SECOND_MOVEMENT_Y = 3
+        const val MOVEMENT_SPEED = 4
+        const val MOVEMENT_REVERSE_SPEED = 5
+        const val MOVEMENT_DIRECTION = 6
+
+        /**
+         * Steps away from a Gamecharacter
+         *
+         * @param character The gamecharacter to step away from
+         */
+        fun stepAway(character: CharacterEntity) {
+            if (character.movementQueue.canWalk(-1, 0)) character.movementQueue.walkStep(
+                -1,
+                0
+            ) else if (character.movementQueue.canWalk(1, 0)) character.movementQueue.walkStep(
+                1,
+                0
+            ) else if (character.movementQueue.canWalk(0, -1)) character.movementQueue.walkStep(
+                0,
+                -1
+            ) else if (character.movementQueue.canWalk(0, 1)) character.movementQueue.walkStep(0, 1)
+        }
+
+        fun getMove(x: Int, p2: Int, size: Int): Int {
+            if (x - p2 == 0) {
+                return 0
+            } else if (x - p2 < 0) {
+                return size
+            } else if (x - p2 > 0) {
+                return -size
+            }
+            return 0
+        }
     }
 }

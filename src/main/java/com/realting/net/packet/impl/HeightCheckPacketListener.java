@@ -1,8 +1,8 @@
 package com.realting.net.packet.impl;
 
+import com.realting.model.entity.character.player.Player;
 import com.realting.net.packet.Packet;
 import com.realting.net.packet.PacketListener;
-import com.realting.model.entity.character.player.Player;
 
 /**
  * Cheap fix for the rare height exploit..
@@ -18,7 +18,7 @@ public class HeightCheckPacketListener implements PacketListener {
 
 			if(plane != player.getPosition().getZ()) { //Player might have used a third-party-software to change their height level
 
-				if(!player.isNeedsPlacement() && !player.getMovementQueue().isLockMovement()) { //Only check if player isn't being blocked
+				if(!player.isNeedsPlacement() && !player.getMovementQueue().isLockedMovement()) { //Only check if player isn't being blocked
 
 					//Player used a third-party-software to change their height level, fix it
 					player.getMovementQueue().reset(); //Reset movement

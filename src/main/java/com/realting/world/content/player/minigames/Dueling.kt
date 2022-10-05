@@ -450,7 +450,7 @@ open class Dueling(var player: Player) {
         }
         duelingStatus = 5
         timer = 3
-        player.movementQueue.reset().isLockMovement = true
+        player.movementQueue.reset().isLockedMovement = true
         player.packetSender.sendInterfaceRemoval()
         if (selectedDuelRules[DuelRule.OBSTACLES.ordinal]) {
             if (selectedDuelRules[DuelRule.NO_MOVEMENT.ordinal]) {
@@ -471,13 +471,13 @@ open class Dueling(var player: Player) {
         TaskManager.submit(object : Task(2, player, false) {
             public override fun execute() {
                 if (player.location !== Locations.Location.DUEL_ARENA) {
-                    player.movementQueue.isLockMovement = false
+                    player.movementQueue.isLockedMovement = false
                     stop()
                     return
                 }
                 if (timer == 3 || timer == 2 || timer == 1) player.forceChat("$timer..") else {
                     player.forceChat("FIGHT!!")
-                    player.movementQueue.isLockMovement = false
+                    player.movementQueue.isLockedMovement = false
                     timer = -1
                     stop()
                     return
@@ -493,7 +493,7 @@ open class Dueling(var player: Player) {
         val refund = player.constitution == 0
         duelingStatus = 6
         player.restart()
-        player.movementQueue.reset().isLockMovement = false
+        player.movementQueue.reset().isLockedMovement = false
         if (duelingWith > 0) {
             val playerDuel = World.getPlayers()[duelingWith]
             if (playerDuel != null && playerDuel.dueling.stakedItems.size > 0) {

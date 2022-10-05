@@ -1,19 +1,15 @@
 package com.realting.world.content;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.realting.engine.task.Task;
 import com.realting.engine.task.TaskManager;
-import com.realting.model.Animation;
-import com.realting.model.Flag;
-import com.realting.model.Graphic;
-import com.realting.model.Item;
-import com.realting.model.Skill;
+import com.realting.model.*;
 import com.realting.model.container.impl.Equipment;
+import com.realting.model.entity.character.player.Player;
 import com.realting.util.Misc;
 import com.realting.world.content.player.skill.SkillManager;
-import com.realting.model.entity.character.player.Player;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Handles emotes
@@ -112,7 +108,7 @@ public class Emotes {
 					player.getPacketSender().sendMessage("You must wait a bit before performing another skillcape emote.");
 					return true;
 				}
-				final boolean lock = player.getMovementQueue().isLockMovement();
+				final boolean lock = player.getMovementQueue().isLockedMovement();
 				player.getMovementQueue().setLockMovement(true);
 				player.getEmoteDelay().reset();
 				if (data != Skillcape_Data.DUNGEONEERING && data != Skillcape_Data.DUNGEONEERING_MASTER) {

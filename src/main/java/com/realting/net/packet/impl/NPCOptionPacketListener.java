@@ -3,14 +3,12 @@ package com.realting.net.packet.impl;
 import com.realting.GameSettings;
 import com.realting.engine.task.impl.WalkToTask;
 import com.realting.engine.task.impl.WalkToTask.FinalizedMovementTask;
-import com.realting.model.GameMode;
-import com.realting.model.Graphic;
+import com.realting.model.*;
 import com.realting.model.Locations.Location;
-import com.realting.model.PlayerRights;
-import com.realting.model.Position;
-import com.realting.model.Skill;
 import com.realting.model.container.impl.Shop.ShopManager;
 import com.realting.model.definitions.NpcDefinition;
+import com.realting.model.entity.character.npc.NPC;
+import com.realting.model.entity.character.player.Player;
 import com.realting.net.packet.Packet;
 import com.realting.net.packet.PacketListener;
 import com.realting.util.Misc;
@@ -43,8 +41,6 @@ import com.realting.world.content.player.skill.summoning.SummoningData;
 import com.realting.world.content.player.skill.thieving.Pickpocket;
 import com.realting.world.content.player.skill.thieving.PickpocketData;
 import com.realting.world.content.transportation.TeleportHandler;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.player.Player;
 
 public class NPCOptionPacketListener implements PacketListener {
 
@@ -842,7 +838,7 @@ public class NPCOptionPacketListener implements PacketListener {
 
 	@Override
 	public void handleMessage(Player player, Packet packet) {
-		if(player.isTeleporting() || player.isPlayerLocked() || player.getMovementQueue().isLockMovement())
+		if(player.isTeleporting() || player.isPlayerLocked() || player.getMovementQueue().isLockedMovement())
 			return;
 		switch (packet.getOpcode()) {
 		case ATTACK_NPC:

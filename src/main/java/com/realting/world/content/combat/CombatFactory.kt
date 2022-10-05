@@ -1069,7 +1069,7 @@ class CombatFactory private constructor() {
             val otherMovement = b.movementQueue
 
             // We're moving so increase the distance.
-            if (!movement.isMovementDone && !otherMovement.isMovementDone && !movement.isLockMovement && !a.isFrozen) {
+            if (!movement.isMovementDone && !otherMovement.isMovementDone && !movement.isLockedMovement && !a.isFrozen) {
                 distance += 1
 
                 // We're running so increase the distance even more.

@@ -44,7 +44,7 @@ object PathFinder {
                 val curAbsX = character.position.regionX * 8 + curX
                 val curAbsY = character.position.regionY * 8 + curY
                 if (curX == destXInline && curY == destYInline) {
-                    println("found path: $foundPath")
+//                    println("found path: $foundPath")
                     foundPath = true
                     break
                 }
@@ -176,7 +176,7 @@ object PathFinder {
                 tail--
                 pathX = character.position.regionX * 8 + tileQueueX[tail]
                 pathY = character.position.regionY * 8 + tileQueueY[tail]
-                println("pathX: $pathX pathY: $pathX")
+//                println("pathX: $pathX pathY: $pathX")
                 character.movementQueue.addStep(Position(pathX, pathY, character.position.z))
             }
         } catch (e: Exception) {

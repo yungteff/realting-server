@@ -277,7 +277,7 @@ public class Slayer {
 	public void handleSlayerRingTP(int itemId) {
 		if(!player.getClickDelay().elapsed(4500))
 			return;
-		if(player.getMovementQueue().isLockMovement())
+		if(player.getMovementQueue().isLockedMovement())
 			return;
 		SlayerTasks task = getSlayerTask();
 		if(task == SlayerTasks.NO_TASK)
