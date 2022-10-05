@@ -1,60 +1,55 @@
-package com.realting.world.content.minigames;
+package com.realting.world.content.minigames
 
-import com.realting.engine.task.Task;
-import com.realting.engine.task.TaskManager;
-import com.realting.model.Locations;
-import com.realting.model.Locations.Location;
-import com.realting.model.Position;
-import com.realting.model.RegionInstance;
-import com.realting.model.RegionInstance.RegionInstanceType;
-import com.realting.util.Misc;
-import com.realting.world.World;
-import com.realting.world.content.dialogue.DialogueManager;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.player.Player;
+import com.realting.engine.task.Task
+import com.realting.model.RegionInstance.RegionInstanceType
+import com.realting.engine.task.TaskManager
+import com.realting.world.World
+import com.realting.world.content.dialogue.DialogueManager
+import com.realting.model.*
+import com.realting.model.entity.character.npc.NPC
+import com.realting.model.entity.character.player.Player
+import com.realting.util.Misc
 
-public class FightCave {
+object FightCave {
+    const val JAD_NPC_ID = 2745
 
-	public static final int JAD_NPC_ID = 2745;
+    @JvmStatic
+    fun enterCave(player: Player) {
+        player.moveTo(Position(2413, 5117, (player.index + 1) * 4))
+        DialogueManager.start(player, 36)
+        player.regionInstance = RegionInstance(player, RegionInstanceType.FIGHT_CAVE)
+        spawnJad(player)
+    }
 
-	public static void enterCave(Player player) {
-		player.moveTo(new Position(2413, 5117, (player.getIndex()+1)*4));
-		DialogueManager.start(player, 36);
-		player.setRegionInstance(new RegionInstance(player, RegionInstanceType.FIGHT_CAVE));
-		spawnJad(player);
-	}
+    @JvmStatic
+    fun leaveCave(player: Player, resetStats: Boolean) {
+        Locations.Location.FIGHT_CAVES.leave(player)
+        if (resetStats) player.restart()
+    }
 
-	public static void leaveCave(Player player, boolean resetStats) {
-		Locations.Location.FIGHT_CAVES.leave(player);
-		if(resetStats)
-			player.restart();
-	}
+    fun spawnJad(player: Player) {
+        TaskManager.submit(object : Task(2, player, false) {
+            public override fun execute() {
+                if (player.regionInstance == null || !player.isRegistered || player.location !== Locations.Location.FIGHT_CAVES) {
+                    stop()
+                    return
+                }
+                val n = NPC(JAD_NPC_ID, Position(2399, 5083, player.position.z)).setSpawnedFor(player)
+                World.register(n)
+                player.regionInstance.npcsList.add(n)
+                n.combatBuilder.attack(player)
+                stop()
+            }
+        })
+    }
 
-	public static void spawnJad(final Player player) {
-		TaskManager.submit(new Task(2, player, false) {
-			@Override
-			public void execute() {
-				if(player.getRegionInstance() == null || !player.isRegistered() || player.getLocation() != Location.FIGHT_CAVES) {
-					stop();
-					return;
-				}
-				NPC n = new NPC(JAD_NPC_ID, new Position(2399, 5083, player.getPosition().getZ())).setSpawnedFor(player);
-				World.register(n);
-				player.getRegionInstance().getNpcsList().add(n);
-				n.getCombatBuilder().attack(player);
-				stop();
-			}
-		});
-	}
-
-	public static void handleJadDeath(final Player player, NPC n) {
-		if(n.getId() == JAD_NPC_ID) {
-			if(player.getRegionInstance() != null)
-				player.getRegionInstance().getNpcsList().remove(n);
-			leaveCave(player, true);
-			DialogueManager.start(player, 37);
-			player.getInventory().add(6570, 1).add(6529, 1000 + Misc.getRandom(2000));
-		}
-	}
-
+    @JvmStatic
+    fun handleJadDeath(player: Player, n: NPC) {
+        if (n.id == JAD_NPC_ID) {
+            if (player.regionInstance != null) player.regionInstance.npcsList.remove(n)
+            leaveCave(player, true)
+            DialogueManager.start(player, 37)
+            player.inventory.add(6570, 1).add(6529, 1000 + Misc.getRandom(2000))
+        }
+    }
 }

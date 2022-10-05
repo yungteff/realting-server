@@ -1,257 +1,156 @@
-package com.realting.world.content.minigames;
+package com.realting.world.content.minigames
 
-import com.realting.world.content.player.skill.dungeoneering.DungeoneeringParty;
+import com.realting.world.content.player.skill.dungeoneering.DungeoneeringParty
 
 /**
  * Holds different minigame attributes for a player
  * @author Gabriel Hannason
  */
-public class MinigameAttributes {
+class MinigameAttributes {
+    val barrowsMinigameAttributes = BarrowsMinigameAttributes()
+    val warriorsGuildAttributes = WarriorsGuildAttributes()
+    val pestControlAttributes = PestControlAttributes()
+    val recipeForDisasterAttributes = RecipeForDisasterAttributes()
+    val nomadAttributes = NomadAttributes()
 
-	private final BarrowsMinigameAttributes barrowsMinigameAttributes = new BarrowsMinigameAttributes();
-	private final WarriorsGuildAttributes warriorsGuildAttributes = new WarriorsGuildAttributes();
-	private final PestControlAttributes pestControlAttributes = new PestControlAttributes();
-	private final RecipeForDisasterAttributes rfdAttributes = new RecipeForDisasterAttributes();
-	private final NomadAttributes nomadAttributes = new NomadAttributes();
-	//private final SoulWarsAttributes soulWarsAttributes = new SoulWarsAttributes();
-	private final GodwarsDungeonAttributes godwarsDungeonAttributes = new GodwarsDungeonAttributes();
-	private final GraveyardAttributes graveyardAttributes = new GraveyardAttributes();
-	private final DungeoneeringAttributes dungeoneeringAttributes = new DungeoneeringAttributes();
-	private final trioAttributes trioAttributes = new trioAttributes();
-	private final ZulrahAttributes zulrahAttributes = new ZulrahAttributes();
+    //private final SoulWarsAttributes soulWarsAttributes = new SoulWarsAttributes();
+    val godwarsDungeonAttributes = GodwarsDungeonAttributes()
+    val graveyardAttributes = GraveyardAttributes()
+    val dungeoneeringAttributes = DungeoneeringAttributes()
+    val trioAttuibutes = trioAttributes()
+    val zulrahAttributes = ZulrahAttributes()
 
-	public class GraveyardAttributes {
+    inner class GraveyardAttributes {
+        var wave = 0
+            private set
+        var requiredKills = 0
+        var level = 0
+        private var entered = false
+        fun setWave(wave: Int): GraveyardAttributes {
+            this.wave = wave
+            return this
+        }
 
-		private int wave;
-		private int requiredKills;
-		private int level;
-		private boolean entered;
+        fun incrementAndGetWave(): Int {
+            return wave++
+        }
 
-		public int getWave() {
-			return wave;
-		}
+        fun incrementLevel() {
+            level++
+        }
 
-		public int getLevel() {
-			return level;
-		}
+        fun decrementAndGetRequiredKills(): Int {
+            return requiredKills--
+        }
 
-		public GraveyardAttributes setWave(int wave) {
-			this.wave = wave;
-			return this;
-		}
+        fun hasEntered(): Boolean {
+            return entered
+        }
 
-		public int incrementAndGetWave() {
-			return this.wave++;
-		}
+        fun setEntered(entered: Boolean): GraveyardAttributes {
+            this.entered = entered
+            return this
+        }
+    }
 
-		public void setLevel(int level) {
-			this.level = level;
-		}
+    inner class PestControlAttributes {
+        var damageDealt = 0
+        fun incrementDamageDealt(damageDealt: Int) {
+            this.damageDealt += damageDealt
+        }
+    }
 
-		public void incrementLevel() {
-			this.level++;
-		}
+    inner class ZulrahAttributes {
+        var redFormDamage = 0
+            private set
 
-		public int getRequiredKills() {
-			return requiredKills;
-		}
+        fun setRedFormDamage(value: Int, add: Boolean) {
+            if (add) {
+                redFormDamage += value
+            } else {
+                redFormDamage = value
+            }
+        }
+    }
 
-		public int decrementAndGetRequiredKills() {
-			return this.requiredKills--;
-		}
+    inner class WarriorsGuildAttributes {
+        private var hasSpawnedArmour = false
+        private var enteredTokenRoom = false
+        fun hasSpawnedArmour(): Boolean {
+            return hasSpawnedArmour
+        }
 
-		public void setRequiredKills(int requiredKills) {
-			this.requiredKills = requiredKills;
-		}
+        fun setSpawnedArmour(hasSpawnedArmour: Boolean) {
+            this.hasSpawnedArmour = hasSpawnedArmour
+        }
 
-		public boolean hasEntered() {
-			return entered;
-		}
+        fun enteredTokenRoom(): Boolean {
+            return enteredTokenRoom
+        }
 
-		public GraveyardAttributes setEntered(boolean entered) {
-			this.entered = entered;
-			return this;
-		}
-	}
+        fun setEnteredTokenRoom(enteredTokenRoom: Boolean) {
+            this.enteredTokenRoom = enteredTokenRoom
+        }
+    }
 
-	public class PestControlAttributes {
+    inner class trioAttributes {
+        private var joinedBossRoom = false
+        fun joinedBossRoom(): Boolean {
+            return joinedBossRoom
+        }
 
-		public PestControlAttributes() {
+        fun setJoinedBossRoom(joinedBossRoom: Boolean) {
+            this.joinedBossRoom = joinedBossRoom
+        }
+    }
 
-		}
+    inner class BarrowsMinigameAttributes {
+        var killcount = 0
+        var randomCoffin = 0
+        var riddleAnswer = -1
+        var barrowsData = arrayOf(
+            intArrayOf(2030, 0),
+            intArrayOf(2029, 0),
+            intArrayOf(2028, 0),
+            intArrayOf(2027, 0),
+            intArrayOf(2026, 0),
+            intArrayOf(2025, 0)
+        )
+    }
 
-		private int damageDealt;
+    inner class RecipeForDisasterAttributes {
+        var wavesCompleted = 0
+        var questParts = BooleanArray(9)
+        fun hasFinishedPart(index: Int): Boolean {
+            return questParts[index]
+        }
 
-		public int getDamageDealt() {
-			return damageDealt;
-		}
+        fun setPartFinished(index: Int, finished: Boolean) {
+            questParts[index] = finished
+        }
 
-		public void setDamageDealt(int damageDealt) {
-			this.damageDealt = damageDealt;
-		}
+        fun reset() {
+            questParts = BooleanArray(9)
+            wavesCompleted = 0
+        }
+    }
 
-		public void incrementDamageDealt(int damageDealt) {
-			this.damageDealt += damageDealt;
-		}
-	}
-	
-	public class ZulrahAttributes {
-	
-		private int redFormDamage;
-		
-		public int getRedFormDamage() {
-			return redFormDamage;
-		}
-		
-		public void setRedFormDamage(int value, boolean add) {
-			if (add) {
-				redFormDamage += value;
-			} else {
-				redFormDamage = value;
-			}
-		}
-		
-	}
+    inner class NomadAttributes {
+        var questParts = BooleanArray(2)
+        fun hasFinishedPart(index: Int): Boolean {
+            return questParts[index]
+        }
 
-	public class WarriorsGuildAttributes {
+        fun setPartFinished(index: Int, finished: Boolean) {
+            questParts[index] = finished
+        }
 
-		private boolean hasSpawnedArmour;
-		private boolean enteredTokenRoom;
+        fun reset() {
+            questParts = BooleanArray(2)
+        }
+    }
 
-		public boolean hasSpawnedArmour() {
-			return hasSpawnedArmour;
-		}
-
-		public void setSpawnedArmour(boolean hasSpawnedArmour) {
-			this.hasSpawnedArmour = hasSpawnedArmour;
-		}
-
-		public boolean enteredTokenRoom() {
-			return enteredTokenRoom;
-		}
-
-		public void setEnteredTokenRoom(boolean enteredTokenRoom) {
-			this.enteredTokenRoom = enteredTokenRoom;
-		}
-
-	}
-
-	public class trioAttributes {
-		private boolean joinedBossRoom;
-
-		public boolean joinedBossRoom() {
-			return joinedBossRoom;
-		}
-		public void setJoinedBossRoom(boolean joinedBossRoom) {
-			this.joinedBossRoom = joinedBossRoom;
-		}
-	}
-
-	public class BarrowsMinigameAttributes {
-
-		private int killcount, randomCoffin, riddleAnswer = -1;
-
-		public int getKillcount() {
-			return killcount;
-		}
-
-		public void setKillcount(int killcount) {
-			this.killcount = killcount;
-		}
-
-		public int getRandomCoffin() {
-			return randomCoffin;
-		}
-
-		public void setRandomCoffin(int randomCoffin) {
-			this.randomCoffin = randomCoffin;
-		}
-
-		public int getRiddleAnswer() {
-			return riddleAnswer;
-		}
-
-		public void setRiddleAnswer(int riddleAnswer) {
-			this.riddleAnswer = riddleAnswer;
-		}
-
-		private int[][] barrowsData = { //NPCID, state
-				{ 2030, 0}, // verac
-				{ 2029, 0 }, // toarg
-				{ 2028, 0 }, // karil
-				{ 2027, 0 }, // guthan
-				{ 2026, 0 }, // dharok
-				{ 2025, 0 } // ahrim
-		};
-
-		public int[][] getBarrowsData() {
-			return barrowsData;
-		}
-
-		public void setBarrowsData(int[][] barrowsData) {
-			this.barrowsData = barrowsData;
-		}
-	}
-
-	public class RecipeForDisasterAttributes {
-		private int wavesCompleted;
-		private boolean[] questParts = new boolean[9];
-
-		public int getWavesCompleted() {
-			return wavesCompleted;
-		}
-
-		public void setWavesCompleted(int wavesCompleted) {
-			this.wavesCompleted = wavesCompleted;
-		}
-
-		public boolean hasFinishedPart(int index) {
-			return questParts[index];
-		}
-
-		public void setPartFinished(int index, boolean finished) {
-			questParts[index] = finished;
-		}
-
-		public boolean[] getQuestParts() {
-			return questParts;
-		}
-
-		public void setQuestParts(boolean[] questParts) {
-			this.questParts = questParts;
-		}
-
-		public void reset() {
-			questParts = new boolean[9];
-			wavesCompleted = 0;
-		}
-	}
-
-	public class NomadAttributes {
-		private boolean[] questParts = new boolean[2];
-
-		public boolean hasFinishedPart(int index) {
-			return questParts[index];
-		}
-
-		public void setPartFinished(int index, boolean finished) {
-			questParts[index] = finished;
-		}
-
-		public boolean[] getQuestParts() {
-			return questParts;
-		}
-
-		public void setQuestParts(boolean[] questParts) {
-			this.questParts = questParts;
-		}
-
-		public void reset() {
-			questParts = new boolean[2];
-		}
-	}
-
-	/*public class SoulWarsAttributes {
+    /*public class SoulWarsAttributes {
 		private int activity = 30;
 		private int productChosen = -1;
 		private int team = -1;
@@ -280,144 +179,39 @@ public class MinigameAttributes {
 			this.team = team;
 		}
 	}*/
+    inner class GodwarsDungeonAttributes {
+        var killcount = IntArray(4) // 0 = armadyl, 1 = bandos, 2 = saradomin, 3 = zamorak
+        private var enteredRoom = false
+        var altarDelay: Long = 0
+            private set
 
-	public class GodwarsDungeonAttributes {
-		private int[] killcount = new int[4]; // 0 = armadyl, 1 = bandos, 2 = saradomin, 3 = zamorak
-		private boolean enteredRoom;
-		private long altarDelay;
+        fun hasEnteredRoom(): Boolean {
+            return enteredRoom
+        }
 
-		public int[] getKillcount() {
-			return killcount;
-		}
+        fun setHasEnteredRoom(enteredRoom: Boolean) {
+            this.enteredRoom = enteredRoom
+        }
 
-		public void setKillcount(int[] killcount) {
-			this.killcount = killcount;
-		}
+        fun setAltarDelay(altarDelay: Long): GodwarsDungeonAttributes {
+            this.altarDelay = altarDelay
+            return this
+        }
+    }
 
-		public boolean hasEnteredRoom() {
-			return enteredRoom;
-		}
+    inner class DungeoneeringAttributes {
+        lateinit var party: DungeoneeringParty
+        lateinit var partyInvitation: DungeoneeringParty
+        var lastInvitation: Long = 0
+        var boundItems = IntArray(5)
+        var damageDealt = 0
+        var deaths = 0
+        fun incrementDamageDealt(damage: Int) {
+            damageDealt += damage
+        }
 
-		public void setHasEnteredRoom(boolean enteredRoom) {
-			this.enteredRoom = enteredRoom;
-		}
-
-		public long getAltarDelay() {
-			return altarDelay;
-		}
-
-		public GodwarsDungeonAttributes setAltarDelay(long altarDelay) {
-			this.altarDelay = altarDelay;
-			return this;
-		}
-	}
-
-	public class DungeoneeringAttributes {
-		private DungeoneeringParty party;
-		private DungeoneeringParty invitation;
-		private long lastInvitation;
-		private int[] boundItems = new int[5];
-		private int damageDealt;
-		private int deaths;
-
-		public DungeoneeringParty getParty() {
-			return party;
-		}
-
-		public void setParty(DungeoneeringParty dungeoneeringParty) {
-			this.party = dungeoneeringParty;
-		}		
-
-		public int[] getBoundItems() {
-			return boundItems;
-		}
-
-		public void setBoundItems(int[] boundItems) {
-			this.boundItems = boundItems;
-		}
-
-		public long getLastInvitation() {
-			return lastInvitation;
-		}
-
-		public void setLastInvitation(long lastInvitation) {
-			this.lastInvitation = lastInvitation;
-		}
-
-		public DungeoneeringParty getPartyInvitation() {
-			return invitation;
-		}
-
-		public void setPartyInvitation(DungeoneeringParty partyInvitation) {
-			this.invitation = partyInvitation;
-		}
-
-		public void incrementDamageDealt(int damage) {
-			this.damageDealt += damage;
-		}
-
-		public void setDamageDealt(int damage) {
-			this.damageDealt = damage;
-		}
-
-		public int getDamageDealt() {
-			return this.damageDealt;
-		}
-
-		public void setDeaths(int deaths) {
-			this.deaths = deaths;
-		}
-
-		public void incrementDeaths() {
-			this.deaths++;
-		}
-
-		public int getDeaths() {
-			return deaths;
-		}
-	}
-
-	public BarrowsMinigameAttributes getBarrowsMinigameAttributes() {
-		return barrowsMinigameAttributes;
-	}
-
-	public WarriorsGuildAttributes getWarriorsGuildAttributes() {
-		return warriorsGuildAttributes;
-	}
-
-	public trioAttributes getTrioAttuibutes() {
-		return trioAttributes;
-	}
-
-	public PestControlAttributes getPestControlAttributes() {
-		return pestControlAttributes;
-	}
-
-	public RecipeForDisasterAttributes getRecipeForDisasterAttributes() {
-		return rfdAttributes;
-	}
-
-	public NomadAttributes getNomadAttributes() {
-		return nomadAttributes;
-	}
-
-	public GraveyardAttributes getGraveyardAttributes() {
-		return graveyardAttributes;
-	}
-
-	public GodwarsDungeonAttributes getGodwarsDungeonAttributes() {
-		return godwarsDungeonAttributes;
-	}
-
-	public DungeoneeringAttributes getDungeoneeringAttributes() {
-		return dungeoneeringAttributes;
-	}
-	
-	public ZulrahAttributes getZulrahAttributes() {
-		return zulrahAttributes;
-	}
-
-
-	public MinigameAttributes() {}
-
+        fun incrementDeaths() {
+            deaths++
+        }
+    }
 }

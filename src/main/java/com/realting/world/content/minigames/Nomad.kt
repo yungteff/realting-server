@@ -1,99 +1,95 @@
-package com.realting.world.content.minigames;
+package com.realting.world.content.minigames
 
-import com.realting.engine.task.Task;
-import com.realting.engine.task.TaskManager;
-import com.realting.model.Graphic;
-import com.realting.model.Position;
-import com.realting.model.RegionInstance;
-import com.realting.model.RegionInstance.RegionInstanceType;
-import com.realting.world.World;
-import com.realting.world.content.PlayerPanel;
-import com.realting.world.content.dialogue.DialogueManager;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.player.Player;
+import com.realting.engine.task.Task
+import com.realting.model.RegionInstance.RegionInstanceType
+import com.realting.engine.task.TaskManager
+import com.realting.world.World
+import com.realting.world.content.dialogue.DialogueManager
+import com.realting.world.content.PlayerPanel
+import com.realting.model.*
+import com.realting.model.entity.character.npc.NPC
+import com.realting.model.entity.character.player.Player
 
 /**
  * @author Gabriel Hannason
  */
-public class Nomad {
+object Nomad {
+    @JvmStatic
+    fun startFight(p: Player) {
+        if (p.minigameAttributes.nomadAttributes.hasFinishedPart(1)) return
+        p.packetSender.sendInterfaceRemoval()
+        p.moveTo(Position(3361, 5856, p.index * 4))
+        p.regionInstance = RegionInstance(p, RegionInstanceType.NOMAD)
+        TaskManager.submit(object : Task(1, p, false) {
+            var tick = 0
+            public override fun execute() {
+                if (tick >= 4) {
+                    val n = NPC(8528, Position(p.position.x, p.position.y - 2, p.position.z)).setSpawnedFor(p)
+                    World.register(n)
+                    p.regionInstance.npcsList.add(n)
+                    n.combatBuilder.attack(p)
+                    n.forceChat("You want to throw hands, brah?!")
+                    n.performGraphic(Graphic(1295))
+                    stop()
+                }
+                tick++
+            }
+        })
+    }
 
-	public static void startFight(final Player p) {
-		if(p.getMinigameAttributes().getNomadAttributes().hasFinishedPart(1))
-			return;
-		p.getPacketSender().sendInterfaceRemoval();
-		p.moveTo(new Position(3361, 5856, p.getIndex() * 4));
-		p.setRegionInstance(new RegionInstance(p, RegionInstanceType.NOMAD));
-		TaskManager.submit(new Task(1, p, false) {
-			int tick = 0;
-			@Override
-			public void execute() {
-				if(tick >= 4) {
-					NPC n = new NPC(8528, new Position(p.getPosition().getX(), p.getPosition().getY() - 2, p.getPosition().getZ())).setSpawnedFor(p);
-					World.register(n);
-					p.getRegionInstance().getNpcsList().add(n);
-					n.getCombatBuilder().attack(p);
-					n.forceChat("You want to throw hands, brah?!");
-					n.performGraphic(new Graphic(1295));
-					stop();
-				}
-				tick++;
-			}
-		});
-	}
+    @JvmStatic
+    fun endFight(p: Player, killed: Boolean) {
+        if (p.regionInstance != null) p.regionInstance.destruct()
+        p.moveTo(Position(1889, 3177))
+        if (killed) {
+            p.restart()
+            p.minigameAttributes.nomadAttributes.setPartFinished(1, true)
+            DialogueManager.start(p, 53)
+            PlayerPanel.refreshPanel(p)
+        }
+    }
 
-	public static void endFight(Player p, boolean killed) {
-		if(p.getRegionInstance() != null)
-			p.getRegionInstance().destruct();
-		p.moveTo(new Position(1889, 3177));
-		if(killed) {
-			p.restart();
-			p.getMinigameAttributes().getNomadAttributes().setPartFinished(1, true);
-			DialogueManager.start(p, 53);
-			PlayerPanel.refreshPanel(p);
-		}
-	}
+    @JvmStatic
+    fun openQuestLog(p: Player) {
+        for (i in 8145..8195) p.packetSender.sendString(i, "")
+        p.packetSender.sendInterface(8134)
+        p.packetSender.sendString(8136, "Close window")
+        p.packetSender.sendString(8144, "" + questTitle)
+        p.packetSender.sendString(8145, "")
+        var questIntroIndex = 0
+        for (i in 8147 until 8147 + questIntro.size) {
+            p.packetSender.sendString(i, "@dre@" + questIntro[questIntroIndex])
+            questIntroIndex++
+        }
+        var questGuideIndex = 0
+        for (i in 8147 + questIntro.size until 8147 + questIntro.size + questGuide.size) {
+            if (!p.minigameAttributes.nomadAttributes.hasFinishedPart(questGuideIndex)) p.packetSender.sendString(
+                i, "" + questGuide[questGuideIndex]
+            ) else p.packetSender.sendString(i, "@str@" + questGuide[questGuideIndex] + "")
+            questGuideIndex++
+        }
+        if (p.minigameAttributes.nomadAttributes.hasFinishedPart(1)) p.packetSender.sendString(
+            8147 + questIntro.size + questGuide.size, "@dre@Quest complete!"
+        )
+    }
 
-	public static void openQuestLog(Player p) {
-		for(int i = 8145; i < 8196; i++)
-			p.getPacketSender().sendString(i, "");
-		p.getPacketSender().sendInterface(8134);
-		p.getPacketSender().sendString(8136, "Close window");
-		p.getPacketSender().sendString(8144, ""+questTitle);
-		p.getPacketSender().sendString(8145, "");
-		int questIntroIndex = 0;
-		for(int i = 8147; i < 8147+questIntro.length; i++) {
-			p.getPacketSender().sendString(i, "@dre@"+questIntro[questIntroIndex]);
-			questIntroIndex++;
-		}
-		int questGuideIndex = 0;
-		for(int i = 8147+questIntro.length; i < 8147+questIntro.length+questGuide.length; i++) {
-			if(!p.getMinigameAttributes().getNomadAttributes().hasFinishedPart(questGuideIndex))
-				p.getPacketSender().sendString(i, ""+questGuide[questGuideIndex]);
-			else
-				p.getPacketSender().sendString(i, "@str@"+questGuide[questGuideIndex]+"");
-			questGuideIndex++;
-		}
-		if(p.getMinigameAttributes().getNomadAttributes().hasFinishedPart(1))
-			p.getPacketSender().sendString(8147+questIntro.length+questGuide.length, "@dre@Quest complete!");
-	}
+    fun getQuestTabPrefix(player: Player): String {
+        if (player.minigameAttributes.nomadAttributes.hasFinishedPart(0) && !player.minigameAttributes.nomadAttributes.hasFinishedPart(
+                1
+            )
+        ) {
+            return "@yel@"
+        } else if (player.minigameAttributes.nomadAttributes.hasFinishedPart(1)) {
+            return "@gre@"
+        }
+        return "@red@"
+    }
 
-	public static String getQuestTabPrefix(Player player) {
-		if(player.getMinigameAttributes().getNomadAttributes().hasFinishedPart(0) && !player.getMinigameAttributes().getNomadAttributes().hasFinishedPart(1)) {
-			return "@yel@";
-		} else if(player.getMinigameAttributes().getNomadAttributes().hasFinishedPart(1)) {
-			return "@gre@";
-		}
-		return "@red@";
-	}
-
-	private static final String questTitle = "Nomad's Requiem";
-	private static final String[] questIntro ={
-		"Nomad is searching for a worthy opponent.", 
-		"Are you eligible for the job?",
-		"",
-	};
-	private static final String[] questGuide ={
-		"Talk to Nomad and accept his challenge to a fight.",
-		"Defeat Nomad."
-	};
+    private const val questTitle = "Nomad's Requiem"
+    private val questIntro = arrayOf(
+        "Nomad is searching for a worthy opponent.", "Are you eligible for the job?", ""
+    )
+    private val questGuide = arrayOf(
+        "Talk to Nomad and accept his challenge to a fight.", "Defeat Nomad."
+    )
 }

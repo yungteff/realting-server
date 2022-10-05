@@ -18,7 +18,7 @@ import com.realting.util.Misc
 class DungeoneeringParty(val ownerPlayer: Player) {
     var dungeoneeringFloor: DungeoneeringFloor? = null
     var complexity = -1
-    val players: CopyOnWriteArrayList<Player>
+    val players: CopyOnWriteArrayList<Player> = CopyOnWriteArrayList()
     val npcs = CopyOnWriteArrayList<NPC?>()
     val groundItems = CopyOnWriteArrayList<GroundItem>()
     var gatestonePosition: Position? = null
@@ -28,7 +28,6 @@ class DungeoneeringParty(val ownerPlayer: Player) {
     private var killedBoss = false
 
     init {
-        players = CopyOnWriteArrayList()
         players.add(ownerPlayer)
     }
 
@@ -207,7 +206,7 @@ class DungeoneeringParty(val ownerPlayer: Player) {
             }
         }
         if (fromParty) {
-            p.minigameAttributes.dungeoneeringAttributes.party = null
+            p.minigameAttributes.dungeoneeringAttributes.party
             refreshInterface()
         }
         p.packetSender.sendInterfaceRemoval()

@@ -1,5 +1,3 @@
-package com.realting.world.content.minigames;
+package com.realting.world.content.minigames
 
-public class Dungeon {
-
-}
+class Dungeon 

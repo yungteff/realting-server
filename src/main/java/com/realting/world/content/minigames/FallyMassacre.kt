@@ -1,47 +1,43 @@
-package com.realting.world.content.minigames;
+package com.realting.world.content.minigames
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.Locale
+import java.util.HashMap
+import com.realting.model.GroundItem
+import com.realting.model.entity.character.player.Player
 
-import com.realting.model.GroundItem;
-import com.realting.model.entity.character.player.Player;
+object FallyMassacre {
+    var TOTAL_PLAYERS = 0
+    var PLAYERS_ALIVE = 0
+    var GRIDCHANGES = 0
+    var GRIDTOTAL = 0
+    var GRIDCURRENT = 0
 
-public class FallyMassacre {
+    /**
+     * @note Stores player and State
+     */
+    private val playerMap: Map<Player, String> = HashMap()
 
-	public static int TOTAL_PLAYERS = 0;
-	public static int PLAYERS_ALIVE = 0;
-	public static int GRIDCHANGES = 0;
-	public static int GRIDTOTAL = 0;
-	public static int GRIDCURRENT = 0;
-
-	/**
-	 * @note Stores player and State
-	 */
-	private static Map<Player, String> playerMap = new HashMap<Player, String>();
-
-	/*
+    /*
 	 * Stores items
 	 */
-	private static CopyOnWriteArrayList<GroundItem> itemList = new CopyOnWriteArrayList<GroundItem>();
+    private val itemList = CopyOnWriteArrayList<GroundItem>()
 
-	/**
-	 * @return HashMap Value
-	 */
-	public static String getState(Player player) {
-		return playerMap.get(player);
-	}
+    /**
+     * @return HashMap Value
+     */
+    fun getState(player: Player): String? {
+        return playerMap[player]
+    }
 
-	/**
-	 * @note States of minigames
-	 */
-	public static final String WAITING = "WAITING";
-	public static final String PLAYING = "PLAYING";
-	
-	/**
-	 * Is a game running?
-	 */
-	private static boolean gameRunning;
+    /**
+     * @note States of minigames
+     */
+    const val WAITING = "WAITING"
+    const val PLAYING = "PLAYING"
 
-	
+    /**
+     * Is a game running?
+     */
+    private const val gameRunning = false
 }
