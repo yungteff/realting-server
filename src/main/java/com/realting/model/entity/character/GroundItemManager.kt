@@ -1,238 +1,244 @@
-package com.realting.model.entity.character;
+package com.realting.model.entity.character
 
-import java.util.concurrent.CopyOnWriteArrayList;
+import com.realting.engine.task.impl.GroundItemsTask
+import com.realting.model.*
+import com.realting.model.definitions.ItemDefinition
+import com.realting.model.entity.character.player.Player
+import com.realting.world.World
+import com.realting.world.content.PlayerLogs
+import com.realting.world.content.Sounds
+import com.realting.world.content.player.skill.dungeoneering.Dungeoneering.doingDungeoneering
+import com.realting.world.content.player.skill.dungeoneering.UltimateIronmanHandler.hasItemsStored
+import java.util.concurrent.CopyOnWriteArrayList
 
-import com.realting.engine.task.impl.GroundItemsTask;
-import com.realting.model.GameMode;
-import com.realting.model.GroundItem;
-import com.realting.model.Item;
-import com.realting.model.Locations.Location;
-import com.realting.model.Position;
-import com.realting.model.definitions.ItemDefinition;
-import com.realting.world.World;
-import com.realting.world.content.PlayerLogs;
-import com.realting.world.content.Sounds;
-import com.realting.world.content.Sounds.Sound;
-import com.realting.world.content.player.skill.dungeoneering.Dungeoneering;
-import com.realting.world.content.player.skill.dungeoneering.UltimateIronmanHandler;
-import com.realting.model.entity.character.player.Player;
-
-public class GroundItemManager {
-
-	/*
+object GroundItemManager {
+    /*
 	 * Our list which holds all grounditems, used an CopyOnWriteArrayList to prevent modification issues
 	 * TODO: Change into a queue of some sort
 	 */
-	private static CopyOnWriteArrayList<GroundItem> groundItems = new CopyOnWriteArrayList<GroundItem>();
+    @JvmStatic
+    val groundItems = CopyOnWriteArrayList<GroundItem>()
 
-	/**
-	 * Removes a grounditem from the world
-	 * @param groundItem	The grounditem to remove from the world.
-	 * @param delistGItem	Should the grounditem be deleted from the arraylist aswell?
-	 */
-	public static void remove(GroundItem groundItem, boolean delistGItem) {
-		if(groundItem != null) {
-			if(groundItem.isGlobal()) {
-				for (Player p : World.getPlayers()) {
-					if(p == null)
-						continue;
-					if(p.getPosition().distanceToPoint(groundItem.getPosition().getX(), groundItem.getPosition().getY()) <= 120)
-						p.getPacketSender().removeGroundItem(groundItem.getItem().getId(), groundItem.getPosition().getX(), groundItem.getPosition().getY(), groundItem.getItem().getAmount());
-				}
-			} else {
-				Player person = World.getPlayerByName(groundItem.getOwner());
-				if(person != null  && person.getPosition().distanceToPoint(groundItem.getPosition().getX(), groundItem.getPosition().getY()) <= 120)
-					person.getPacketSender().removeGroundItem(groundItem.getItem().getId(), groundItem.getPosition().getX(), groundItem.getPosition().getY(), groundItem.getItem().getAmount());
-			}
-			if(delistGItem)
-				groundItems.remove(groundItem);
-		}
-	}
+    /**
+     * Removes a grounditem from the world
+     * @param groundItem    The grounditem to remove from the world.
+     * @param delistGItem    Should the grounditem be deleted from the arraylist aswell?
+     */
+    @JvmStatic
+    fun remove(groundItem: GroundItem?, delistGItem: Boolean) {
+        if (groundItem != null) {
+            if (groundItem.isGlobal) {
+                for (p in World.getPlayers()) {
+                    if (p == null) continue
+                    if (p.position.distanceToPoint(
+                            groundItem.position.x, groundItem.position.y
+                        ) <= 120
+                    ) p.packetSender.removeGroundItem(
+                        groundItem.item.id, groundItem.position.x, groundItem.position.y, groundItem.item.amount
+                    )
+                }
+            } else {
+                val person = World.getPlayerByName(groundItem.owner)
+                if (person != null && person.position.distanceToPoint(
+                        groundItem.position.x, groundItem.position.y
+                    ) <= 120
+                ) person.packetSender.removeGroundItem(
+                    groundItem.item.id, groundItem.position.x, groundItem.position.y, groundItem.item.amount
+                )
+            }
+            if (delistGItem) groundItems.remove(groundItem)
+        }
+    }
 
-	/**
-	 * This method spawns a grounditem for a player.
-	 * @param p		The owner of the grounditem
-	 * @param g		The grounditem to spawn
-	 */
-	public static void spawnGroundItem(Player p, GroundItem g) {
-		if(p == null)// || p.getRights() == PlayerRights.DEVELOPER)
-			return;
-		final Item item = g.getItem();
-		if(item.getId() <= 0) {
-			return;
-		}
-		//if(item.getDefinition().getName().toLowerCase().contains("clue scroll"))
-			//return;
-		if (item.getId() >= 2412 && item.getId() <= 2414) {
-			p.getPacketSender().sendMessage("The cape vanishes as it touches the ground.");
-			return;
-		}
-		if(Dungeoneering.doingDungeoneering(p)) {
-			g = new GroundItem(item, g.getPosition(), "Dungeoneering", true, -1, false, -1);
-			p.getMinigameAttributes().getDungeoneeringAttributes().getParty().getGroundItems().add(g);
-			if(item.getId() == 17489) {
-				p.getMinigameAttributes().getDungeoneeringAttributes().getParty().setGatestonePosition(g.getPosition().copy());
-			}
-		}
-		if(ItemDefinition.forId(item.getId()).isStackable()) {
-			GroundItem it = getGroundItem(p, item, g.getPosition());
-			if(it != null) {
-				it.getItem().setAmount(it.getItem().getAmount() + g.getItem().getAmount() > Integer.MAX_VALUE ? Integer.MAX_VALUE : it.getItem().getAmount() + g.getItem().getAmount());
-				if(it.getItem().getAmount() <= 0)
-					remove(it, true);
-				else
-					it.setRefreshNeeded(true);
-				return;
-			}
-		}
-		/*
+    /**
+     * This method spawns a grounditem for a player.
+     * @param p        The owner of the grounditem
+     * @param g        The grounditem to spawn
+     */
+    @JvmStatic
+    fun spawnGroundItem(p: Player?, g: GroundItem) {
+        var g = g
+        if (p == null) // || p.getRights() == PlayerRights.DEVELOPER)
+            return
+        val item = g.item
+        if (item.id <= 0) {
+            return
+        }
+        //if(item.getDefinition().getName().toLowerCase().contains("clue scroll"))
+        //return;
+        if (item.id >= 2412 && item.id <= 2414) {
+            p.packetSender.sendMessage("The cape vanishes as it touches the ground.")
+            return
+        }
+        if (doingDungeoneering(p)) {
+            g = GroundItem(item, g.position, "Dungeoneering", true, -1, false, -1)
+            p.minigameAttributes.dungeoneeringAttributes.party!!.groundItems.add(g)
+            if (item.id == 17489) {
+                p.minigameAttributes.dungeoneeringAttributes.party!!.gatestonePosition = g.position.copy()
+            }
+        }
+        if (ItemDefinition.forId(item.id).isStackable) {
+            val it = getGroundItem(p, item, g.position)
+            if (it != null) {
+                it.item.amount =
+                    if (it.item.amount + g.item.amount > Int.MAX_VALUE) Int.MAX_VALUE else it.item.amount + g.item.amount
+                if (it.item.amount <= 0) remove(it, true) else it.isRefreshNeeded = true
+                return
+            }
+        }
+        /*
 		if(Misc.getMinutesPlayed(p) < 15) {
 			g.setGlobalStatus(false);
 			g.setGoGlobal(false);
-		}*/
-		add(g, true);
-	}
+		}*/add(g, true)
+    }
 
-	/**
-	 * Adds a grounditem to the world
-	 * @param groundItem	The grounditem to add to the world
-	 * @param listGItem		Should the grounditem be added to the arraylist?
-	 */
-	public static void add(GroundItem groundItem, boolean listGItem) {
-		if(groundItem.isGlobal()) {
-			for (Player p : World.getPlayers()) {
-				if(p == null)
-					continue;
-				if (groundItem.getPosition().getZ() == p.getPosition().getZ() && p.getPosition().distanceToPoint(groundItem.getPosition().getX(), groundItem.getPosition().getY()) <= 120)
-					p.getPacketSender().createGroundItem(groundItem.getItem().getId(), groundItem.getPosition().getX(), groundItem.getPosition().getY(), groundItem.getItem().getAmount());
-			}
-		} else {
-			Player person = World.getPlayerByName(groundItem.getOwner());
-			if(person != null && groundItem.getPosition().getZ() == person.getPosition().getZ() && person.getPosition().distanceToPoint(groundItem.getPosition().getX(), groundItem.getPosition().getY()) <= 120)
-				person.getPacketSender().createGroundItem(groundItem.getItem().getId(), groundItem.getPosition().getX(), groundItem.getPosition().getY(), groundItem.getItem().getAmount());
-		}
-		if(listGItem) {
-			if(Location.getLocation(groundItem) == Location.DUNGEONEERING)
-				groundItem.setShouldProcess(false);
-			groundItems.add(groundItem);
-			GroundItemsTask.fireTask();
-		}
-	}
+    /**
+     * Adds a grounditem to the world
+     * @param groundItem    The grounditem to add to the world
+     * @param listGItem        Should the grounditem be added to the arraylist?
+     */
+    @JvmStatic
+    fun add(groundItem: GroundItem, listGItem: Boolean) {
+        when {
+            groundItem.isGlobal -> {
+                for (p in World.getPlayers()) {
+                    if (p == null) continue
+                    if (groundItem.position.z == p.position.z && p.position.distanceToPoint(
+                            groundItem.position.x, groundItem.position.y
+                        ) <= 120
+                    ) p.packetSender.createGroundItem(
+                        groundItem.item.id, groundItem.position.x, groundItem.position.y, groundItem.item.amount
+                    )
+                }
+            }
+            else -> {
+                val person = World.getPlayerByName(groundItem.owner)
+                if (person != null && groundItem.position.z == person.position.z && person.position.distanceToPoint(
+                        groundItem.position.x, groundItem.position.y
+                    ) <= 120
+                ) person.packetSender.createGroundItem(
+                    groundItem.item.id, groundItem.position.x, groundItem.position.y, groundItem.item.amount
+                )
+            }
+        }
+        if (listGItem) {
+            if (Locations.Location.getLocation(groundItem) === Locations.Location.DUNGEONEERING) groundItem.setShouldProcess(
+                false
+            )
+            groundItems.add(groundItem)
+            GroundItemsTask.fireTask()
+        }
+    }
 
-	/**
-	 * Handles the pick up of a grounditem
-	 * @param p			The player picking up the item
-	 * @param item
-	 * @param position
-	 */
-	public static void pickupGroundItem(Player p, Item item, Position position) {
-		if(!p.getLastItemPickup().elapsed(500))
-			return;
-		boolean canAddItem = p.getInventory().getFreeSlots() > 0 || item.getDefinition().isStackable() && p.getInventory().contains(item.getId());
-		if(!canAddItem) {
-			p.getInventory().full();
-			return;
-		}
-		GroundItem gt = getGroundItem(p, item, position);
-		if(gt == null || gt.hasBeenPickedUp() || !groundItems.contains(gt)) //last one isn't needed, but hey, just trying to be safe
-			return;
-		else {
-			/*	if(p.getHostAdress().equals(gt.getFromIP()) && !p.getUsername().equals(gt.getOwner())) { //Transferring items by IP..
+    /**
+     * Handles the pick up of a grounditem
+     * @param p            The player picking up the item
+     * @param item
+     * @param position
+     */
+    @JvmStatic
+    fun pickupGroundItem(p: Player, item: Item, position: Position) {
+        var item = item
+        if (!p.lastItemPickup.elapsed(500)) return
+        val canAddItem = p.inventory.freeSlots > 0 || item.definition.isStackable && p.inventory.contains(item.id)
+        if (!canAddItem) {
+            p.inventory.full()
+            return
+        }
+        val gt = getGroundItem(p, item, position)
+        if (gt == null || gt.hasBeenPickedUp() || !groundItems.contains(gt)) //last one isn't needed, but hey, just trying to be safe
+            return else {
+            /*	if(p.getHostAdress().equals(gt.getFromIP()) && !p.getUsername().equals(gt.getOwner())) { //Transferring items by IP..
 
 				p.getPacketSender().sendMessage("An error occured.");
 				return;
 			}*/
-			if (UltimateIronmanHandler.hasItemsStored(p) && p.getLocation() != Location.DUNGEONEERING) {
-				p.getPacketSender().sendMessage("<shad=0>@red@You cannot pick up items until you claim your stored Dungeoneering items.");
-				return;
-			}
-			if(p.getGameMode() != GameMode.NORMAL && !Dungeoneering.doingDungeoneering(p)) {
-				if(gt.getOwner() != null && !gt.getOwner().equals("null") && !gt.getOwner().equals(p.getUsername())) {
-					p.getPacketSender().sendMessage("You cannot pick this item up because it was not spawned for you.");
-					return;
-				}
-			}
-			if(item.getId() == 17489 && Dungeoneering.doingDungeoneering(p)) {
-				p.getMinigameAttributes().getDungeoneeringAttributes().getParty().setGatestonePosition(null);
-			}
-			item = gt.getItem();
-			if (item.getId() == 7509 && position.equals(GlobalItemSpawner.ROCKCAKE_POSITION)) {
-				item = new Item(7510, gt.getItem().getAmount());
-			}
-			gt.setPickedUp(true);
-			remove(gt, true);
-			p.getInventory().add(item);
-			if (ItemDefinition.forId(item.getId()) != null && ItemDefinition.forId(item.getId()).getName() != null) {
-				PlayerLogs.log(p.getUsername(), "Picked up gr.Item "+item.getDefinition().getName()+", amount: "+item.getAmount());
-			} else {
-				PlayerLogs.log(p.getUsername(), "Picked up gr.Item "+item.getId()+", amount: "+item.getAmount());
-			}
-			p.getLastItemPickup().reset();
-			Sounds.sendSound(p, Sound.PICKUP_ITEM);
-			p.getInventory().processRefreshItems(); // Instant refresh or it looks weird,
-													// the item disappears then inventory update way later
-		}
-	}
+            if (hasItemsStored(p) && p.location !== Locations.Location.DUNGEONEERING) {
+                p.packetSender.sendMessage("<shad=0>@red@You cannot pick up items until you claim your stored Dungeoneering items.")
+                return
+            }
+            if (p.gameMode != GameMode.NORMAL && !doingDungeoneering(p)) {
+                if (gt.owner != null && gt.owner != "null" && gt.owner != p.username) {
+                    p.packetSender.sendMessage("You cannot pick this item up because it was not spawned for you.")
+                    return
+                }
+            }
+            if (item.id == 17489 && doingDungeoneering(p)) {
+                p.minigameAttributes.dungeoneeringAttributes.party!!.gatestonePosition = null
+            }
+            item = gt.item
+            if (item.id == 7509 && position == GlobalItemSpawner.ROCKCAKE_POSITION) {
+                item = Item(7510, gt.item.amount)
+            }
+            gt.setPickedUp(true)
+            remove(gt, true)
+            p.inventory.add(item)
+            if (ItemDefinition.forId(item.id) != null && ItemDefinition.forId(item.id).name != null) {
+                PlayerLogs.log(p.username, "Picked up gr.Item " + item.definition.name + ", amount: " + item.amount)
+            } else {
+                PlayerLogs.log(p.username, "Picked up gr.Item " + item.id + ", amount: " + item.amount)
+            }
+            p.lastItemPickup.reset()
+            Sounds.sendSound(p, Sounds.Sound.PICKUP_ITEM)
+            p.inventory.processRefreshItems() // Instant refresh or it looks weird,
+            // the item disappears then inventory update way later
+        }
+    }
 
-	/**
-	 * Handles a region change for a player.
-	 * This method respawns all grounditems for a player who has changed region.
-	 * @param p		The player who has changed region
-	 */
-	public static void handleRegionChange(Player p) {
-		for(GroundItem gi : groundItems) {
-			if(gi == null)
-				continue;
-			p.getPacketSender().removeGroundItem(gi.getItem().getId(), gi.getPosition().getX(), gi.getPosition().getY(), gi.getItem().getAmount());
-		}
-		for(GroundItem gi : groundItems) {
-			if(gi == null || p.getPosition().getZ() != gi.getPosition().getZ() || p.getPosition().distanceToPoint(gi.getPosition().getX(), gi.getPosition().getY()) > 120)
-				continue;
-			if(gi.isGlobal() || !gi.isGlobal() && gi.getOwner().equals(p.getUsername()))
-				p.getPacketSender().createGroundItem(gi.getItem().getId(), gi.getPosition().getX(), gi.getPosition().getY(), gi.getItem().getAmount());
-		}
-	}
+    /**
+     * Handles a region change for a player.
+     * This method respawns all grounditems for a player who has changed region.
+     * @param p        The player who has changed region
+     */
+    @JvmStatic
+    fun handleRegionChange(p: Player) {
+        for (gi in groundItems) {
+            if (gi == null) continue
+            p.packetSender.removeGroundItem(gi.item.id, gi.position.x, gi.position.y, gi.item.amount)
+        }
+        for (gi in groundItems) {
+            if (gi == null || p.position.z != gi.position.z || p.position.distanceToPoint(
+                    gi.position.x, gi.position.y
+                ) > 120
+            ) continue
+            if (gi.isGlobal || !gi.isGlobal && gi.owner == p.username) p.packetSender.createGroundItem(
+                gi.item.id, gi.position.x, gi.position.y, gi.item.amount
+            )
+        }
+    }
 
-	/**
-	 * Checks if a grounditem exists in the stated position.
-	 * @param p			The player trying to check if the grounditem exists
-	 * @param item		The grounditem's item
-	 * @param position	The position to check if a grounditem exists on
-	 * @return			true if a grounditem exists in the specified position, otherwise false
-	 */
-	public static GroundItem getGroundItem(Player p, Item item, Position position) {
-		for(GroundItem l : groundItems) {
-			if(l == null || l.getPosition().getZ() != position.getZ())
-				continue;
-			if(l.getPosition().equals(position) && l.getItem().getId() == item.getId()) {
-				if(l.isGlobal())
-					return l;
-				else if(p != null) {
-					Player owner = World.getPlayerByName(l.getOwner());
-					if(owner == null || owner.getIndex() != p.getIndex())
-						continue;
-					return l;
-				}
-			}
-		}
-		return null;
-	}
+    /**
+     * Checks if a grounditem exists in the stated position.
+     * @param p            The player trying to check if the grounditem exists
+     * @param item        The grounditem's item
+     * @param position    The position to check if a grounditem exists on
+     * @return            true if a grounditem exists in the specified position, otherwise false
+     */
+    @JvmStatic
+    fun getGroundItem(p: Player?, item: Item, position: Position): GroundItem? {
+        for (l in groundItems) {
+            if (l == null || l.position.z != position.z) continue
+            if (l.position == position && l.item.id == item.id) {
+                if (l.isGlobal) return l else if (p != null) {
+                    val owner = World.getPlayerByName(l.owner)
+                    if (owner == null || owner.index != p.index) continue
+                    return l
+                }
+            }
+        }
+        return null
+    }
 
-	/**
-	 * Clears a position of ground items
-	 * @param pos		The position to remove all ground items on
-	 * @param owner		The owner of the grounditems to remove
-	 */
-	public static void clearArea(Position pos, String owner) {
-		for(GroundItem l : groundItems) {
-			if(l == null || l.getPosition().getZ() != pos.getZ())
-				continue;
-			if(l.getPosition().equals(pos) && l.getOwner().equals(owner)) 
-				remove(l, true);
-		}
-	}
-
-	public static CopyOnWriteArrayList<GroundItem> getGroundItems() {
-		return groundItems;
-	}
+    /**
+     * Clears a position of ground items
+     * @param pos        The position to remove all ground items on
+     * @param owner        The owner of the grounditems to remove
+     */
+    fun clearArea(pos: Position, owner: String) {
+        for (l in groundItems) {
+            if (l == null || l.position.z != pos.z) continue
+            if (l.position == pos && l.owner == owner) remove(l, true)
+        }
+    }
 }
