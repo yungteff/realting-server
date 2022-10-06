@@ -1,53 +1,52 @@
-package com.realting.world.content.combat.strategy.impl;
+package com.realting.world.content.combat.strategy.impl
 
-import com.realting.model.Animation;
-import com.realting.model.Locations.Location;
-import com.realting.model.Projectile;
-import com.realting.util.Misc;
-import com.realting.world.content.combat.CombatContainer;
-import com.realting.world.content.combat.CombatType;
-import com.realting.world.content.combat.strategy.CombatStrategy;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.npc.NPC;
+import com.realting.model.Animation
+import com.realting.model.Locations
+import com.realting.model.Projectile
+import com.realting.model.entity.character.CharacterEntity
+import com.realting.model.entity.character.npc.NPC
+import com.realting.util.Misc
+import com.realting.world.content.combat.CombatContainer
+import com.realting.world.content.combat.CombatType
+import com.realting.world.content.combat.strategy.CombatStrategy
 
-public class Spinolyp implements CombatStrategy {
+class Spinolyp : CombatStrategy {
+    override fun canAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        return true
+    }
 
-	@Override
-	public boolean canAttack(CharacterEntity entity, CharacterEntity victim) {
-		return true;
-	}
+    override fun attack(entity: CharacterEntity?, victim: CharacterEntity?): CombatContainer? {
+        return null
+    }
 
-	@Override
-	public CombatContainer attack(CharacterEntity entity, CharacterEntity victim) {
-		return null;
-	}
+    override fun customContainerAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        val spinolyp = entity as NPC?
+        if (spinolyp!!.constitution <= 0 || victim!!.constitution <= 0) {
+            return true
+        }
+        spinolyp.performAnimation(Animation(spinolyp.definition.attackAnimation))
+        val mage = Misc.getRandom(10) <= 7
+        Projectile(spinolyp, victim, if (mage) 1658 else 1017, 44, 3, 43, 43, 0).sendProjectile()
+        spinolyp.combatBuilder.container = CombatContainer(
+            spinolyp,
+            victim!!,
+            1,
+            if (mage) 3 else 2,
+            if (mage) CombatType.MAGIC else CombatType.RANGED,
+            true
+        )
+        return true
+    }
 
-	@Override
-	public boolean customContainerAttack(CharacterEntity entity, CharacterEntity victim) {
-		NPC spinolyp = (NPC)entity;
-		if(spinolyp.getConstitution() <= 0 || victim.getConstitution() <= 0) {
-			return true;
-		}
-		spinolyp.performAnimation(new Animation(spinolyp.getDefinition().getAttackAnimation()));
-		boolean mage = Misc.getRandom(10) <= 7;
-		new Projectile(spinolyp, victim, mage ? 1658 : 1017, 44, 3, 43, 43, 0).sendProjectile();
-		spinolyp.getCombatBuilder().setContainer(new CombatContainer(spinolyp, victim, 1, mage ? 3 : 2, mage ? CombatType.MAGIC : CombatType.RANGED, true));
-		return true;
-	}
+    override fun attackDelay(entity: CharacterEntity?): Int {
+        return entity!!.attackSpeed
+    }
 
+    override fun attackDistance(entity: CharacterEntity): Int {
+        return if (entity.location === Locations.Location.DUNGEONEERING) 6 else 50
+    }
 
-	@Override
-	public int attackDelay(CharacterEntity entity) {
-		return entity.getAttackSpeed();
-	}
-
-	@Override
-	public int attackDistance(CharacterEntity entity) {
-		return entity.getLocation() == Location.DUNGEONEERING ? 6 : 50;
-	}
-	
-	@Override
-	public CombatType getCombatType(CharacterEntity entity) {
-		return CombatType.MIXED;
-	}
+    override fun getCombatType(entity: CharacterEntity): CombatType {
+        return CombatType.MIXED
+    }
 }

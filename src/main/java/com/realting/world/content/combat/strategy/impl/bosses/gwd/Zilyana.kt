@@ -1,60 +1,55 @@
-package com.realting.world.content.combat.strategy.impl.bosses.gwd;
+package com.realting.world.content.combat.strategy.impl.bosses.gwd
 
-import com.realting.model.Animation;
-import com.realting.model.Graphic;
-import com.realting.model.Locations;
-import com.realting.util.Misc;
-import com.realting.world.content.combat.CombatContainer;
-import com.realting.world.content.combat.CombatType;
-import com.realting.world.content.combat.strategy.CombatStrategy;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.player.Player;
+import com.realting.model.Animation
+import com.realting.model.Graphic
+import com.realting.model.Locations
+import com.realting.model.entity.character.CharacterEntity
+import com.realting.model.entity.character.npc.NPC
+import com.realting.model.entity.character.player.Player
+import com.realting.util.Misc
+import com.realting.world.content.combat.CombatContainer
+import com.realting.world.content.combat.CombatType
+import com.realting.world.content.combat.strategy.CombatStrategy
 
-public class Zilyana implements CombatStrategy {
+class Zilyana : CombatStrategy {
+    override fun canAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        return victim!!.isPlayer && (victim as Player?)!!.minigameAttributes.godwarsDungeonAttributes.hasEnteredRoom()
+    }
 
-	private static final Animation attack_anim = new Animation(6967);
-	
-	@Override
-	public boolean canAttack(CharacterEntity entity, CharacterEntity victim) {
-		return victim.isPlayer() && ((Player)victim).getMinigameAttributes().getGodwarsDungeonAttributes().hasEnteredRoom();
-	}
+    override fun attack(entity: CharacterEntity?, victim: CharacterEntity?): CombatContainer? {
+        return null
+    }
 
-	@Override
-	public CombatContainer attack(CharacterEntity entity, CharacterEntity victim) {
-		return null;
-	}
+    override fun customContainerAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        val zilyana = entity as NPC?
+        if (victim!!.constitution <= 0) {
+            return true
+        }
+        if (Locations.goodDistance(zilyana!!.position.copy(), victim.position.copy(), 1) && Misc.getRandom(5) <= 3) {
+            zilyana.performAnimation(Animation(zilyana.definition.attackAnimation))
+            zilyana.combatBuilder.container = CombatContainer(zilyana, victim, 1, 1, CombatType.MELEE, true)
+        } else {
+            zilyana.performAnimation(attack_anim)
+            zilyana.performGraphic(Graphic(1220))
+            zilyana.combatBuilder.container = CombatContainer(zilyana, victim, 2, 3, CombatType.MAGIC, true)
+            zilyana.combatBuilder.attackTimer = 7
+        }
+        return true
+    }
 
-	@Override
-	public boolean customContainerAttack(CharacterEntity entity, CharacterEntity victim) {
-		NPC zilyana = (NPC)entity;
-		if(victim.getConstitution() <= 0) {
-			return true;
-		}
-		if(Locations.goodDistance(zilyana.getPosition().copy(), victim.getPosition().copy(), 1) && Misc.getRandom(5) <= 3) {
-			zilyana.performAnimation(new Animation(zilyana.getDefinition().getAttackAnimation()));
-			zilyana.getCombatBuilder().setContainer(new CombatContainer(zilyana, victim, 1, 1, CombatType.MELEE, true));
-		} else {
-			zilyana.performAnimation(attack_anim);
-			zilyana.performGraphic(new Graphic(1220));
-			zilyana.getCombatBuilder().setContainer(new CombatContainer(zilyana, victim, 2, 3, CombatType.MAGIC, true));
-			zilyana.getCombatBuilder().setAttackTimer(7);
-		}
-		return true;
-	}
+    override fun attackDelay(entity: CharacterEntity?): Int {
+        return entity!!.attackSpeed
+    }
 
-	@Override
-	public int attackDelay(CharacterEntity entity) {
-		return entity.getAttackSpeed();
-	}
+    override fun attackDistance(entity: CharacterEntity): Int {
+        return 1
+    }
 
-	@Override
-	public int attackDistance(CharacterEntity entity) {
-		return 1;
-	}
-	
-	@Override
-	public CombatType getCombatType(CharacterEntity entity) {
-		return CombatType.MIXED;
-	}
+    override fun getCombatType(entity: CharacterEntity): CombatType? {
+        return CombatType.MIXED
+    }
+
+    companion object {
+        private val attack_anim = Animation(6967)
+    }
 }

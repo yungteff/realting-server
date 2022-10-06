@@ -238,7 +238,7 @@ class HitQueue {
                 Sounds.sendSound(p, Sounds.getPlayerBlockSounds(p.equipment[Equipment.WEAPON_SLOT].id))
                 /** CUSTOM ON DAMAGE STUFF  */
                 if ((victim as Player).isPlayer && npc.id == 13447) {
-                    Nex.dealtDamage(victim as Player?, damage)
+                    Nex.dealtDamage(victim as Player, damage)
                 }
             } else if (attacker.isPlayer) {
                 val player = attacker as Player

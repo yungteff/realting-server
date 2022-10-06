@@ -1,108 +1,114 @@
-package com.realting.world.content.combat.strategy.impl;
-import com.realting.engine.task.Task;
-import com.realting.engine.task.TaskManager;
-import com.realting.model.Animation;
-import com.realting.model.Graphic;
-import com.realting.model.Locations;
-import com.realting.model.Position;
-import com.realting.model.Projectile;
-import com.realting.util.Misc;
-import com.realting.world.content.combat.CombatContainer;
-import com.realting.world.content.combat.CombatType;
-import com.realting.world.content.combat.strategy.CombatStrategy;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.npc.NPC;
+package com.realting.world.content.combat.strategy.impl
 
-public class Crimson implements CombatStrategy {
+import com.realting.engine.task.Task
+import com.realting.engine.task.TaskManager
+import com.realting.model.*
+import com.realting.model.entity.character.CharacterEntity
+import com.realting.model.entity.character.npc.NPC
+import com.realting.util.Misc
+import com.realting.world.content.combat.CombatContainer
+import com.realting.world.content.combat.CombatType
+import com.realting.world.content.combat.strategy.CombatStrategy
 
-	public static NPC Crimson;
-	private static final Animation attack_anim1 = new Animation(401); 
-	private static final Animation attack_anim2 = new Animation(2555);
-	private static final Animation attack_anim3 = new Animation(10546);
-	private static final Graphic graphic1 = new Graphic(1154);
-	private static final Graphic graphic2 = new Graphic(1166);
-	private static final Graphic graphic3 = new Graphic(1333);
-	private static final Graphic StormGFX = new Graphic(457);
+class Crimson : CombatStrategy {
+    override fun canAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        return true
+    }
 
+    override fun attack(entity: CharacterEntity?, victim: CharacterEntity?): CombatContainer? {
+        return null
+    }
 
-	public static void spawn() {
+    override fun customContainerAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        val Crimson = entity as NPC?
+        if (Crimson!!.isChargingAttack) {
+            return true
+        }
+        val random = Misc.getRandom(10)
+        if (random <= 8 && Locations.goodDistance(
+                Crimson.position.x,
+                Crimson.position.y,
+                victim!!.position.x,
+                victim.position.y,
+                3
+            )
+        ) {
+            Crimson.performAnimation(attack_anim1)
+            Crimson.combatBuilder.container = CombatContainer(Crimson, victim, 1, CombatType.MELEE, true)
+        } else if (random <= 4 || !Locations.goodDistance(
+                Crimson.position.x,
+                Crimson.position.y,
+                victim!!.position.x,
+                victim.position.y,
+                8
+            )
+        ) {
+            Crimson.combatBuilder.container = CombatContainer(Crimson, victim!!, 1, 3, CombatType.MAGIC, true)
+            Crimson.performAnimation(attack_anim3)
+            Crimson.performGraphic(StormGFX)
+            Crimson.isChargingAttack = true
+            Crimson.forceChat("I've banned people for less.")
+            TaskManager.submit(object : Task(2, Crimson, false) {
+                var tick = 0
+                public override fun execute() {
+                    when (tick) {
+                        1 -> {
+                            Projectile(
+                                Crimson,
+                                victim,
+                                graphic3.getId(),
+                                44,
+                                0,
+                                0,
+                                0,
+                                0
+                            ).sendProjectile()
+                            Crimson.isChargingAttack = false
+                            stop()
+                        }
+                    }
+                    tick++
+                }
+            })
+        } else {
+            Crimson.combatBuilder.container = CombatContainer(Crimson, victim, 1, CombatType.RANGED, true)
+            Crimson.performAnimation(attack_anim2)
+            Projectile(Crimson, victim, graphic2.getId(), 44, 0, 0, 0, 0).sendProjectile()
+            Crimson.isChargingAttack = true
+            TaskManager.submit(object : Task(2, Crimson, false) {
+                public override fun execute() {
+                    victim.performGraphic(graphic1)
+                    Crimson.isChargingAttack = false
+                    stop()
+                }
+            })
+        }
+        return true
+    }
 
+    override fun attackDelay(entity: CharacterEntity?): Int {
+        return entity!!.attackSpeed
+    }
 
-		Crimson = new NPC(200, new Position(3023, 3735));
-	}
+    override fun attackDistance(entity: CharacterEntity): Int {
+        return 20
+    }
 
-	@Override
-	public boolean canAttack(CharacterEntity entity, CharacterEntity victim) {
-		return true;
-	}
+    override fun getCombatType(entity: CharacterEntity): CombatType? {
+        return CombatType.MIXED
+    }
 
-	@Override
-	public CombatContainer attack(CharacterEntity entity, CharacterEntity victim) {
-		return null;
-	}
-	
-	@Override
-	public boolean customContainerAttack(CharacterEntity entity, CharacterEntity victim) {
-		NPC Crimson = (NPC)entity;
-		if(Crimson.isChargingAttack()) {
-			return true;
-		}
-		int random = Misc.getRandom(10);
-		if(random <= 8 && Locations.goodDistance(Crimson.getPosition().getX(), Crimson.getPosition().getY(), victim.getPosition().getX(), victim.getPosition().getY(), 3)) {
-			Crimson.performAnimation(attack_anim1);
-			Crimson.getCombatBuilder().setContainer(new CombatContainer(Crimson, victim, 1, CombatType.MELEE, true));
-		} else if(random <= 4 || !Locations.goodDistance(Crimson.getPosition().getX(), Crimson.getPosition().getY(), victim.getPosition().getX(), victim.getPosition().getY(), 8)) {
-			Crimson.getCombatBuilder().setContainer(new CombatContainer(Crimson, victim, 1, 3, CombatType.MAGIC, true));
-			Crimson.performAnimation(attack_anim3);
-			Crimson.performGraphic(StormGFX);
-			Crimson.setChargingAttack(true);
-			Crimson.forceChat("I've banned people for less.");	
-			TaskManager.submit(new Task(2, Crimson, false) {
-				int tick = 0;
-				@Override
-				public void execute() {
-					switch(tick) {
-					case 1:
-						new Projectile(Crimson, victim, graphic3.getId(), 44, 0, 0, 0, 0).sendProjectile();
-						Crimson.setChargingAttack(false);
-						stop();
-						break;
-					}
-					tick++;
-				}
-			});
-		} else {
-			Crimson.getCombatBuilder().setContainer(new CombatContainer(Crimson, victim, 1, CombatType.RANGED, true));
-			Crimson.performAnimation(attack_anim2);
-			new Projectile(Crimson, victim, graphic2.getId(), 44, 0, 0, 0, 0).sendProjectile();
-			Crimson.setChargingAttack(true);
-			TaskManager.submit(new Task(2, Crimson, false) {
-				@Override
-				public void execute() {
-					victim.performGraphic(graphic1);
-					Crimson.setChargingAttack(false);
-					stop();
-				}
-			});
-		}
-		return true;
-	}
-	
-	
-	@Override
-	public int attackDelay(CharacterEntity entity) {
-		return entity.getAttackSpeed();
-	}
-
-	@Override
-	public int attackDistance(CharacterEntity entity) {
-		return 20;
-	}
-
-	
-	@Override
-	public CombatType getCombatType(CharacterEntity entity) {
-		return CombatType.MIXED;
-	}
+    companion object {
+        var Crimson: NPC? = null
+        private val attack_anim1 = Animation(401)
+        private val attack_anim2 = Animation(2555)
+        private val attack_anim3 = Animation(10546)
+        private val graphic1 = Graphic(1154)
+        private val graphic2 = Graphic(1166)
+        private val graphic3 = Graphic(1333)
+        private val StormGFX = Graphic(457)
+        fun spawn() {
+            Crimson = NPC(200, Position(3023, 3735))
+        }
+    }
 }
-

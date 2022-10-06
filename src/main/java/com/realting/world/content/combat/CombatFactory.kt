@@ -937,7 +937,7 @@ class CombatFactory private constructor() {
                     }
                 }
                 if (Nex.nexMob(npc.id)) {
-                    if (!Nex.checkAttack(entity as Player?, npc.id)) {
+                    if (!Nex.checkAttack(entity as Player, npc.id)) {
                         entity.combatBuilder.reset(true)
                         return false
                     }

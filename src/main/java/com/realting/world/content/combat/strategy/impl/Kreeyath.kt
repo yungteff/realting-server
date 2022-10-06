@@ -1,94 +1,81 @@
-package com.realting.world.content.combat.strategy.impl;
+package com.realting.world.content.combat.strategy.impl
 
-import com.realting.engine.task.Task;
-import com.realting.engine.task.TaskManager;
-import com.realting.model.Animation;
-import com.realting.model.Graphic;
-import com.realting.model.Locations;
-import com.realting.model.Projectile;
-import com.realting.util.Misc;
-import com.realting.world.content.combat.CombatContainer;
-import com.realting.world.content.combat.CombatType;
-import com.realting.world.content.combat.strategy.CombatStrategy;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.player.Player;
+import com.realting.engine.task.Task
+import com.realting.engine.task.TaskManager
+import com.realting.model.Animation
+import com.realting.model.Graphic
+import com.realting.model.Locations
+import com.realting.model.Projectile
+import com.realting.model.entity.character.CharacterEntity
+import com.realting.model.entity.character.npc.NPC
+import com.realting.model.entity.character.player.Player
+import com.realting.util.Misc
+import com.realting.world.content.combat.CombatContainer
+import com.realting.world.content.combat.CombatType
+import com.realting.world.content.combat.strategy.CombatStrategy
 
-public class Kreeyath implements CombatStrategy {
+class Kreeyath : CombatStrategy {
+    override fun canAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        return victim!!.isPlayer && (victim as Player?)!!.minigameAttributes.godwarsDungeonAttributes.hasEnteredRoom()
+    }
 
-	private static final Animation attack_anim = new Animation(69);
-	private static final Graphic graphic1 = new Graphic(1212);
-	private static final Graphic graphic2 = new Graphic(1213);
-	
-	@Override
-	public boolean canAttack(CharacterEntity entity, CharacterEntity victim) {
-		return victim.isPlayer() && ((Player)victim).getMinigameAttributes().getGodwarsDungeonAttributes().hasEnteredRoom();
-	}
+    override fun attack(entity: CharacterEntity?, victim: CharacterEntity?): CombatContainer? {
+        return null
+    }
 
-	@Override
-	public CombatContainer attack(CharacterEntity entity, CharacterEntity victim) {
-		return null;
-	}
+    override fun customContainerAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        val kreeyath = entity as NPC?
+        if (victim!!.constitution <= 0) {
+            return true
+        }
+        if (kreeyath!!.isChargingAttack) {
+            kreeyath.combatBuilder.attackTimer = 4
+            return true
+        }
+        if (Locations.goodDistance(kreeyath.position.copy(), victim.position.copy(), 1) && Misc.getRandom(5) <= 3) {
+            kreeyath.performAnimation(Animation(kreeyath.definition.attackAnimation))
+            kreeyath.combatBuilder.container = CombatContainer(kreeyath, victim, 1, 1, CombatType.MELEE, true)
+        } else {
+            kreeyath.isChargingAttack = true
+            kreeyath.performAnimation(attack_anim)
+            kreeyath.performGraphic(graphic1)
+            kreeyath.combatBuilder.container = CombatContainer(kreeyath, victim, 1, 3, CombatType.MAGIC, true)
+            TaskManager.submit(object : Task(1, kreeyath, false) {
+                var tick = 0
+                public override fun execute() {
+                    if (tick == 1) {
+                        Projectile(kreeyath, victim, graphic2.id, 44, 3, 43, 43, 0).sendProjectile()
+                        kreeyath.isChargingAttack = false
+                        stop()
+                    }
+                    tick++
+                }
+            })
+        }
+        return true
+    }
 
-	@Override
-	public boolean customContainerAttack(CharacterEntity entity, CharacterEntity victim) {
-		NPC kreeyath = (NPC)entity;
-		if(victim.getConstitution() <= 0) {
-			return true;
-		}
-		if(kreeyath.isChargingAttack()) {
-			kreeyath.getCombatBuilder().setAttackTimer(4);
-			return true;
-		}
-		if(Locations.goodDistance(kreeyath.getPosition().copy(), victim.getPosition().copy(), 1) && Misc.getRandom(5) <= 3) {
-			kreeyath.performAnimation(new Animation(kreeyath.getDefinition().getAttackAnimation()));
-			kreeyath.getCombatBuilder().setContainer(new CombatContainer(kreeyath, victim, 1, 1, CombatType.MELEE, true));
-		} else {
-			kreeyath.setChargingAttack(true);
-			kreeyath.performAnimation(attack_anim);
-			kreeyath.performGraphic(graphic1);
-			kreeyath.getCombatBuilder().setContainer(new CombatContainer(kreeyath, victim, 1, 3, CombatType.MAGIC, true));
-			TaskManager.submit(new Task(1, kreeyath, false) {
-				int tick = 0;
-				@Override
-				public void execute() {
-					if(tick == 1) {
-						new Projectile(kreeyath, victim, graphic2.getId(), 44, 3, 43, 43, 0).sendProjectile();
-						kreeyath.setChargingAttack(false);
-						stop();
-						
-					}
-					tick++;
-				}
-			});
-		}
-		return true;
-	}
+    override fun attackDelay(entity: CharacterEntity?): Int {
+        return entity!!.attackSpeed
+    }
 
-	public static int getAnimation(int npc) {
-		int anim = 12259;
-		if(npc == 50)
-			anim = 81;
-		else if(npc == 5363 || npc == 1590 || npc == 1591 || npc == 1592)
-			anim = 14246;
-		else if(npc == 51)
-			anim = 13152;
-		return anim;
-	}
+    override fun attackDistance(entity: CharacterEntity): Int {
+        return 5
+    }
 
+    override fun getCombatType(entity: CharacterEntity): CombatType? {
+        return CombatType.MIXED
+    }
 
-	@Override
-	public int attackDelay(CharacterEntity entity) {
-		return entity.getAttackSpeed();
-	}
-
-	@Override
-	public int attackDistance(CharacterEntity entity) {
-		return 5;
-	}
-	
-	@Override
-	public CombatType getCombatType(CharacterEntity entity) {
-		return CombatType.MIXED;
-	}
+    companion object {
+        private val attack_anim = Animation(69)
+        private val graphic1 = Graphic(1212)
+        private val graphic2 = Graphic(1213)
+        fun getAnimation(npc: Int): Int {
+            var anim = 12259
+            if (npc == 50) anim = 81 else if (npc == 5363 || npc == 1590 || npc == 1591 || npc == 1592) anim =
+                14246 else if (npc == 51) anim = 13152
+            return anim
+        }
+    }
 }

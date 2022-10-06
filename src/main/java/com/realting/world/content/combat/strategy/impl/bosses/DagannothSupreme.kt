@@ -1,60 +1,49 @@
-package com.realting.world.content.combat.strategy.impl.bosses;
+package com.realting.world.content.combat.strategy.impl.bosses
 
-import com.realting.engine.task.Task;
-import com.realting.engine.task.TaskManager;
-import com.realting.model.Animation;
-import com.realting.model.Projectile;
-import com.realting.world.content.combat.CombatContainer;
-import com.realting.world.content.combat.CombatType;
-import com.realting.world.content.combat.strategy.CombatStrategy;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.npc.NPC;
+import com.realting.engine.task.Task
+import com.realting.engine.task.TaskManager
+import com.realting.model.Animation
+import com.realting.model.Projectile
+import com.realting.model.entity.character.CharacterEntity
+import com.realting.model.entity.character.npc.NPC
+import com.realting.world.content.combat.CombatContainer
+import com.realting.world.content.combat.CombatType
+import com.realting.world.content.combat.strategy.CombatStrategy
 
-public class DagannothSupreme implements CombatStrategy {
+class DagannothSupreme : CombatStrategy {
+    override fun canAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        return true
+    }
 
-	@Override
-	public boolean canAttack(CharacterEntity entity, CharacterEntity victim) {
-		return true;
-	}
+    override fun attack(entity: CharacterEntity?, victim: CharacterEntity?): CombatContainer? {
+        return null
+    }
 
-	@Override
-	public CombatContainer attack(CharacterEntity entity, CharacterEntity victim) {
-		return null;
-	}
+    override fun customContainerAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        val prime = entity as NPC?
+        if (prime!!.constitution <= 0 || victim!!.constitution <= 0) {
+            return true
+        }
+        prime.performAnimation(Animation(prime.definition.attackAnimation))
+        TaskManager.submit(object : Task(1, prime, false) {
+            override fun execute() {
+                Projectile(prime, victim, 1937, 44, 3, 43, 43, 0).sendProjectile()
+                prime.combatBuilder.container = CombatContainer(prime, victim!!, 1, 2, CombatType.RANGED, true)
+                stop()
+            }
+        })
+        return true
+    }
 
-	@Override
-	public boolean customContainerAttack(CharacterEntity entity, CharacterEntity victim) {
-		NPC prime = (NPC)entity;
-		if(prime.getConstitution() <= 0 || victim.getConstitution() <= 0) {
-			return true;
-		}
-		prime.performAnimation(new Animation(prime.getDefinition().getAttackAnimation()));
-		TaskManager.submit(new Task(1, prime, false) {
+    override fun attackDelay(entity: CharacterEntity?): Int {
+        return entity!!.attackSpeed
+    }
 
-			@Override
-			protected void execute() {
-				new Projectile(prime, victim, 1937, 44, 3, 43, 43, 0).sendProjectile();
-				prime.getCombatBuilder().setContainer(new CombatContainer(prime, victim, 1, 2, CombatType.RANGED, true));
-				stop();
-			}
-			
-		});
-		return true;
-	}
+    override fun attackDistance(entity: CharacterEntity): Int {
+        return 5
+    }
 
-
-	@Override
-	public int attackDelay(CharacterEntity entity) {
-		return entity.getAttackSpeed();
-	}
-
-	@Override
-	public int attackDistance(CharacterEntity entity) {
-		return 5;
-	}
-	
-	@Override
-	public CombatType getCombatType(CharacterEntity entity) {
-		return CombatType.RANGED;
-	}
+    override fun getCombatType(entity: CharacterEntity): CombatType? {
+        return CombatType.RANGED
+    }
 }

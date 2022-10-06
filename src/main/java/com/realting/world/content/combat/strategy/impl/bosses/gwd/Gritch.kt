@@ -1,76 +1,69 @@
-package com.realting.world.content.combat.strategy.impl.bosses.gwd;
+package com.realting.world.content.combat.strategy.impl.bosses.gwd
 
-import com.realting.engine.task.Task;
-import com.realting.engine.task.TaskManager;
-import com.realting.model.Animation;
-import com.realting.model.Graphic;
-import com.realting.model.Locations;
-import com.realting.model.Projectile;
-import com.realting.util.Misc;
-import com.realting.world.content.combat.CombatContainer;
-import com.realting.world.content.combat.CombatType;
-import com.realting.world.content.combat.strategy.CombatStrategy;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.npc.NPC;
+import com.realting.engine.task.Task
+import com.realting.engine.task.TaskManager
+import com.realting.model.Animation
+import com.realting.model.Graphic
+import com.realting.model.Locations
+import com.realting.model.Projectile
+import com.realting.model.entity.character.CharacterEntity
+import com.realting.model.entity.character.npc.NPC
+import com.realting.util.Misc
+import com.realting.world.content.combat.CombatContainer
+import com.realting.world.content.combat.CombatType
+import com.realting.world.content.combat.strategy.CombatStrategy
 
-public class Gritch implements CombatStrategy {
+class Gritch : CombatStrategy {
+    override fun canAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        return true
+    }
 
-	private static final Animation anim = new Animation(69);
-	private static final Graphic gfx = new Graphic(386);
-	
-	@Override
-	public boolean canAttack(CharacterEntity entity, CharacterEntity victim) {
-		return true;
-	}
+    override fun attack(entity: CharacterEntity?, victim: CharacterEntity?): CombatContainer? {
+        return null
+    }
 
-	@Override
-	public CombatContainer attack(CharacterEntity entity, CharacterEntity victim) {
-		return null;
-	}
+    override fun customContainerAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        val gritch = entity as NPC?
+        if (gritch!!.isChargingAttack || victim!!.constitution <= 0) {
+            gritch.combatBuilder.attackTimer = 4
+            return true
+        }
+        if (Locations.goodDistance(gritch.position.copy(), victim!!.position.copy(), 1) && Misc.getRandom(5) <= 3) {
+            gritch.performAnimation(Animation(gritch.definition.attackAnimation))
+            gritch.combatBuilder.container = CombatContainer(gritch, victim, 1, 1, CombatType.MELEE, true)
+        } else {
+            gritch.isChargingAttack = true
+            gritch.performAnimation(anim)
+            gritch.combatBuilder.container = CombatContainer(gritch, victim, 1, 3, CombatType.RANGED, true)
+            TaskManager.submit(object : Task(1, gritch, false) {
+                var tick = 0
+                public override fun execute() {
+                    if (tick == 1) {
+                        Projectile(gritch, victim, gfx.id, 44, 3, 43, 43, 0).sendProjectile()
+                        gritch.isChargingAttack = false
+                        stop()
+                    }
+                    tick++
+                }
+            })
+        }
+        return true
+    }
 
-	@Override
-	public boolean customContainerAttack(CharacterEntity entity, CharacterEntity victim) {
-		NPC gritch = (NPC)entity;
-		if(gritch.isChargingAttack() || victim.getConstitution() <= 0) {
-			gritch.getCombatBuilder().setAttackTimer(4);
-			return true;
-		}
-		if(Locations.goodDistance(gritch.getPosition().copy(), victim.getPosition().copy(), 1) && Misc.getRandom(5) <= 3) {
-			gritch.performAnimation(new Animation(gritch.getDefinition().getAttackAnimation()));
-			gritch.getCombatBuilder().setContainer(new CombatContainer(gritch, victim, 1, 1, CombatType.MELEE, true));
-		} else {
-			gritch.setChargingAttack(true);
-			gritch.performAnimation(anim);
-			gritch.getCombatBuilder().setContainer(new CombatContainer(gritch, victim, 1, 3, CombatType.RANGED, true));
-			TaskManager.submit(new Task(1, gritch, false) {
-				int tick = 0;
-				@Override
-				public void execute() {
-					if(tick == 1) {
-						new Projectile(gritch, victim, gfx.getId(), 44, 3, 43, 43, 0).sendProjectile();
-						gritch.setChargingAttack(false);
-						stop();
-					}
-					tick++;
-				}
-			});
-		}
-		return true;
-	}
+    override fun attackDelay(entity: CharacterEntity?): Int {
+        return entity!!.attackSpeed
+    }
 
+    override fun attackDistance(entity: CharacterEntity): Int {
+        return 5
+    }
 
-	@Override
-	public int attackDelay(CharacterEntity entity) {
-		return entity.getAttackSpeed();
-	}
+    override fun getCombatType(entity: CharacterEntity): CombatType? {
+        return CombatType.MIXED
+    }
 
-	@Override
-	public int attackDistance(CharacterEntity entity) {
-		return 5;
-	}
-	
-	@Override
-	public CombatType getCombatType(CharacterEntity entity) {
-		return CombatType.MIXED;
-	}
+    companion object {
+        private val anim = Animation(69)
+        private val gfx = Graphic(386)
+    }
 }

@@ -1,67 +1,56 @@
-package com.realting.world.content.combat.strategy.impl;
+package com.realting.world.content.combat.strategy.impl
 
-import com.realting.engine.task.Task;
-import com.realting.engine.task.TaskManager;
-import com.realting.model.Animation;
-import com.realting.model.Projectile;
-import com.realting.world.content.combat.CombatContainer;
-import com.realting.world.content.combat.CombatType;
-import com.realting.world.content.combat.strategy.CombatStrategy;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.player.Player;
+import com.realting.engine.task.Task
+import com.realting.engine.task.TaskManager
+import com.realting.model.Animation
+import com.realting.model.Projectile
+import com.realting.model.entity.character.CharacterEntity
+import com.realting.model.entity.character.npc.NPC
+import com.realting.model.entity.character.player.Player
+import com.realting.world.content.combat.CombatContainer
+import com.realting.world.content.combat.CombatType
+import com.realting.world.content.combat.strategy.CombatStrategy
 
-public class Geerin implements CombatStrategy {
+class Geerin : CombatStrategy {
+    override fun canAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        return victim!!.isPlayer && (victim as Player?)!!.minigameAttributes.godwarsDungeonAttributes.hasEnteredRoom()
+    }
 
-	@Override
-	public boolean canAttack(CharacterEntity entity, CharacterEntity victim) {
-		return victim.isPlayer() && ((Player)victim).getMinigameAttributes().getGodwarsDungeonAttributes().hasEnteredRoom();
-	}
+    override fun attack(entity: CharacterEntity?, victim: CharacterEntity?): CombatContainer? {
+        return null
+    }
 
-	@Override
-	public CombatContainer attack(CharacterEntity entity, CharacterEntity victim) {
-		return null;
-	}
+    override fun customContainerAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        val geerin = entity as NPC?
+        if (geerin!!.isChargingAttack || victim!!.constitution <= 0 || geerin.constitution <= 0) {
+            return true
+        }
+        geerin.performAnimation(Animation(geerin.definition.attackAnimation))
+        geerin.isChargingAttack = true
+        geerin.combatBuilder.container = CombatContainer(geerin, victim!!, 1, 3, CombatType.RANGED, true)
+        TaskManager.submit(object : Task(1, geerin, false) {
+            var tick = 0
+            public override fun execute() {
+                if (tick == 1) {
+                    Projectile(geerin, victim, 1837, 44, 3, 43, 43, 0).sendProjectile()
+                    geerin.isChargingAttack = false
+                    stop()
+                }
+                tick++
+            }
+        })
+        return true
+    }
 
-	@Override
-	public boolean customContainerAttack(CharacterEntity entity, CharacterEntity victim) {
-		NPC geerin = (NPC)entity;
-		if(geerin.isChargingAttack() || victim.getConstitution() <= 0 || geerin.getConstitution() <= 0) {
-			return true;
-		}
-		
-		geerin.performAnimation(new Animation(geerin.getDefinition().getAttackAnimation()));
-		geerin.setChargingAttack(true);
+    override fun attackDelay(entity: CharacterEntity?): Int {
+        return entity!!.attackSpeed
+    }
 
-		geerin.getCombatBuilder().setContainer(new CombatContainer(geerin, victim, 1, 3, CombatType.RANGED, true));
-		
-		TaskManager.submit(new Task(1, geerin, false) {
-			int tick = 0;
-			@Override
-			public void execute() {
-				if(tick == 1) {
-					new Projectile(geerin, victim, 1837, 44, 3, 43, 43, 0).sendProjectile();
-					geerin.setChargingAttack(false);
-					stop();
-				}
-				tick++;
-			}
-		});
-		return true;
-	}
+    override fun attackDistance(entity: CharacterEntity): Int {
+        return 6
+    }
 
-	@Override
-	public int attackDelay(CharacterEntity entity) {
-		return entity.getAttackSpeed();
-	}
-
-	@Override
-	public int attackDistance(CharacterEntity entity) {
-		return 6;
-	}
-
-	@Override
-	public CombatType getCombatType(CharacterEntity entity) {
-		return CombatType.RANGED;
-	}
+    override fun getCombatType(entity: CharacterEntity): CombatType? {
+        return CombatType.RANGED
+    }
 }

@@ -1,68 +1,70 @@
-package com.realting.world.content.combat.strategy.impl;
+package com.realting.world.content.combat.strategy.impl
 
-import com.realting.engine.task.Task;
-import com.realting.engine.task.TaskManager;
-import com.realting.model.Animation;
-import com.realting.model.Projectile;
-import com.realting.util.Misc;
-import com.realting.world.content.combat.CombatContainer;
-import com.realting.world.content.combat.CombatType;
-import com.realting.world.content.combat.strategy.CombatStrategy;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.npc.NPC;
+import com.realting.engine.task.Task
+import com.realting.engine.task.TaskManager
+import com.realting.model.Animation
+import com.realting.model.Projectile
+import com.realting.model.entity.character.CharacterEntity
+import com.realting.model.entity.character.npc.NPC
+import com.realting.util.Misc
+import com.realting.world.content.combat.CombatContainer
+import com.realting.world.content.combat.CombatType
+import com.realting.world.content.combat.strategy.CombatStrategy
 
-public class PlaneFreezer implements CombatStrategy {
+class PlaneFreezer : CombatStrategy {
+    override fun canAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        return true
+    }
 
-	@Override
-	public boolean canAttack(CharacterEntity entity, CharacterEntity victim) {
-		return true;
-	}
+    override fun attack(entity: CharacterEntity?, victim: CharacterEntity?): CombatContainer? {
+        return null
+    }
 
-	@Override
-	public CombatContainer attack(CharacterEntity entity, CharacterEntity victim) {
-		return null;
-	}
+    override fun customContainerAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        val lakra = entity as NPC?
+        if (victim!!.constitution <= 0) {
+            return true
+        }
+        if (lakra!!.isChargingAttack) {
+            return true
+        }
+        lakra.isChargingAttack = true
+        lakra.performAnimation(Animation(13770))
+        val attkType = if (Misc.getRandom(5) <= 2) CombatType.RANGED else CombatType.MAGIC
+        lakra.combatBuilder.container =
+            CombatContainer(lakra, victim, 1, 4, attkType, if (Misc.getRandom(5) <= 1) false else true)
+        TaskManager.submit(object : Task(1, lakra, false) {
+            var tick = 0
+            public override fun execute() {
+                if (tick == 2) {
+                    Projectile(
+                        lakra,
+                        victim,
+                        if (attkType === CombatType.RANGED) 605 else 473,
+                        44,
+                        3,
+                        43,
+                        43,
+                        0
+                    ).sendProjectile()
+                    lakra.isChargingAttack = false
+                    stop()
+                }
+                tick++
+            }
+        })
+        return true
+    }
 
-	@Override
-	public boolean customContainerAttack(CharacterEntity entity, CharacterEntity victim) {
-		NPC lakra = (NPC)entity;
-		if(victim.getConstitution() <= 0) {
-			return true;
-		}
-		if(lakra.isChargingAttack()) {
-			return true;
-		}
-		lakra.setChargingAttack(true);
-		lakra.performAnimation(new Animation((13770)));
-		final CombatType attkType = Misc.getRandom(5) <= 2 ? CombatType.RANGED : CombatType.MAGIC;
-		lakra.getCombatBuilder().setContainer(new CombatContainer(lakra, victim, 1, 4, attkType, Misc.getRandom(5) <= 1 ? false : true));
-		TaskManager.submit(new Task(1, lakra, false) {
-			int tick = 0;
-			@Override
-			public void execute() {
-				if(tick == 2) {
-					new Projectile(lakra, victim, (attkType == CombatType.RANGED ? 605 : 473), 44, 3, 43, 43, 0).sendProjectile();
-					lakra.setChargingAttack(false);
-					stop();
-				}
-				tick++;
-			}
-		});
-		return true;
-	}
+    override fun attackDelay(entity: CharacterEntity?): Int {
+        return entity!!.attackSpeed
+    }
 
-	@Override
-	public int attackDelay(CharacterEntity entity) {
-		return entity.getAttackSpeed();
-	}
+    override fun attackDistance(entity: CharacterEntity): Int {
+        return 5
+    }
 
-	@Override
-	public int attackDistance(CharacterEntity entity) {
-		return 5;
-	}
-
-	@Override
-	public CombatType getCombatType(CharacterEntity entity) {
-		return CombatType.MIXED;
-	}
+    override fun getCombatType(entity: CharacterEntity): CombatType? {
+        return CombatType.MIXED
+    }
 }

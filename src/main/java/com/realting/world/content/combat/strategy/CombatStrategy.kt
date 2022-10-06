@@ -55,29 +55,29 @@ interface CombatStrategy {
      * the attacking entity in this combat hook.
      * @return the radius that the attacker has to be within in order to attack.
      */
-    fun attackDistance(entity: CharacterEntity?): Int
-    fun getCombatType(entity: CharacterEntity?): CombatType?
+    fun attackDistance(entity: CharacterEntity): Int
+    fun getCombatType(entity: CharacterEntity): CombatType?
 
     /**
      * Entity was damaged.
      * @param hit the damage
      */
-    fun damaged(entity: CharacterEntity?, hit: Hit?) {}
+    fun damaged(entity: CharacterEntity, hit: Hit?) {}
 
     /**
      * This entity attacked another entity
      */
-    fun attacked(entity: CharacterEntity?, victim: CharacterEntity?, hit: Hit?) {}
+    fun attacked(entity: CharacterEntity, victim: CharacterEntity?, hit: Hit?) {}
 
     /**
      * Modify a hit.
      * @param entity the entity that has the CombatStrategy
      */
-    fun modifyHit(entity: CharacterEntity?, hit: Hit?) {}
+    fun modifyHit(entity: CharacterEntity, hit: Hit?) {}
 
     /**
      * Entity respawned
      * @param entity the entity
      */
-    fun respawned(entity: CharacterEntity?) {}
+    fun respawned(entity: CharacterEntity) {}
 }

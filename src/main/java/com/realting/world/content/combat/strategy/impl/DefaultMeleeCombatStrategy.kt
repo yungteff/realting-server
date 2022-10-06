@@ -1,104 +1,96 @@
-package com.realting.world.content.combat.strategy.impl;
+package com.realting.world.content.combat.strategy.impl
 
-import com.realting.model.Animation;
-import com.realting.model.definitions.WeaponAnimations;
-import com.realting.model.definitions.WeaponInterfaces.WeaponInterface;
-import com.realting.world.content.combat.CombatContainer;
-import com.realting.world.content.combat.CombatType;
-import com.realting.world.content.combat.strategy.CombatStrategy;
-import com.realting.world.content.minigames.Dueling;
-import com.realting.world.content.minigames.Dueling.DuelRule;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.player.Player;
+import com.realting.model.Animation
+import com.realting.model.definitions.WeaponAnimations
+import com.realting.model.definitions.WeaponInterfaces.WeaponInterface
+import com.realting.model.entity.character.CharacterEntity
+import com.realting.model.entity.character.npc.NPC
+import com.realting.model.entity.character.player.Player
+import com.realting.world.content.combat.CombatContainer
+import com.realting.world.content.combat.CombatType
+import com.realting.world.content.combat.strategy.CombatStrategy
+import com.realting.world.content.minigames.Dueling.Companion.checkRule
+import com.realting.world.content.minigames.Dueling.DuelRule
 
 /**
- * The default combat strategy assigned to an {@link CharacterEntity} during a melee
- * based combat session. This is the combat strategy used by all {@link Npc}s by
+ * The default combat strategy assigned to an [CharacterEntity] during a melee
+ * based combat session. This is the combat strategy used by all [Npc]s by
  * default.
- * 
+ *
  * @author lare96
  */
-public class DefaultMeleeCombatStrategy implements CombatStrategy {
-
-    @Override
-    public boolean canAttack(CharacterEntity entity, CharacterEntity victim) {
-    	
-		
-    	if(entity.isPlayer()) {
-    		Player player = (Player)entity;
-    		if(Dueling.checkRule(player, DuelRule.NO_MELEE)) {
-    			player.getPacketSender().sendMessage("Melee-attacks have been turned off in this duel!");
-    			player.getCombatBuilder().reset(true);
-    			return false;
-    		}
-    	}
-       
-        return true;
+class DefaultMeleeCombatStrategy : CombatStrategy {
+    override fun canAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        if (entity!!.isPlayer) {
+            val player = entity as Player?
+            if (checkRule(player!!, DuelRule.NO_MELEE)) {
+                player.packetSender.sendMessage("Melee-attacks have been turned off in this duel!")
+                player.combatBuilder.reset(true)
+                return false
+            }
+        }
+        return true
     }
 
-    @Override
-    public CombatContainer attack(CharacterEntity entity, CharacterEntity victim) {
+    override fun attack(entity: CharacterEntity?, victim: CharacterEntity?): CombatContainer? {
 
         // Start the performAnimation for this attack.
-        startAnimation(entity);
+        startAnimation(entity)
 
         // Create the combat container for this hook.
-        return new CombatContainer(entity, victim, 1, CombatType.MELEE, true);
+        return CombatContainer(entity!!, victim!!, 1, CombatType.MELEE, true)
     }
 
-    @Override
-    public int attackDelay(CharacterEntity entity) {
+    override fun attackDelay(entity: CharacterEntity?): Int {
 
         // The attack speed for the weapon being used.
-        return entity.getAttackSpeed();
+        return entity!!.attackSpeed
     }
 
-    @Override
-    public int attackDistance(CharacterEntity entity) {
+    override fun attackDistance(entity: CharacterEntity): Int {
 
         // The default distance for all npcs using melee is 1.
-        if (entity.isNpc()) {
-            return ((NPC)entity).getDefinition().getSize();
+        if (entity.isNpc) {
+            return (entity as NPC).definition.size
         }
 
         // The default distance for all players is 1, or 2 if they are using a
         // halberd.
-        Player player = (Player) entity;
-        if (player.getWeapon() == WeaponInterface.HALBERD) {
-            return 2;
-        }
-        return 1;
+        val player = entity as Player
+        return if (player.weapon == WeaponInterface.HALBERD) {
+            2
+        } else 1
     }
 
     /**
      * Starts the performAnimation for the argued entity in the current combat hook.
-     * 
+     *
      * @param entity
-     *            the entity to start the performAnimation for.
+     * the entity to start the performAnimation for.
      */
-    private void startAnimation(CharacterEntity entity) {
-        if (entity.isNpc()) {
-            NPC npc = (NPC) entity;
-            npc.performAnimation(new Animation(
-                npc.getDefinition().getAttackAnimation()));
-        } else if (entity.isPlayer()) {
-            Player player = (Player) entity;
-            if (!player.isSpecialActivated()) {
-            	player.performAnimation(new Animation(WeaponAnimations.getAttackAnimation(player)));
+    private fun startAnimation(entity: CharacterEntity?) {
+        if (entity!!.isNpc) {
+            val npc = entity as NPC?
+            npc!!.performAnimation(
+                Animation(
+                    npc.definition.attackAnimation
+                )
+            )
+        } else if (entity.isPlayer) {
+            val player = entity as Player?
+            if (!player!!.isSpecialActivated) {
+                player.performAnimation(Animation(WeaponAnimations.getAttackAnimation(player)))
             } else {
-                player.performAnimation(new Animation(player.getFightType().getAnimation()));
+                player.performAnimation(Animation(player.fightType.animation))
             }
         }
     }
 
-	@Override
-	public boolean customContainerAttack(CharacterEntity entity, CharacterEntity victim) {
-		return false;
-	}
-	
-	@Override
-	public CombatType getCombatType(CharacterEntity entity) {
-		return CombatType.MELEE;
-	}
+    override fun customContainerAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        return false
+    }
+
+    override fun getCombatType(entity: CharacterEntity): CombatType? {
+        return CombatType.MELEE
+    }
 }

@@ -1,224 +1,217 @@
-package com.realting.world.content.combat.strategy.impl.bosses;
+package com.realting.world.content.combat.strategy.impl.bosses
 
-import com.realting.engine.task.Task;
-import com.realting.engine.task.TaskManager;
-import com.realting.model.Animation;
-import com.realting.model.Graphic;
-import com.realting.model.Position;
-import com.realting.util.Misc;
-import com.realting.util.Stopwatch;
-import com.realting.world.World;
-import com.realting.world.content.combat.CombatContainer;
-import com.realting.world.content.combat.CombatType;
-import com.realting.world.content.combat.strategy.CombatStrategy;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.npc.NPCMovementCoordinator.Coordinator;
+import com.realting.engine.task.Task
+import com.realting.engine.task.TaskManager
+import com.realting.model.Animation
+import com.realting.model.Graphic
+import com.realting.model.Position
+import com.realting.model.entity.character.CharacterEntity
+import com.realting.model.entity.character.npc.NPC
+import com.realting.model.entity.character.npc.NPCMovementCoordinator
+import com.realting.util.Misc
+import com.realting.util.Stopwatch
+import com.realting.world.World
+import com.realting.world.content.combat.CombatContainer
+import com.realting.world.content.combat.CombatType
+import com.realting.world.content.combat.strategy.CombatStrategy
 
-public class OLDNewZulrah implements CombatStrategy {
+class OLDNewZulrah : CombatStrategy {
+    //private static TilePointer tile;
+    //private static ArrayList<TilePointer> poisonedTiles = new ArrayList<TilePointer>();
+    private val shoot = Animation(5069)
+    private val charge = Animation(5806)
+    private val melee_attack = Animation(5807)
+    private val toxic_cloud = Graphic(310)
+    private val fire = Graphic(78)
+    private val snakeling_summon = Graphic(281)
+    override fun canAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        //System.out.println("canAttack called");
+        return true
+    }
 
-	public static NPC ZULRAH;
-	private static int zulrahId, zulrahHp;
-	private static boolean firstForm, isDiving, firstCall, venom;
-	
-	private static Stopwatch venomTime = new Stopwatch();
-	
-	private static boolean[] snakelingsKilled;
-	
-	private static int form;
-	
-	private static int defaultConstitution = 10000;
-	
-	private static int phase, prayerType, prayerTimer;
+    override fun attack(entity: CharacterEntity?, victim: CharacterEntity?): CombatContainer? {
+        // TODO Auto-generated method stub
+        //System.out.println("attack called");
+        return null
+    }
 
-	private static int[] moveX = {3366, 3360, 3370, 3363, 3356, 3369};
-	private static int[] moveY = {3800, 3801, 3805, 3818, 3812, 3809};
-	
-	private static int randomCoord;
-	private static int dir = -1;
-	private static Position zulrahPosition, venomPosition, snakelingPosition;
-	
-	private static NPC TILE, TILE2, SNAKELING;
-	//private static TilePointer tile;
-	//private static ArrayList<TilePointer> poisonedTiles = new ArrayList<TilePointer>();
-	
-	private Animation shoot = new Animation(5069);
-	private Animation charge = new Animation(5806);
-	private Animation melee_attack = new Animation(5807);
-	private static Animation dive = new Animation(5072);
-	private static Animation rise = new Animation(5073);
-	private Graphic toxic_cloud = new Graphic(310);
-	private Graphic fire = new Graphic(78);
-	private Graphic snakeling_summon = new Graphic(281);
-	
-	/**
-	 * Handles the spawning of {@link OLDZulrah}.
-	 * 
-	 * @param firstSpawn 
-	 * 				Determines whether this is the first time the method is being called.
-	 */
-	public static void spawn() {
-		if (ZULRAH != null && ZULRAH.isRegistered()) {
-			System.out.println("Could not spawn another, as ZULRAH is registered.");
-		} else {
-			getDir();
-			zulrahId = 2042;
-			zulrahHp = 2000;
-			zulrahPosition = new Position(moveX[dir], moveY[dir]);
-			firstForm = true;
-			ZULRAH = new NPC(zulrahId, zulrahPosition);
-			ZULRAH.getMovementCoordinator().setCoordinator(new Coordinator(true, 3));
-			World.register(ZULRAH);
-			ZULRAH.performAnimation(rise);
-			ZULRAH.setDefaultConstitution(defaultConstitution);
-			ZULRAH.setConstitution(defaultConstitution);
-			form = 1;
-			System.out.println("Spawned completed");
-		}
-	}
-	
-	public static void despawn() {
-		System.out.println("Despawn called");
-		ZULRAH.performAnimation(dive);
-		TaskManager.submit(new Task(1, ZULRAH, false) {
-			int tick = 0;
-			@Override
-			public void execute() {
-				if(tick == 3){
-					zulrahHp = ZULRAH.getConstitution();
-					phase = 2;
-				if(ZULRAH != null && ZULRAH.isRegistered())
-					World.deregister(ZULRAH);
-					dir = -1;
-					form = -1;
-				this.stop();
-				}
-				tick++;
-			} 
-		});
-		System.out.println("Despawn completed");
-	}
-	
-	public static void move() {
-		if(ZULRAH != null && ZULRAH.isRegistered()){
-			zulrahHp = ZULRAH.getConstitution();
-			World.deregister(ZULRAH);
-		}
-		System.out.println("deregistered zulrah, zulrahHp = "+zulrahHp);
-		TaskManager.submit(new Task(4, ZULRAH, false) {
-			@Override
-			public void execute() {
-					int newpos = newDir();
-					zulrahPosition = new Position(moveX[newpos], moveY[newpos]);
-					zulrahId = newForm();
-					phase = prayerType = prayerTimer = 0;
-					System.out.println("Zulrah: "+ zulrahId +", phase = "+phase+", Moved to newpos: "+newpos + ", x: "+moveX[newpos] + ", y: " +moveY[newpos]);
-					isDiving = false;
-					System.out.println("IsDiving false");
-					ZULRAH = new NPC(zulrahId, zulrahPosition);
-					System.out.println("Declared new NPC");
-					ZULRAH.getMovementCoordinator().setCoordinator(new Coordinator(true, 10));
-					System.out.println("Set ZULRAH movement");
-					World.register(ZULRAH);
-					System.out.println("Registered zulrah");
-					ZULRAH.performAnimation(rise);
-					System.out.println("zulrahHp = "+zulrahHp + ", Zulrah constitution "+ZULRAH.getConstitution());
-					ZULRAH.setDefaultConstitution(zulrahHp);
-					ZULRAH.setConstitution(zulrahHp);
-					System.out.println("done moving " +ZULRAH.getConstitution());
-					ZULRAH.setForcedChat("HISSSS!");
-					stop();						
-			}
-		});
-	}
-	
-	private static int getForm() {
-		if (ZULRAH == null) {
-			return -1;
-		}
-		if (!ZULRAH.isRegistered()) {
-			return -1;
-		}
-		if (ZULRAH.getId() == 2042) {
-			return 1; //green
-		} else if (ZULRAH.getId() == 2043) {
-			return 2; //red
-		} else if (ZULRAH.getId() == 2044) {
-			return 3; //blue
-		} else {
-			return -404;//ERROR
-		}
-	}
-	
-	private static int newForm() {
-		int current = getForm();
-		int aNewForm = 2042+Misc.getRandom(2);
-		if (current == aNewForm) {
-						return newForm();//TODO FIX
-		}
-		return aNewForm;
-	}
-	
-	private static int getDir() {
-		if (dir == -1) {
-			int newdir = Misc.getRandom(moveX.length-1);
-			dir = newdir;
-		}
-		if (ZULRAH != null && ZULRAH.isRegistered() && ZULRAH.getPosition().getX() != moveX[dir]) {
-			System.out.println("Error. Dir = "+dir+ ", Zulrah's pos = "+ZULRAH.getPosition().getX() + ", moveX["+dir+"] = "+moveX[dir]);
-		}
-		return dir;
-	}
-	
-	private static int newDir() {
-		int current = getDir();
-		int newdir = Misc.getRandom(moveX.length-1);
-		if (ZULRAH != null && ZULRAH.isRegistered() && ZULRAH.getPosition().getX() != moveX[current]) {
-			System.out.println("[ERROR 666] Zulrah's X = "+ZULRAH.getPosition().getX() + ", dir = "+current+ ", moveX["+current+"] = "+moveX[current]);
-			return 666;
-		}
-		if (newdir == current) {
-			System.out.println("[ERROR 2] Newdir == current ("+current+"). Running again.");
-			return newDir();//TODO FIX
-		}
-		return newdir;
-	}
+    override fun customContainerAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        // TODO 
+        return true
+    }
 
-	@Override
-	public boolean canAttack(CharacterEntity entity, CharacterEntity victim) {
-		//System.out.println("canAttack called");
-		return true;
-	}
+    override fun attackDelay(entity: CharacterEntity?): Int {
+        //System.out.println("attackDelay called");
+        return entity!!.attackSpeed
+    }
 
-	@Override
-	public CombatContainer attack(CharacterEntity entity, CharacterEntity victim) {
-		// TODO Auto-generated method stub
-		//System.out.println("attack called");
-		return null;
-	}
+    override fun attackDistance(entity: CharacterEntity): Int {
+        //System.out.println("attackDistance called");
+        return 15
+    }
 
-	@Override
-	public boolean customContainerAttack(CharacterEntity entity, CharacterEntity victim) {
-		// TODO 
-		return true;
-	}
+    override fun getCombatType(entity: CharacterEntity): CombatType? {
+        //System.out.println("combatType called");
+        return CombatType.MIXED
+    }
 
-	@Override
-	public int attackDelay(CharacterEntity entity) {
-		//System.out.println("attackDelay called");
-		return entity.getAttackSpeed();
-	}
+    companion object {
+        var ZULRAH: NPC? = null
+        private var zulrahId = 0
+        private var zulrahHp = 0
+        private var firstForm = false
+        private var isDiving = false
+        private const val firstCall = false
+        private const val venom = false
+        private val venomTime = Stopwatch()
+        private val snakelingsKilled: BooleanArray = TODO()
+        private var form = 0
+        private const val defaultConstitution = 10000
+        private var phase = 0
+        private var prayerType = 0
+        private var prayerTimer = 0
+        private val moveX = intArrayOf(3366, 3360, 3370, 3363, 3356, 3369)
+        private val moveY = intArrayOf(3800, 3801, 3805, 3818, 3812, 3809)
+        private const val randomCoord = 0
+        private var dir = -1
+        private var zulrahPosition: Position? = null
+        private val venomPosition: Position? = null
+        private val snakelingPosition: Position? = null
+        private val TILE: NPC? = null
+        private val TILE2: NPC? = null
+        private val SNAKELING: NPC? = null
+        private val dive = Animation(5072)
+        private val rise = Animation(5073)
 
-	@Override
-	public int attackDistance(CharacterEntity entity) {
-		//System.out.println("attackDistance called");
-		return 15;
-	}
+        /**
+         * Handles the spawning of [OLDZulrah].
+         *
+         * @param firstSpawn
+         * Determines whether this is the first time the method is being called.
+         */
+        fun spawn() {
+            if (ZULRAH != null && ZULRAH!!.isRegistered) {
+                println("Could not spawn another, as ZULRAH is registered.")
+            } else {
+                getDir()
+                zulrahId = 2042
+                zulrahHp = 2000
+                zulrahPosition = Position(moveX[dir], moveY[dir])
+                firstForm = true
+                ZULRAH = NPC(zulrahId, zulrahPosition)
+                ZULRAH!!.movementCoordinator.coordinator = NPCMovementCoordinator.Coordinator(true, 3)
+                World.register(ZULRAH)
+                ZULRAH!!.performAnimation(rise)
+                ZULRAH!!.defaultConstitution = defaultConstitution
+                ZULRAH!!.constitution = defaultConstitution
+                form = 1
+                println("Spawned completed")
+            }
+        }
 
-	@Override
-	public CombatType getCombatType(CharacterEntity entity) {
-		//System.out.println("combatType called");
-		return CombatType.MIXED;
-	}
+        fun despawn() {
+            println("Despawn called")
+            ZULRAH!!.performAnimation(dive)
+            TaskManager.submit(object : Task(1, ZULRAH, false) {
+                var tick = 0
+                public override fun execute() {
+                    if (tick == 3) {
+                        zulrahHp = ZULRAH!!.constitution
+                        phase = 2
+                        if (ZULRAH != null && ZULRAH!!.isRegistered) World.deregister(ZULRAH)
+                        dir = -1
+                        form = -1
+                        stop()
+                    }
+                    tick++
+                }
+            })
+            println("Despawn completed")
+        }
 
+        fun move() {
+            if (ZULRAH != null && ZULRAH!!.isRegistered) {
+                zulrahHp = ZULRAH!!.constitution
+                World.deregister(ZULRAH)
+            }
+            println("deregistered zulrah, zulrahHp = " + zulrahHp)
+            TaskManager.submit(object : Task(4, ZULRAH, false) {
+                public override fun execute() {
+                    val newpos = newDir()
+                    zulrahPosition = Position(moveX[newpos], moveY[newpos])
+                    zulrahId = newForm()
+                    prayerTimer = 0
+                    prayerType = prayerTimer
+                    phase = prayerType
+                    println("Zulrah: " + zulrahId + ", phase = " + phase + ", Moved to newpos: " + newpos + ", x: " + moveX[newpos] + ", y: " + moveY[newpos])
+                    isDiving = false
+                    println("IsDiving false")
+                    ZULRAH = NPC(zulrahId, zulrahPosition)
+                    println("Declared new NPC")
+                    ZULRAH!!.movementCoordinator.coordinator = NPCMovementCoordinator.Coordinator(true, 10)
+                    println("Set ZULRAH movement")
+                    World.register(ZULRAH)
+                    println("Registered zulrah")
+                    ZULRAH!!.performAnimation(rise)
+                    println("zulrahHp = " + zulrahHp + ", Zulrah constitution " + ZULRAH!!.constitution)
+                    ZULRAH!!.defaultConstitution = zulrahHp
+                    ZULRAH!!.constitution = zulrahHp
+                    println("done moving " + ZULRAH!!.constitution)
+                    ZULRAH!!.forcedChat = "HISSSS!"
+                    stop()
+                }
+            })
+        }
+
+        private fun getForm(): Int {
+            if (ZULRAH == null) {
+                return -1
+            }
+            if (!ZULRAH!!.isRegistered) {
+                return -1
+            }
+            return if (ZULRAH!!.id == 2042) {
+                1 //green
+            } else if (ZULRAH!!.id == 2043) {
+                2 //red
+            } else if (ZULRAH!!.id == 2044) {
+                3 //blue
+            } else {
+                -404 //ERROR
+            }
+        }
+
+        private fun newForm(): Int {
+            val current = getForm()
+            val aNewForm = 2042 + Misc.getRandom(2)
+            return if (current == aNewForm) {
+                newForm() //TODO FIX
+            } else aNewForm
+        }
+
+        private fun getDir(): Int {
+            if (dir == -1) {
+                val newdir = Misc.getRandom(moveX.size - 1)
+                dir = newdir
+            }
+            if (ZULRAH != null && ZULRAH!!.isRegistered && ZULRAH!!.position.x != moveX[dir]) {
+                println("Error. Dir = " + dir + ", Zulrah's pos = " + ZULRAH!!.position.x + ", moveX[" + dir + "] = " + moveX[dir])
+            }
+            return dir
+        }
+
+        private fun newDir(): Int {
+            val current = getDir()
+            val newdir = Misc.getRandom(moveX.size - 1)
+            if (ZULRAH != null && ZULRAH!!.isRegistered && ZULRAH!!.position.x != moveX[current]) {
+                println("[ERROR 666] Zulrah's X = " + ZULRAH!!.position.x + ", dir = " + current + ", moveX[" + current + "] = " + moveX[current])
+                return 666
+            }
+            if (newdir == current) {
+                println("[ERROR 2] Newdir == current ($current). Running again.")
+                return newDir() //TODO FIX
+            }
+            return newdir
+        }
+    }
 }

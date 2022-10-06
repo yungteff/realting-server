@@ -1,102 +1,97 @@
-package com.realting.world.content.combat.strategy.impl;
-import com.realting.engine.task.Task;
-import com.realting.engine.task.TaskManager;
-import com.realting.model.Animation;
-import com.realting.model.Graphic;
-import com.realting.model.Locations;
-import com.realting.model.Position;
-import com.realting.util.Misc;
-import com.realting.world.content.combat.CombatContainer;
-import com.realting.world.content.combat.CombatType;
-import com.realting.world.content.combat.strategy.CombatStrategy;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.npc.NPC;
+package com.realting.world.content.combat.strategy.impl
 
-public class Kilik implements CombatStrategy {
+import com.realting.engine.task.Task
+import com.realting.engine.task.TaskManager
+import com.realting.model.Animation
+import com.realting.model.Graphic
+import com.realting.model.Locations
+import com.realting.model.Position
+import com.realting.model.entity.character.CharacterEntity
+import com.realting.model.entity.character.npc.NPC
+import com.realting.util.Misc
+import com.realting.world.content.combat.CombatContainer
+import com.realting.world.content.combat.CombatType
+import com.realting.world.content.combat.strategy.CombatStrategy
 
-	public static NPC Kilik;
-	private static final Animation attack_anim1 = new Animation(393); //clawspec10961
-	private static final Animation attack_anim2 = new Animation(8525);
-	private static final Animation attack_anim3 = new Animation(1979);
-	private static final Graphic graphic1 = new Graphic(1950);
-	private static final Graphic graphic2 = new Graphic(451);
-	private static final Graphic graphic3 = new Graphic(383);
+class Kilik : CombatStrategy {
+    override fun canAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        return true
+    }
 
+    override fun attack(entity: CharacterEntity?, victim: CharacterEntity?): CombatContainer? {
+        return null
+    }
 
-	public static void spawn() {
-		Kilik = new NPC(2010, new Position(3023, 3735));
-	}
+    override fun customContainerAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        val Kilik = entity as NPC?
+        if (Kilik!!.isChargingAttack) {
+            return true
+        }
+        val random = Misc.getRandom(10)
+        if (random <= 8 && Locations.goodDistance(
+                Kilik.position.x, Kilik.position.y, victim!!.position.x, victim.position.y, 3
+            )
+        ) {
+            Kilik.performAnimation(attack_anim1)
+            Kilik.combatBuilder.container = CombatContainer(Kilik, victim, 1, CombatType.MELEE, true)
+        } else if (random <= 4 || !Locations.goodDistance(
+                Kilik.position.x, Kilik.position.y, victim!!.position.x, victim.position.y, 8
+            )
+        ) {
+            Kilik.combatBuilder.container = CombatContainer(Kilik, victim!!, 1, 2, CombatType.MAGIC, true)
+            Kilik.performAnimation(attack_anim3)
+            Kilik.isChargingAttack = true
+            Kilik.forceChat("Taste this!")
+            TaskManager.submit(object : Task(2, Kilik, false) {
+                var tick = 0
+                public override fun execute() {
+                    when (tick) {
+                        1 -> {
+                            victim.performGraphic(graphic3)
+                            Kilik.isChargingAttack = false
+                            stop()
+                        }
+                    }
+                    tick++
+                }
+            })
+        } else {
+            Kilik.combatBuilder.container = CombatContainer(Kilik, victim, 1, CombatType.RANGED, true)
+            Kilik.performAnimation(attack_anim2)
+            Kilik.isChargingAttack = true
+            TaskManager.submit(object : Task(2, Kilik, false) {
+                public override fun execute() {
+                    victim.performGraphic(graphic2)
+                    Kilik.isChargingAttack = false
+                    stop()
+                }
+            })
+        }
+        return true
+    }
 
-	@Override
-	public boolean canAttack(CharacterEntity entity, CharacterEntity victim) {
-		return true;
-	}
+    override fun attackDelay(entity: CharacterEntity?): Int {
+        return entity!!.attackSpeed
+    }
 
-	@Override
-	public CombatContainer attack(CharacterEntity entity, CharacterEntity victim) {
-		return null;
-	}
-	
-	@Override
-	public boolean customContainerAttack(CharacterEntity entity, CharacterEntity victim) {
-		NPC Kilik = (NPC)entity;
-		if(Kilik.isChargingAttack()) {
-			return true;
-		}
-		int random = Misc.getRandom(10);
-		if(random <= 8 && Locations.goodDistance(Kilik.getPosition().getX(), Kilik.getPosition().getY(), victim.getPosition().getX(), victim.getPosition().getY(), 3)) {
-			Kilik.performAnimation(attack_anim1);
-			Kilik.getCombatBuilder().setContainer(new CombatContainer(Kilik, victim, 1, CombatType.MELEE, true));
-		} else if(random <= 4 || !Locations.goodDistance(Kilik.getPosition().getX(), Kilik.getPosition().getY(), victim.getPosition().getX(), victim.getPosition().getY(), 8)) {
-			Kilik.getCombatBuilder().setContainer(new CombatContainer(Kilik, victim, 1, 2, CombatType.MAGIC, true));
-			Kilik.performAnimation(attack_anim3);
-			Kilik.setChargingAttack(true);
-			Kilik.forceChat("Taste this!");	
-			TaskManager.submit(new Task(2, Kilik, false) {
-				int tick = 0;
-				@Override
-				public void execute() {
-					switch(tick) {
-					case 1:
-						victim.performGraphic(graphic3);
-						Kilik.setChargingAttack(false);
-						stop();
-						break;
-					}
-					tick++;
-				}
-			});
-		} else {
-			Kilik.getCombatBuilder().setContainer(new CombatContainer(Kilik, victim, 1, CombatType.RANGED, true));
-			Kilik.performAnimation(attack_anim2);
-			Kilik.setChargingAttack(true);
-			TaskManager.submit(new Task(2, Kilik, false) {
-				@Override
-				public void execute() {
-					victim.performGraphic(graphic2);
-					Kilik.setChargingAttack(false);
-					stop();
-				}
-			});
-		}
-		return true;
-	}
-	
-	
-	@Override
-	public int attackDelay(CharacterEntity entity) {
-		return entity.getAttackSpeed();
-	}
+    override fun attackDistance(entity: CharacterEntity): Int {
+        return 20
+    }
 
-	@Override
-	public int attackDistance(CharacterEntity entity) {
-		return 20;
-	}
+    override fun getCombatType(entity: CharacterEntity): CombatType? {
+        return CombatType.MIXED
+    }
 
-	
-	@Override
-	public CombatType getCombatType(CharacterEntity entity) {
-		return CombatType.MIXED;
-	}
+    companion object {
+        var Kilik: NPC? = null
+        private val attack_anim1 = Animation(393) //clawspec10961
+        private val attack_anim2 = Animation(8525)
+        private val attack_anim3 = Animation(1979)
+        private val graphic1 = Graphic(1950)
+        private val graphic2 = Graphic(451)
+        private val graphic3 = Graphic(383)
+        fun spawn() {
+            Kilik = NPC(2010, Position(3023, 3735))
+        }
+    }
 }
-

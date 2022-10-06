@@ -1,85 +1,81 @@
-package com.realting.world.content.combat.strategy.impl.bosses;
+package com.realting.world.content.combat.strategy.impl.bosses
 
-import com.realting.engine.task.Task;
-import com.realting.engine.task.TaskManager;
-import com.realting.model.Animation;
-import com.realting.model.Skill;
-import com.realting.util.Misc;
-import com.realting.world.content.combat.CombatContainer;
-import com.realting.world.content.combat.CombatType;
-import com.realting.world.content.combat.HitQueue.CombatHit;
-import com.realting.world.content.combat.magic.CombatSpells;
-import com.realting.world.content.combat.strategy.CombatStrategy;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.player.Player;
+import com.realting.engine.task.Task
+import com.realting.engine.task.TaskManager
+import com.realting.model.Animation
+import com.realting.model.Skill
+import com.realting.model.entity.character.CharacterEntity
+import com.realting.model.entity.character.npc.NPC
+import com.realting.model.entity.character.player.Player
+import com.realting.util.Misc
+import com.realting.world.content.combat.CombatContainer
+import com.realting.world.content.combat.CombatType
+import com.realting.world.content.combat.HitQueue.CombatHit
+import com.realting.world.content.combat.magic.CombatSpells
+import com.realting.world.content.combat.strategy.CombatStrategy
 
-public class Venenatis implements CombatStrategy {
+class Venenatis : CombatStrategy {
+    override fun canAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        return true
+    }
 
-	@Override
-	public boolean canAttack(CharacterEntity entity, CharacterEntity victim) {
-		return true;
-	}
+    override fun attack(entity: CharacterEntity?, victim: CharacterEntity?): CombatContainer? {
+        return null
+    }
 
-	@Override
-	public CombatContainer attack(CharacterEntity entity, CharacterEntity victim) {
-		return null;
-	}
+    override fun customContainerAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        val venenatis = entity as NPC?
+        if (venenatis!!.isChargingAttack || victim!!.constitution <= 0) {
+            return true
+        }
+        venenatis.isChargingAttack = true
+        venenatis.performAnimation(Animation(venenatis.definition.attackAnimation))
+        venenatis.combatBuilder.container = CombatContainer(venenatis, victim!!, 1, 1, CombatType.MELEE, true)
+        TaskManager.submit(object : Task(1, venenatis, false) {
+            var tick = 0
+            public override fun execute() {
+                if (tick == 0) {
+                    val random = Misc.getRandom(15)
+                    if (random <= 12) {
+                        venenatis.prepareSpell(CombatSpells.EARTH_WAVE.spell, victim)
+                    } else if (random == 13) {
+                        venenatis.prepareSpell(CombatSpells.ENFEEBLE.spell, victim)
+                    } else if (random == 14) {
+                        venenatis.prepareSpell(CombatSpells.CONFUSE.spell, victim)
+                    } else if (random == 15) {
+                        venenatis.prepareSpell(CombatSpells.STUN.spell, victim)
+                    }
+                } else if (tick == 3) {
+                    CombatHit(
+                        venenatis.combatBuilder, CombatContainer(venenatis, victim, 1, CombatType.MAGIC, true)
+                    ).handleAttack()
+                    if (Misc.getRandom(10) <= 2) {
+                        val p = victim as Player?
+                        var lvl = p!!.skillManager.getCurrentLevel(Skill.PRAYER)
+                        lvl *= 0.9.toInt()
+                        p.skillManager.setCurrentLevel(
+                            Skill.PRAYER, if (p.skillManager.getCurrentLevel(Skill.PRAYER) - lvl <= 0) 1 else lvl
+                        )
+                        p.packetSender.sendMessage("Venenatis has reduced your Prayer level.")
+                    }
+                    venenatis.isChargingAttack = false
+                    stop()
+                }
+                tick++
+            }
+        })
+        return true
+    }
 
-	@Override
-	public boolean customContainerAttack(CharacterEntity entity, CharacterEntity victim) {
-		NPC venenatis = (NPC)entity;
-		if(venenatis.isChargingAttack() || victim.getConstitution() <= 0) {
-			return true;
-		}
-		venenatis.setChargingAttack(true);
-		venenatis.performAnimation(new Animation(venenatis.getDefinition().getAttackAnimation()));
-		venenatis.getCombatBuilder().setContainer(new CombatContainer(venenatis, victim, 1, 1, CombatType.MELEE, true));
-		TaskManager.submit(new Task(1, venenatis, false) {
-			int tick = 0;
-			@Override
-			public void execute() {
-				if(tick == 0) {
-					final int random = Misc.getRandom(15);
-					if(random <= 12) {
-						venenatis.prepareSpell(CombatSpells.EARTH_WAVE.getSpell(), victim);
-					} else if(random == 13) {
-						venenatis.prepareSpell(CombatSpells.ENFEEBLE.getSpell(), victim);
-					} else if(random == 14) {
-						venenatis.prepareSpell(CombatSpells.CONFUSE.getSpell(), victim);
-					} else if(random == 15) {
-						venenatis.prepareSpell(CombatSpells.STUN.getSpell(), victim);
-					}
-				} else if(tick == 3) {
-					new CombatHit(venenatis.getCombatBuilder(), new CombatContainer(venenatis, victim, 1, CombatType.MAGIC, true)).handleAttack();
-					if(Misc.getRandom(10) <= 2) {
-						Player p = (Player)victim;
-						int lvl = p.getSkillManager().getCurrentLevel(Skill.PRAYER);
-						lvl *= 0.9;
-						p.getSkillManager().setCurrentLevel(Skill.PRAYER, p.getSkillManager().getCurrentLevel(Skill.PRAYER) - lvl <= 0 ?  1 : lvl);
-						p.getPacketSender().sendMessage("Venenatis has reduced your Prayer level.");
-					}
-					venenatis.setChargingAttack(false);
-					stop();
-				}
-				tick++;
-			}
-		});
-		return true;
-	}
+    override fun attackDelay(entity: CharacterEntity?): Int {
+        return entity!!.attackSpeed
+    }
 
-	@Override
-	public int attackDelay(CharacterEntity entity) {
-		return entity.getAttackSpeed();
-	}
+    override fun attackDistance(entity: CharacterEntity): Int {
+        return 3
+    }
 
-	@Override
-	public int attackDistance(CharacterEntity entity) {
-		return 3;
-	}
-
-	@Override
-	public CombatType getCombatType(CharacterEntity entity) {
-		return CombatType.MIXED;
-	}
+    override fun getCombatType(entity: CharacterEntity): CombatType? {
+        return CombatType.MIXED
+    }
 }

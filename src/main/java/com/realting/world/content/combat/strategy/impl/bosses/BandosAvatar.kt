@@ -1,119 +1,121 @@
-package com.realting.world.content.combat.strategy.impl.bosses;
+package com.realting.world.content.combat.strategy.impl.bosses
 
-import com.realting.engine.task.Task;
-import com.realting.engine.task.TaskManager;
-import com.realting.model.Animation;
-import com.realting.model.Graphic;
-import com.realting.model.Locations;
-import com.realting.model.Position;
-import com.realting.model.Projectile;
-import com.realting.util.Misc;
-import com.realting.world.content.combat.CombatContainer;
-import com.realting.world.content.combat.CombatType;
-import com.realting.world.content.combat.HitQueue.CombatHit;
-import com.realting.world.content.combat.strategy.CombatStrategy;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.player.Player;
+import com.realting.engine.task.Task
+import com.realting.engine.task.TaskManager
+import com.realting.model.*
+import com.realting.model.entity.character.CharacterEntity
+import com.realting.model.entity.character.npc.NPC
+import com.realting.model.entity.character.player.Player
+import com.realting.util.Misc
+import com.realting.world.content.combat.CombatContainer
+import com.realting.world.content.combat.CombatType
+import com.realting.world.content.combat.HitQueue.CombatHit
+import com.realting.world.content.combat.strategy.CombatStrategy
 
-public class BandosAvatar implements CombatStrategy {
+class BandosAvatar : CombatStrategy {
+    override fun canAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        return true
+    }
 
-	@Override
-	public boolean canAttack(CharacterEntity entity, CharacterEntity victim) {
-		return true;
-	}
+    override fun attack(entity: CharacterEntity?, victim: CharacterEntity?): CombatContainer? {
+        return null
+    }
 
-	@Override
-	public CombatContainer attack(CharacterEntity entity, CharacterEntity victim) {
-		return null;
-	}
+    override fun customContainerAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        val bandosAvatar = entity as NPC?
+        if (bandosAvatar!!.isChargingAttack || victim!!.constitution <= 0) {
+            return true
+        }
+        if (Locations.goodDistance(
+                bandosAvatar.position.copy(),
+                victim!!.position.copy(),
+                1
+            ) && Misc.getRandom(5) <= 3
+        ) {
+            bandosAvatar.performAnimation(Animation(bandosAvatar.definition.attackAnimation))
+            bandosAvatar.combatBuilder.container = CombatContainer(bandosAvatar, victim, 1, 1, CombatType.MELEE, true)
+        } else if (!Locations.goodDistance(
+                bandosAvatar.position.copy(),
+                victim.position.copy(),
+                3
+            ) && Misc.getRandom(5) == 1
+        ) {
+            bandosAvatar.isChargingAttack = true
+            val pos = Position(victim.position.x - 2 + Misc.getRandom(4), victim.position.y - 2 + Misc.getRandom(4))
+            (victim as Player?)!!.packetSender.sendGlobalGraphic(Graphic(1549), pos)
+            bandosAvatar.performAnimation(Animation(11246))
+            bandosAvatar.forceChat("You shall perish!")
+            TaskManager.submit(object : Task(2) {
+                override fun execute() {
+                    bandosAvatar.moveTo(pos)
+                    bandosAvatar.performAnimation(Animation(bandosAvatar.definition.attackAnimation))
+                    bandosAvatar.combatBuilder.container =
+                        CombatContainer(bandosAvatar, victim, 1, 1, CombatType.MELEE, false)
+                    bandosAvatar.isChargingAttack = false
+                    bandosAvatar.combatBuilder.attackTimer = 0
+                    stop()
+                }
+            })
+        } else {
+            bandosAvatar.isChargingAttack = true
+            val barrage = Misc.getRandom(4) <= 2
+            bandosAvatar.performAnimation(Animation(if (barrage) 11245 else 11252))
+            bandosAvatar.combatBuilder.container = CombatContainer(bandosAvatar, victim, 1, 3, CombatType.MAGIC, true)
+            TaskManager.submit(object : Task(1, bandosAvatar, false) {
+                var tick = 0
+                public override fun execute() {
+                    if (tick == 0 && !barrage) {
+                        Projectile(bandosAvatar, victim, 2706, 44, 3, 43, 43, 0).sendProjectile()
+                    } else if (tick == 1) {
+                        if (barrage && victim.isPlayer && Misc.getRandom(10) <= 5) {
+                            victim.movementQueue.freeze(15)
+                            victim.performGraphic(Graphic(369))
+                        }
+                        if (barrage && Misc.getRandom(6) <= 3) {
+                            bandosAvatar.performAnimation(Animation(11245))
+                            for (toAttack in Misc.getCombinedPlayerList(victim as Player?)) {
+                                if (toAttack != null && Locations.goodDistance(
+                                        bandosAvatar.position,
+                                        toAttack.position,
+                                        7
+                                    ) && toAttack.constitution > 0
+                                ) {
+                                    bandosAvatar.forceChat("DIE!")
+                                    CombatHit(
+                                        bandosAvatar.combatBuilder,
+                                        CombatContainer(bandosAvatar, toAttack, 2, CombatType.MAGIC, false)
+                                    ).handleAttack()
+                                    toAttack.performGraphic(Graphic(1556))
+                                }
+                            }
+                        }
+                        bandosAvatar.setChargingAttack(false).combatBuilder.attackTimer = attackDelay(bandosAvatar) - 2
+                        stop()
+                    }
+                    tick++
+                }
+            })
+        }
+        return true
+    }
 
-	@Override
-	public boolean customContainerAttack(CharacterEntity entity, CharacterEntity victim) {
-		NPC bandosAvatar = (NPC)entity;
-		if(bandosAvatar.isChargingAttack() || victim.getConstitution() <= 0) {
-			return true;
-		}
-		if(Locations.goodDistance(bandosAvatar.getPosition().copy(), victim.getPosition().copy(), 1) && Misc.getRandom(5) <= 3) {
-			bandosAvatar.performAnimation(new Animation(bandosAvatar.getDefinition().getAttackAnimation()));
-			bandosAvatar.getCombatBuilder().setContainer(new CombatContainer(bandosAvatar, victim, 1, 1, CombatType.MELEE, true));
-		} else if(!Locations.goodDistance(bandosAvatar.getPosition().copy(), victim.getPosition().copy(), 3) && Misc.getRandom(5) == 1) {
-			bandosAvatar.setChargingAttack(true);
-			final Position pos = new Position(victim.getPosition().getX()-2 + Misc.getRandom(4), victim.getPosition().getY()-2 +Misc.getRandom(4));
-			((Player)victim).getPacketSender().sendGlobalGraphic(new Graphic(1549), pos);
-			bandosAvatar.performAnimation(new Animation(11246));
-			bandosAvatar.forceChat("You shall perish!");
-			TaskManager.submit(new Task(2) {
-				@Override
-				protected void execute() {
-					bandosAvatar.moveTo(pos);
-					bandosAvatar.performAnimation(new Animation(bandosAvatar.getDefinition().getAttackAnimation()));
-					bandosAvatar.getCombatBuilder().setContainer(new CombatContainer(bandosAvatar, victim, 1, 1, CombatType.MELEE, false));
-					bandosAvatar.setChargingAttack(false);
-					bandosAvatar.getCombatBuilder().setAttackTimer(0);
-					stop();
-				}
-			});
-		} else {
-			bandosAvatar.setChargingAttack(true);
-			boolean barrage = Misc.getRandom(4) <= 2;
-			bandosAvatar.performAnimation(new Animation(barrage ? 11245 : 11252));
-			bandosAvatar.getCombatBuilder().setContainer(new CombatContainer(bandosAvatar, victim, 1, 3, CombatType.MAGIC, true));
-			TaskManager.submit(new Task(1, bandosAvatar, false) {
-				int tick = 0;
-				@Override
-				public void execute() {
-					if(tick == 0 && !barrage) {
-						new Projectile(bandosAvatar, victim, 2706, 44, 3, 43, 43, 0).sendProjectile();
-					} else if(tick == 1) {
-						if(barrage && victim.isPlayer() && Misc.getRandom(10) <= 5) {
-							victim.getMovementQueue().freeze(15);
-							victim.performGraphic(new Graphic(369));
-						}
-						if(barrage && Misc.getRandom(6) <= 3) {
-							bandosAvatar.performAnimation(new Animation(11245));
-							for(Player toAttack : Misc.getCombinedPlayerList((Player)victim)) {
-								if(toAttack != null && Locations.goodDistance(bandosAvatar.getPosition(), toAttack.getPosition(), 7) && toAttack.getConstitution() > 0) {
-									bandosAvatar.forceChat("DIE!");
-									new CombatHit(bandosAvatar.getCombatBuilder(), new CombatContainer(bandosAvatar, toAttack, 2, CombatType.MAGIC, false)).handleAttack();
-									toAttack.performGraphic(new Graphic(1556));
-								}
-							}
-						}
-						bandosAvatar.setChargingAttack(false).getCombatBuilder().setAttackTimer(attackDelay(bandosAvatar) - 2);
-						stop();
-					}
-					tick++;
-				}
-			});
-		}
-		return true;
-	}
+    override fun attackDelay(entity: CharacterEntity?): Int {
+        return entity!!.attackSpeed
+    }
 
-	public static int getAnimation(int npc) {
-		int anim = 12259;
-		if(npc == 50)
-			anim = 81;
-		else if(npc == 5362 || npc == 5363)
-			anim = 14246;
-		else if(npc == 51)
-			anim = 13152;
-		return anim;
-	}
+    override fun attackDistance(entity: CharacterEntity): Int {
+        return 5
+    }
 
+    override fun getCombatType(entity: CharacterEntity): CombatType? {
+        return CombatType.MIXED
+    }
 
-	@Override
-	public int attackDelay(CharacterEntity entity) {
-		return entity.getAttackSpeed();
-	}
-
-	@Override
-	public int attackDistance(CharacterEntity entity) {
-		return 5;
-	}
-
-	@Override
-	public CombatType getCombatType(CharacterEntity entity) {
-		return CombatType.MIXED;
-	}
+    companion object {
+        fun getAnimation(npc: Int): Int {
+            var anim = 12259
+            if (npc == 50) anim = 81 else if (npc == 5362 || npc == 5363) anim = 14246 else if (npc == 51) anim = 13152
+            return anim
+        }
+    }
 }

@@ -1,81 +1,80 @@
-package com.realting.world.content.combat.strategy.impl;
+package com.realting.world.content.combat.strategy.impl
 
-import com.realting.engine.task.Task;
-import com.realting.engine.task.TaskManager;
-import com.realting.model.Animation;
-import com.realting.model.Locations;
-import com.realting.model.Projectile;
-import com.realting.util.Misc;
-import com.realting.world.content.combat.CombatContainer;
-import com.realting.world.content.combat.CombatType;
-import com.realting.world.content.combat.strategy.CombatStrategy;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.npc.NPC;
+import com.realting.engine.task.Task
+import com.realting.engine.task.TaskManager
+import com.realting.model.Animation
+import com.realting.model.Locations
+import com.realting.model.Projectile
+import com.realting.model.entity.character.CharacterEntity
+import com.realting.model.entity.character.npc.NPC
+import com.realting.util.Misc
+import com.realting.world.content.combat.CombatContainer
+import com.realting.world.content.combat.CombatType
+import com.realting.world.content.combat.strategy.CombatStrategy
 
-public class Aviansie implements CombatStrategy {
+class Aviansie : CombatStrategy {
+    override fun canAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        return true
+    }
 
-	@Override
-	public boolean canAttack(CharacterEntity entity, CharacterEntity victim) {
-		return true;
-	}
+    override fun attack(entity: CharacterEntity?, victim: CharacterEntity?): CombatContainer? {
+        return null
+    }
 
-	@Override
-	public CombatContainer attack(CharacterEntity entity, CharacterEntity victim) {
-		return null;
-	}
+    override fun customContainerAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
+        val aviansie = entity as NPC?
+        if (aviansie!!.isChargingAttack || victim!!.constitution <= 0) {
+            return true
+        }
+        if (Locations.goodDistance(aviansie.position.copy(), victim!!.position.copy(), 1) && Misc.getRandom(5) <= 3) {
+            aviansie.performAnimation(Animation(aviansie.definition.attackAnimation))
+            aviansie.combatBuilder.container = CombatContainer(aviansie, victim, 1, 1, CombatType.MELEE, true)
+        } else {
+            aviansie.isChargingAttack = true
+            aviansie.performAnimation(Animation(aviansie.definition.attackAnimation))
+            aviansie.combatBuilder.container = CombatContainer(
+                aviansie,
+                victim,
+                1,
+                3,
+                if (aviansie.id == 6231) CombatType.MAGIC else CombatType.RANGED,
+                true
+            )
+            TaskManager.submit(object : Task(1, aviansie, false) {
+                var tick = 0
+                public override fun execute() {
+                    if (tick == 0) {
+                        Projectile(aviansie, victim, getGfx(aviansie.id), 44, 3, 43, 43, 0).sendProjectile()
+                    } else if (tick == 1) {
+                        aviansie.isChargingAttack = false
+                        stop()
+                    }
+                    tick++
+                }
+            })
+        }
+        return true
+    }
 
-	@Override
-	public boolean customContainerAttack(CharacterEntity entity, CharacterEntity victim) {
-		NPC aviansie = (NPC)entity;
-		if(aviansie.isChargingAttack() || victim.getConstitution() <= 0) {
-			return true;
-		}
-		if(Locations.goodDistance(aviansie.getPosition().copy(), victim.getPosition().copy(), 1) && Misc.getRandom(5) <= 3) {
-			aviansie.performAnimation(new Animation(aviansie.getDefinition().getAttackAnimation()));
-			aviansie.getCombatBuilder().setContainer(new CombatContainer(aviansie, victim, 1, 1, CombatType.MELEE, true));
-		} else {
-			aviansie.setChargingAttack(true);
-			aviansie.performAnimation(new Animation(aviansie.getDefinition().getAttackAnimation()));
-			aviansie.getCombatBuilder().setContainer(new CombatContainer(aviansie, victim, 1, 3, aviansie.getId() == 6231 ? CombatType.MAGIC : CombatType.RANGED, true));
-			TaskManager.submit(new Task(1, aviansie, false) {
-				int tick = 0;
-				@Override
-				public void execute() {
-					if(tick == 0) {
-						new Projectile(aviansie, victim, getGfx(aviansie.getId()), 44, 3, 43, 43, 0).sendProjectile();
-					} else if(tick == 1) {
-						aviansie.setChargingAttack(false);
-						stop();
-					}
-					tick++;
-				}
-			});
-		}
-		return true;
-	}
+    override fun attackDelay(entity: CharacterEntity?): Int {
+        return entity!!.attackSpeed
+    }
 
-	public static int getGfx(int npc) {
-		switch(npc) {
-		case 6230:
-			return 1837;
-		case 6231:
-			return 2729;
-		}
-		return 37;
-	}
+    override fun attackDistance(entity: CharacterEntity): Int {
+        return 4
+    }
 
-	@Override
-	public int attackDelay(CharacterEntity entity) {
-		return entity.getAttackSpeed();
-	}
+    override fun getCombatType(entity: CharacterEntity): CombatType? {
+        return CombatType.MIXED
+    }
 
-	@Override
-	public int attackDistance(CharacterEntity entity) {
-		return 4;
-	}
-
-	@Override
-	public CombatType getCombatType(CharacterEntity entity) {
-		return CombatType.MIXED;
-	}
+    companion object {
+        fun getGfx(npc: Int): Int {
+            when (npc) {
+                6230 -> return 1837
+                6231 -> return 2729
+            }
+            return 37
+        }
+    }
 }
