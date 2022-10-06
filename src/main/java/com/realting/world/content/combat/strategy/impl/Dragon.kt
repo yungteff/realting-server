@@ -38,7 +38,7 @@ class Dragon : CombatStrategy {
             //entity.forceChat("i just tried to pj but was stopped");
             return true
         }
-        if (Locations.goodDistance(dragon.position.copy(), victim.getPosition().copy(), 1) && Misc.getRandom(5) <= 3) {
+        if (Locations.goodDistance(dragon.position.copy(), victim.position.copy(), 1) && Misc.getRandom(5) <= 3) {
             dragon.performAnimation(Animation(dragon.definition.attackAnimation))
             dragon.combatBuilder.container = CombatContainer(dragon, victim, 1, 1, CombatType.MELEE, true)
         } else {

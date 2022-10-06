@@ -69,7 +69,7 @@ class ChaosElemental : CombatStrategy {
         cE.setEntityInteraction(victim)
         val attackStyle = Misc.getRandom(2) //0 = melee, 1 = range, 2 =mage
         val data = elementalData.forId(attackStyle)
-        if (data!!.startGraphic != null) cE.performGraphic(data.startGraphic)
+        if (data!!.startGraphic != null) data.startGraphic?.let { cE.performGraphic(it) }
         cE.performAnimation(Animation(cE.definition.attackAnimation))
         if (data.projectileGraphic != null) Projectile(
             cE,
@@ -85,7 +85,7 @@ class ChaosElemental : CombatStrategy {
         TaskManager.submit(object : Task(1, cE, false) {
             public override fun execute() {
                 cE.combatBuilder.container = CombatContainer(cE, victim!!, 1, 2, data.combatType, true)
-                if (data.endGraphic != null) victim.performGraphic(data.endGraphic)
+                if (data.endGraphic != null) victim.performGraphic(data.endGraphic!!)
                 cE.isChargingAttack = false
                 if (Misc.getRandom(50) <= 2) {
                     cE.performGraphic(teleGraphic)

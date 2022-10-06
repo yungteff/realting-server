@@ -177,7 +177,7 @@ class HitQueue {
                 // Finish the magic spell with the correct end graphic.
                 if (container.combatType == CombatType.MAGIC && attacker.currentlyCasting != null) {
                     attacker.currentlyCasting.endGraphic()
-                        .ifPresent { graphic: Graphic? -> victim!!.performGraphic(graphic) }
+                        .ifPresent { graphic: Graphic-> victim!!.performGraphic(graphic) }
                     attacker.currentlyCasting.finishCast(attacker, victim, true, damage)
                     attacker.currentlyCasting = null
                 }

@@ -204,7 +204,7 @@ class MovementQueue(
                 }
                 if (!isPlayer && !character.combatBuilder.isAttacking) {
                     if ((character as NPC).isSummoningNpc && !character.summoningCombat()) {
-                        if (!canWalk(character.getPosition(), walkPoint.position, character.getSize())) {
+                        if (!canWalk(character.position, walkPoint.position, character.size)) {
                             return
                         }
                     }
@@ -313,8 +313,8 @@ class MovementQueue(
                     }
                     if (character.isNpc && (character as NPC).isSummoningNpc && (followCharacter!!.location === Locations.Location.HOME_BANK || followCharacter!!.location === Locations.Location.EDGEVILLE || followCharacter!!.location === Locations.Location.VARROCK)) {
                         character.getMovementQueue().walkStep(
-                            getMove(character.getPosition().x, followCharacter!!.position.x, 1), getMove(
-                                character.getPosition().y - 1, followCharacter!!.position.y, 1
+                            getMove(character.position.x, followCharacter!!.position.x, 1), getMove(
+                                character.position.y - 1, followCharacter!!.position.y, 1
                             )
                         )
                     } else {

@@ -1058,7 +1058,7 @@ class CombatFactory private constructor() {
             val victim = victimEntity.position
 
             if (attackerEntity.isNpc && (attackerEntity as NPC).isSummoningNpc) {
-                return Locations.goodDistance(attacker, victim, attackerEntity.getSize())
+                return Locations.goodDistance(attacker, victim, attackerEntity.size)
             }
             if (attackerEntity.combatBuilder.strategy == null) {
                 attackerEntity.combatBuilder.determineStrategy()
