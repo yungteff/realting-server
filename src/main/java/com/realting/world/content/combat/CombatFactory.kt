@@ -1144,7 +1144,7 @@ class CombatFactory private constructor() {
                 val victim = builder.victim as Player
                 if (victim.equipment.items[Equipment.SHIELD_SLOT].id == 13740 || victim.equipment.items[Equipment.SHIELD_SLOT].id == 13742) {
                     if (Misc.getRandom(10) <= 7) {
-                        container.allHits { context: ContainerHit ->
+                        container.allHits { context: ContainerHit? ->
                             if (PrayerHandler.isActivated(
                                     victim, PrayerHandler.getProtectingPrayer(container.combatType)
                                 ) || CurseHandler.isActivated(
@@ -1153,7 +1153,7 @@ class CombatFactory private constructor() {
                             ) {
                                 return@allHits   //we don't want to do the calculation now if they are praying against the right style.
                             }
-                            if (context.hit.damage > 10) {
+                            if (context?.hit?.damage!! > 10) {
                                 if (victim.skillManager.getCurrentLevel(Skill.PRAYER) > 0) {
                                     val prayerLost = (context.hit.damage * 0.1).toInt()
                                     if (victim.skillManager.getCurrentLevel(Skill.PRAYER) >= prayerLost) {
@@ -1189,29 +1189,33 @@ class CombatFactory private constructor() {
                             victim, PrayerHandler.getProtectingPrayer(container.combatType)
                         ) || CurseHandler.isActivated(victim, CurseHandler.getProtectingPrayer(container.combatType))
                     ) {
-                        container.allHits { context: ContainerHit ->
-                            val hit = context.hit.damage
+                        container.allHits { context: ContainerHit? ->
+                            val hit = context?.hit?.damage
                             if (attacker.id == 2745) { //Jad
-                                context.isAccurate = false
-                                context.hit.incrementAbsorbedDamage(hit)
+                                context?.isAccurate = false
+                                if (hit != null) {
+                                    context.hit.incrementAbsorbedDamage(hit)
+                                }
                             } else {
                                 //now that we know they're praying, check if they also have the spirit shield.
                                 if (victim.equipment.items[Equipment.SHIELD_SLOT].id == 13740 || victim.equipment.items[Equipment.SHIELD_SLOT].id == 13742) {
                                     if (victim.isSpiritDebug) {
-                                        victim.packetSender.sendMessage("Original DMG: " + context.hit.damage)
+                                        victim.packetSender.sendMessage("Original DMG: " + context?.hit?.damage)
                                     }
                                     val reduceRatio = if (attacker.id == 1158 || attacker.id == 1160) 0.4 else 0.8
                                     var mod = Math.abs(1 - reduceRatio)
-                                    context.hit.incrementAbsorbedDamage((hit - hit * mod).toInt())
+                                    if (hit != null) {
+                                        context.hit.incrementAbsorbedDamage((hit - hit * mod).toInt())
+                                    }
                                     mod = Math.round(Misc.RANDOM.nextDouble() * 100.0) / 100.0
                                     if (mod <= PRAYER_ACCURACY_REDUCTION) {
-                                        context.isAccurate = false
+                                        context?.isAccurate = false
                                     }
                                     if (victim.isSpiritDebug) {
-                                        victim.packetSender.sendMessage("Prayer method finished. New DMG: " + context.hit.damage + " | total absorbed: " + context.hit.absorb)
+                                        victim.packetSender.sendMessage("Prayer method finished. New DMG: " + context?.hit?.damage + " | total absorbed: " + context?.hit?.absorb)
                                     }
                                     if (Misc.getRandom(10) <= 7) {
-                                        if (context.hit.damage > 10) {
+                                        if (context?.hit?.damage!! > 10) {
                                             if (victim.skillManager.getCurrentLevel(Skill.PRAYER) > 0) {
                                                 val prayerLost = (context.hit.damage * 0.1).toInt()
                                                 if (victim.skillManager.getCurrentLevel(Skill.PRAYER) >= prayerLost) {
@@ -1238,10 +1242,12 @@ class CombatFactory private constructor() {
                                 }
                                 val reduceRatio = if (attacker.id == 1158 || attacker.id == 1160) 0.4 else 0.8
                                 var mod = Math.abs(1 - reduceRatio)
-                                context.hit.incrementAbsorbedDamage((hit - hit * mod).toInt())
+                                if (hit != null) {
+                                    context.hit.incrementAbsorbedDamage((hit - hit * mod).toInt())
+                                }
                                 mod = Math.round(Misc.RANDOM.nextDouble() * 100.0) / 100.0
                                 if (mod <= PRAYER_ACCURACY_REDUCTION) {
-                                    context.isAccurate = false
+                                    context?.isAccurate = false
                                 }
                             }
                         }
@@ -1260,15 +1266,17 @@ class CombatFactory private constructor() {
                         ) || CurseHandler.isActivated(victim, CurseHandler.getProtectingPrayer(container.combatType))
                     ) {
                         //PLAYER TO PLAYER EVENTS
-                        container.allHits { context: ContainerHit ->
+                        container.allHits { context: ContainerHit? ->
                             // First reduce the damage.
-                            val hit = context.hit.damage
+                            val hit = context?.hit?.damage
                             var mod = Math.abs(1 - 0.5)
-                            context.hit.incrementAbsorbedDamage((hit - hit * mod).toInt())
+                            if (hit != null) {
+                                context.hit.incrementAbsorbedDamage((hit - hit * mod).toInt())
+                            }
                             // Then reduce the accuracy.
                             mod = Math.round(Misc.RANDOM.nextDouble() * 100.0) / 100.0
                             if (mod <= PRAYER_ACCURACY_REDUCTION) {
-                                context.isAccurate = false
+                                context?.isAccurate = false
                             }
                         }
                     }
@@ -1277,8 +1285,8 @@ class CombatFactory private constructor() {
                 val attacker = builder.character as Player
                 val npc = builder.victim as NPC
                 if (npc.id == 8349 && container.combatType === CombatType.MELEE) {
-                    container.allHits { context: ContainerHit ->
-                        val hit = context.hit.damage
+                    container.allHits { context: ContainerHit? ->
+                        val hit = context?.hit?.damage!!
                         var mod = Math.abs(1 - 0.5)
                         context.hit.incrementAbsorbedDamage((hit - hit * mod).toInt())
                         mod = Math.round(Misc.RANDOM.nextDouble() * 100.0) / 100.0
@@ -1287,11 +1295,11 @@ class CombatFactory private constructor() {
                         }
                     }
                 } else if (npc.id == 1158 && (container.combatType === CombatType.MAGIC || container.combatType === CombatType.RANGED) || npc.id == 1160 && container.combatType === CombatType.MELEE) {
-                    container.allHits { context: ContainerHit ->
+                    container.allHits { context: ContainerHit? ->
                         if (fullVeracs(attacker)) {
                             return@allHits
                         }
-                        val hit = context.hit.damage
+                        val hit = context?.hit?.damage!!
                         var mod = Math.abs(1 - 0.95)
                         context.hit.incrementAbsorbedDamage((hit - hit * mod).toInt())
                         mod = Math.round(Misc.RANDOM.nextDouble() * 100.0) / 100.0
@@ -1301,12 +1309,12 @@ class CombatFactory private constructor() {
                     }
                     if (!fullVeracs(attacker)) {
                         attacker.packetSender.sendMessage(
-                            "Your " + (if (container.combatType === CombatType.MAGIC) "magic" else if (container.combatType === CombatType.RANGED) "ranged" else "melee") + " attack has" + (if (!container.hits[0].isAccurate) "" else " close to") + " no effect on the queen."
+                            "Your " + (if (container.combatType === CombatType.MAGIC) "magic" else if (container.combatType === CombatType.RANGED) "ranged" else "melee") + " attack has" + (if (!container.hits[0]!!.isAccurate) "" else " close to") + " no effect on the queen."
                         )
                     }
                 } else if (npc.id == 13347 && Nex.zarosStage()) {
-                    container.allHits { context: ContainerHit ->
-                        val hit = context.hit.damage
+                    container.allHits { context: ContainerHit? ->
+                        val hit = context?.hit?.damage!!
                         var mod = Math.abs(1 - 0.4)
                         context.hit.incrementAbsorbedDamage((hit - hit * mod).toInt())
                         mod = Math.round(Misc.RANDOM.nextDouble() * 100.0) / 100.0

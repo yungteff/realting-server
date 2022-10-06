@@ -100,9 +100,9 @@ class HitQueue {
                 }
             }
             if (container.modifiedDamage > 0) {
-                container.allHits { context: ContainerHit ->
-                    context.hit.damage = container.modifiedDamage
-                    context.isAccurate = true
+                container.allHits { context: ContainerHit? ->
+                    context?.hit?.damage = container.modifiedDamage
+                    context?.isAccurate = true
                 }
             }
 

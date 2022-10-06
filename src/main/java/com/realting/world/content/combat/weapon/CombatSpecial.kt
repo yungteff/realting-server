@@ -74,7 +74,7 @@ enum class CombatSpecial
             player.performAnimation(Animation(1062))
             player.performGraphic(Graphic(252, GraphicHeight.HIGH))
             return CombatContainer(
-                player, target, 2, CombatType.MELEE, true
+                player, target!!, 2, CombatType.MELEE, true
             )
         }
     },
@@ -82,7 +82,7 @@ enum class CombatSpecial
         override fun container(player: Player, target: CharacterEntity?): CombatContainer {
             player.performAnimation(Animation(14788))
             player.performGraphic(Graphic(1729))
-            return object : CombatContainer(player, target, 1, 1, CombatType.MAGIC, true) {
+            return object : CombatContainer(player, target!!, 1, 1, CombatType.MAGIC, true) {
                 override fun onHit(damage: Int, accurate: Boolean) {
                     target!!.performGraphic(Graphic(1730))
                 }
@@ -100,21 +100,21 @@ enum class CombatSpecial
                     stop()
                 }
             })
-            return CombatContainer(player, target, 1, CombatType.RANGED, true)
+            return CombatContainer(player, target!!, 1, CombatType.RANGED, true)
         }
     },
     MORRIGANS_JAVELIN(intArrayOf(13879), 50, 1.40, 1.30, CombatType.RANGED, WeaponInterface.JAVELIN) {
         override fun container(player: Player, target: CharacterEntity?): CombatContainer {
             player.performAnimation(Animation(10501))
             player.performGraphic(Graphic(1836))
-            return CombatContainer(player, target, 1, CombatType.RANGED, true)
+            return CombatContainer(player, target!!, 1, CombatType.RANGED, true)
         }
     },
     MORRIGANS_THROWNAXE(intArrayOf(13883), 50, 1.38, 1.30, CombatType.RANGED, WeaponInterface.THROWNAXE) {
         override fun container(player: Player, target: CharacterEntity?): CombatContainer {
             player.performAnimation(Animation(10504))
             player.performGraphic(Graphic(1838))
-            return CombatContainer(player, target, 1, CombatType.RANGED, true)
+            return CombatContainer(player, target!!, 1, CombatType.RANGED, true)
         }
     },
     GRANITE_MAUL(intArrayOf(4153, 20084), 50, 1.21, 1.0, CombatType.MELEE, WeaponInterface.WARHAMMER) {
@@ -123,7 +123,7 @@ enum class CombatSpecial
             player.performGraphic(Graphic(337, GraphicHeight.HIGH))
             player.combatBuilder.attackTimer = 1
             return CombatContainer(
-                player, target, 1, CombatType.MELEE, true
+                player, target!!, 1, CombatType.MELEE, true
             )
         }
     },
@@ -131,7 +131,7 @@ enum class CombatSpecial
         override fun container(player: Player, target: CharacterEntity?): CombatContainer {
             player.performAnimation(Animation(2066))
             player.performGraphic(Graphic(2959)) //2114
-            return CombatContainer(player, target, 1, CombatType.MELEE, true)
+            return CombatContainer(player, target!!, 1, CombatType.MELEE, true)
         }
     },
     ABYSSAL_WHIP(
@@ -158,7 +158,7 @@ enum class CombatSpecial
             player.performAnimation(Animation(1058))
             player.performGraphic(Graphic(248, GraphicHeight.HIGH))
             return CombatContainer(
-                player, target, 1, CombatType.MELEE, true
+                player, target!!, 1, CombatType.MELEE, true
             )
         }
     },
@@ -190,7 +190,7 @@ enum class CombatSpecial
             player.performAnimation(Animation(5870))
             player.performGraphic(Graphic(1027, GraphicHeight.MIDDLE))
             return CombatContainer(
-                player, target, 1, CombatType.MELEE, true
+                player, target!!, 1, CombatType.MELEE, true
             )
         }
     },
@@ -198,7 +198,7 @@ enum class CombatSpecial
         override fun container(player: Player, target: CharacterEntity?): CombatContainer {
             player.performAnimation(Animation(11993))
             player.setEntityInteraction(target)
-            return object : CombatContainer(player, target, 2, CombatType.MAGIC, true) {
+            return object : CombatContainer(player, target!!, 2, CombatType.MAGIC, true) {
                 override fun onHit(damage: Int, accurate: Boolean) {
                     target!!.performGraphic(Graphic(1194))
                 }
@@ -208,7 +208,7 @@ enum class CombatSpecial
     VESTAS_LONGSWORD(intArrayOf(13899, 13901), 25, 1.28, 1.25, CombatType.MELEE, WeaponInterface.LONGSWORD) {
         override fun container(player: Player, target: CharacterEntity?): CombatContainer {
             player.performAnimation(Animation(10502))
-            return CombatContainer(player, target, 1, CombatType.MELEE, true)
+            return CombatContainer(player, target!!, 1, CombatType.MELEE, true)
         }
     },
     VESTAS_SPEAR(intArrayOf(13905, 13907), 50, 1.26, 1.0, CombatType.MELEE, WeaponInterface.SPEAR) {
@@ -217,7 +217,7 @@ enum class CombatSpecial
             player.performGraphic(Graphic(1835))
             player.combatBuilder.attackTimer = 1
             return CombatContainer(
-                player, target, 1, CombatType.MELEE, true
+                player, target!!, 1, CombatType.MELEE, true
             )
         }
     },
@@ -225,7 +225,7 @@ enum class CombatSpecial
         override fun container(player: Player, target: CharacterEntity?): CombatContainer {
             player.performAnimation(Animation(10505))
             player.performGraphic(Graphic(1840))
-            return object : CombatContainer(player, target, 1, CombatType.MELEE, true) {
+            return object : CombatContainer(player, target!!, 1, CombatType.MELEE, true) {
                 override fun onHit(damage: Int, accurate: Boolean) {
                     if (target!!.isPlayer && accurate) {
                         val t = target as Player?
@@ -244,7 +244,7 @@ enum class CombatSpecial
         override fun container(player: Player, target: CharacterEntity?): CombatContainer {
             player.performAnimation(Animation(10505))
             player.performGraphic(Graphic(1840))
-            return object : CombatContainer(player, target, 1, CombatType.MELEE, true) {
+            return object : CombatContainer(player, target!!, 1, CombatType.MELEE, true) {
                 override fun onHit(damage: Int, accurate: Boolean) {
                     if (target!!.isPlayer) {
                         val t = target as Player?
@@ -273,7 +273,7 @@ enum class CombatSpecial
                 }
             })
             return CombatContainer(
-                player, target, 2, CombatType.RANGED, true
+                player, target!!, 2, CombatType.RANGED, true
             )
         }
     },
@@ -283,7 +283,7 @@ enum class CombatSpecial
             player.performGraphic(Graphic(250, GraphicHeight.HIGH))
             Projectile(player, target, 249, 44, 3, 43, 31, 0).sendProjectile()
             return CombatContainer(
-                player, target, 1, CombatType.RANGED, true
+                player, target!!, 1, CombatType.RANGED, true
             )
         }
     },
@@ -304,7 +304,7 @@ enum class CombatSpecial
                 }
             })
             return CombatContainer(
-                player, target, 2, CombatType.RANGED, true
+                player, target!!, 2, CombatType.RANGED, true
             )
         }
     },
@@ -317,14 +317,14 @@ enum class CombatSpecial
                     player.performGraphic(Graphic(2141))
                     Projectile(player, target, 2143, 44, 3, 43, 31, 0).sendProjectile()
                     CombatHit(
-                        player.combatBuilder, CombatContainer(player, target, CombatType.RANGED, true)
+                        player.combatBuilder, CombatContainer(player, target!!, CombatType.RANGED, true)
                     ).handleAttack()
                     player.combatBuilder.attackTimer = 2
                     stop()
                 }
             })
             return CombatContainer(
-                player, target, 1, 1, CombatType.RANGED, true
+                player, target!!, 1, 1, CombatType.RANGED, true
             )
         }
     },
@@ -369,7 +369,7 @@ enum class CombatSpecial
             player.performAnimation(Animation(1064))
             player.performGraphic(Graphic(253))
             return object : CombatContainer(
-                player, target, 1, CombatType.MELEE, true
+                player, target!!, 1, CombatType.MELEE, true
             ) {
                 override fun onHit(damage: Int, accurate: Boolean) {
                     if (target!!.isPlayer) {
@@ -399,7 +399,7 @@ enum class CombatSpecial
             player.performAnimation(Animation(1060))
             player.performGraphic(Graphic(251, GraphicHeight.HIGH))
             return CombatContainer(
-                player, target, 1, CombatType.MELEE, true
+                player, target!!, 1, CombatType.MELEE, true
             )
         }
     },
@@ -408,7 +408,7 @@ enum class CombatSpecial
             player.performAnimation(Animation(1872))
             player.performGraphic(Graphic(347, GraphicHeight.HIGH))
             return CombatContainer(
-                player, target, 1, CombatType.MELEE, true
+                player, target!!, 1, CombatType.MELEE, true
             )
         }
     },
@@ -417,7 +417,7 @@ enum class CombatSpecial
             player.performAnimation(Animation(3157))
             player.performGraphic(Graphic(559))
             return object : CombatContainer(
-                player, target, 1, CombatType.MELEE, false
+                player, target!!, 1, CombatType.MELEE, false
             ) {
                 override fun onHit(damage: Int, accurate: Boolean) {
                     /*if (Location.inMulti(player)) {
@@ -453,7 +453,7 @@ enum class CombatSpecial
             player.performAnimation(Animation(1203))
             player.performGraphic(Graphic(282, GraphicHeight.HIGH))
             return CombatContainer(
-                player, target, 2, CombatType.MELEE, true
+                player, target!!, 2, CombatType.MELEE, true
             )
         }
     },
@@ -461,13 +461,13 @@ enum class CombatSpecial
         override fun container(player: Player, target: CharacterEntity?): CombatContainer {
             player.performAnimation(Animation(11989))
             player.performGraphic(Graphic(2113))
-            return CombatContainer(player, target, 1, CombatType.MELEE, true)
+            return CombatContainer(player, target!!, 1, CombatType.MELEE, true)
         }
     },
     ZAMORAK_GODSWORD(intArrayOf(11700), 50, 1.25, 1.4, CombatType.MELEE, WeaponInterface.TWO_HANDED_SWORD) {
         override fun container(player: Player, target: CharacterEntity?): CombatContainer {
             player.performAnimation(Animation(7070))
-            return object : CombatContainer(player, target, 1, CombatType.MELEE, true) {
+            return object : CombatContainer(player, target!!, 1, CombatType.MELEE, true) {
                 override fun onHit(damage: Int, accurate: Boolean) {
                     if (target != null && target.isPlayer && accurate) {
                         val p = target as Player
@@ -515,7 +515,7 @@ enum class CombatSpecial
             player.performAnimation(Animation(11991))
             player.performGraphic(Graphic(2114))
             return object : CombatContainer(
-                player, target, 1, CombatType.MELEE, false
+                player, target!!, 1, CombatType.MELEE, false
             ) {
                 override fun onHit(damage: Int, accurate: Boolean) {
                     if (target != null && target.isPlayer && accurate) {
@@ -548,7 +548,7 @@ enum class CombatSpecial
         override fun container(player: Player, target: CharacterEntity?): CombatContainer {
             player.performAnimation(Animation(7071))
             player.performGraphic(Graphic(1220))
-            return object : CombatContainer(player, target, 1, CombatType.MELEE, false) {
+            return object : CombatContainer(player, target!!, 1, CombatType.MELEE, false) {
                 override fun onHit(dmg: Int, accurate: Boolean) {
                     if (accurate) {
                         val damageHeal = (dmg * 0.5).toInt()
@@ -573,7 +573,7 @@ enum class CombatSpecial
         override fun container(player: Player, target: CharacterEntity?): CombatContainer {
             player.performAnimation(Animation(10961))
             player.performGraphic(Graphic(1950))
-            return CombatContainer(player, target, 4, CombatType.MELEE, true)
+            return CombatContainer(player, target!!, 4, CombatType.MELEE, true)
         }
     };
     /**
