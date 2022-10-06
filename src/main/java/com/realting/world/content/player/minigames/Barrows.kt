@@ -1,17 +1,15 @@
 package com.realting.world.content.minigames
 
-import com.realting.model.RegionInstance.RegionInstanceType
 import com.realting.engine.task.TaskManager
-import com.realting.world.World
-import com.realting.world.content.dialogue.DialogueManager
 import com.realting.engine.task.impl.CeilingCollapseTask
 import com.realting.model.*
+import com.realting.model.RegionInstance.RegionInstanceType
 import com.realting.model.definitions.ItemDefinition
 import com.realting.model.entity.character.npc.NPC
 import com.realting.model.entity.character.player.Player
-import com.realting.model.input.impl.EnterAmountToSellToShop
-import com.realting.model.input.impl.EnterAmountToBuyFromShop
 import com.realting.util.Misc
+import com.realting.world.World
+import com.realting.world.content.dialogue.DialogueManager
 
 /**
  * Handles the Barrows minigame and it's objects, npcs, etc.
@@ -208,7 +206,7 @@ object Barrows {
                     handleObject(
                         player, GameObject(
                             COFFIN_AND_BROTHERS[player.minigameAttributes.barrowsMinigameAttributes.randomCoffin][0],
-                            null
+                            Position(3551,9695)
                         )
                     )
                     player.minigameAttributes.barrowsMinigameAttributes.barrowsData[player.minigameAttributes.barrowsMinigameAttributes.randomCoffin][1] =

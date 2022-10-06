@@ -4,18 +4,13 @@ import com.realting.engine.task.Task;
 import com.realting.engine.task.TaskManager;
 import com.realting.engine.task.impl.WalkToTask;
 import com.realting.engine.task.impl.WalkToTask.FinalizedMovementTask;
-import com.realting.model.Animation;
-import com.realting.model.GameMode;
-import com.realting.model.GameObject;
-import com.realting.model.Graphic;
-import com.realting.model.Item;
+import com.realting.model.*;
 import com.realting.model.Locations.Location;
-import com.realting.model.PlayerRights;
-import com.realting.model.Position;
-import com.realting.model.Skill;
 import com.realting.model.definitions.GameObjectDefinition;
 import com.realting.model.definitions.ItemDefinition;
 import com.realting.model.definitions.NpcDefinition;
+import com.realting.model.entity.character.npc.NPC;
+import com.realting.model.entity.character.player.Player;
 import com.realting.net.packet.Packet;
 import com.realting.net.packet.PacketListener;
 import com.realting.util.Misc;
@@ -52,8 +47,6 @@ import com.realting.world.content.player.skill.slayer.SlayerDialogues;
 import com.realting.world.content.player.skill.slayer.SlayerTasks;
 import com.realting.world.content.player.skill.smithing.EquipmentMaking;
 import com.realting.world.content.player.skill.smithing.Smelting;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.player.Player;
 
 /**
  * This packet listener is called when a player 'uses' an item on another
@@ -207,7 +200,7 @@ public class UseItemPacketListener implements PacketListener {
 				if (player.getFarming().useItemOnPlant(itemId,
 						objectX, objectY))
 					return;
-				if (objectId == 15621) { // Warriors guild
+				if (objectId == 210648325) { // Warriors guild
 					// animator
 					if (!WarriorsGuild.itemOnAnimator(player,
 							item, gameObject))
