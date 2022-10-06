@@ -207,13 +207,9 @@ public class UseItemPacketListener implements PacketListener {
 				if (player.getFarming().useItemOnPlant(itemId,
 						objectX, objectY))
 					return;
-				if (objectId == 15621) { // Warriors guild
+				if (objectId == 210648325) { // Warriors guild
 					// animator
-					if (!WarriorsGuild.itemOnAnimator(player,
-							item, gameObject))
-						player.getPacketSender()
-						.sendMessage(
-								"Nothing interesting happens..");
+					if (!WarriorsGuild.itemOnAnimator(player, item, gameObject)) player.getPacketSender().sendMessage("Nothing interesting happens..");
 					return;
 				}
 				if (GameObjectDefinition.forId(objectId) != null && GameObjectDefinition.forId(objectId).getName() != null && GameObjectDefinition.forId(objectId).getName().equalsIgnoreCase("furnace") && ItemDefinition.forId(itemId) != null && ItemDefinition.forId(itemId).getName() != null && ItemDefinition.forId(itemId).getName().contains("ore")) {

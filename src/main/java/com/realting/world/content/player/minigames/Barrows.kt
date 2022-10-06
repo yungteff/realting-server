@@ -208,7 +208,7 @@ object Barrows {
                     handleObject(
                         player, GameObject(
                             COFFIN_AND_BROTHERS[player.minigameAttributes.barrowsMinigameAttributes.randomCoffin][0],
-                            null
+                            Position(3551,9695)
                         )
                     )
                     player.minigameAttributes.barrowsMinigameAttributes.barrowsData[player.minigameAttributes.barrowsMinigameAttributes.randomCoffin][1] =
