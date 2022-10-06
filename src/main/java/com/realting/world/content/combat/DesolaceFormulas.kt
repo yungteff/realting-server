@@ -3,7 +3,6 @@ package com.realting.world.content.combat
 import com.realting.model.Graphic
 import com.realting.model.Skill
 import com.realting.model.container.impl.Equipment
-import com.realting.model.definitions.ItemDefinition
 import com.realting.model.entity.character.CharacterEntity
 import com.realting.model.entity.character.npc.NPC
 import com.realting.model.entity.character.player.Player
@@ -12,8 +11,8 @@ import com.realting.world.content.combat.effect.EquipmentBonus
 import com.realting.world.content.combat.prayer.CurseHandler
 import com.realting.world.content.combat.prayer.PrayerHandler
 import com.realting.world.content.combat.weapon.FightStyle
-import com.realting.world.content.combat.weapon.FightType
 import java.util.*
+import kotlin.math.floor
 
 object DesolaceFormulas {
     /*==============================================================================*/ /*===================================MELEE=====================================*/
@@ -23,16 +22,20 @@ object DesolaceFormulas {
         if (entity.isNpc) {
             val npc = entity as NPC
             maxHit = npc.definition.maxHit.toDouble()
-            if (npc.strengthWeakened[0]) {
-                maxHit -= (0.10 * maxHit).toInt().toDouble()
-            } else if (npc.strengthWeakened[1]) {
-                maxHit -= (0.20 * maxHit).toInt().toDouble()
-            } else if (npc.strengthWeakened[2]) {
-                maxHit -= (0.30 * maxHit).toInt().toDouble()
+            when {
+                npc.strengthWeakened[0] -> {
+                    maxHit -= (0.10 * maxHit)
+                }
+                npc.strengthWeakened[1] -> {
+                    maxHit -= (0.20 * maxHit)
+                }
+                npc.strengthWeakened[2] -> {
+                    maxHit -= (0.30 * maxHit)
+                }
             }
             /** CUSTOM NPCS  */
             if (npc.id == 2026) { //Dharok the wretched
-                maxHit += ((npc.defaultConstitution - npc.constitution) * 0.2).toInt().toDouble()
+                maxHit += ((npc.defaultConstitution - npc.constitution) * 0.2)
             }
         } else {
             val plr = entity as Player
@@ -47,7 +50,7 @@ object DesolaceFormulas {
             if (plr.equipment.items[3].id == 4718 && plr.equipment.items[0].id == 4716 && plr.equipment.items[4].id == 4720 && plr.equipment.items[7].id == 4722) base += (plr.skillManager.getMaxLevel(
                 Skill.CONSTITUTION
             ) - plr.constitution) * .045 + 1
-            if (specialBonus > 1) base = base * specialBonus
+            if (specialBonus > 1) base *= specialBonus
             /*if (hasObsidianEffect(plr))// || EquipmentBonus.wearingVoid(plr))//, CombatType.MELEE))
 				base = (base * 1.2);*/if (victim.isNpc) {
                 val npc = victim as NPC
@@ -70,11 +73,11 @@ object DesolaceFormulas {
         if (victim.isPlayer) {
             val p = victim as Player
             if (p.hasStaffOfLightEffect()) {
-                maxHit = maxHit / 2
+                maxHit /= 2
                 p.performGraphic(Graphic(2319))
             }
         }
-        return Math.floor(maxHit).toInt()
+        return floor(maxHit).toInt()
     }
 
     /**
@@ -88,34 +91,31 @@ object DesolaceFormulas {
         when (plr.fightType.style) {
             FightStyle.AGGRESSIVE -> attackLevel += 3
             FightStyle.CONTROLLED -> attackLevel += 1
+            else -> {}
         }
         //boolean hasVoid = EquipmentBonus.wearingVoid(plr);//, CombatType.MELEE);
-        if (PrayerHandler.isActivated(
-                plr, PrayerHandler.CLARITY_OF_THOUGHT
-            )
-        ) {
-            attackLevel += (plr.skillManager.getMaxLevel(Skill.ATTACK) * 0.05).toInt()
-        } else if (PrayerHandler.isActivated(
-                plr, PrayerHandler.IMPROVED_REFLEXES
-            )
-        ) {
-            attackLevel += (plr.skillManager.getMaxLevel(Skill.ATTACK) * 0.1).toInt()
-        } else if (PrayerHandler.isActivated(
-                plr, PrayerHandler.INCREDIBLE_REFLEXES
-            )
-        ) {
-            attackLevel += (plr.skillManager.getMaxLevel(Skill.ATTACK) * 0.15).toInt()
-        } else if (PrayerHandler.isActivated(
-                plr, PrayerHandler.CHIVALRY
-            )
-        ) {
-            attackLevel += (plr.skillManager.getMaxLevel(Skill.ATTACK) * 0.15).toInt()
-        } else if (PrayerHandler.isActivated(plr, PrayerHandler.PIETY)) {
-            attackLevel += (plr.skillManager.getMaxLevel(Skill.ATTACK) * 0.2).toInt()
-        } else if (CurseHandler.isActivated(plr, CurseHandler.LEECH_ATTACK)) {
-            attackLevel += (plr.skillManager.getMaxLevel(Skill.ATTACK) * 0.05 + plr.leechedBonuses[2]).toInt()
-        } else if (CurseHandler.isActivated(plr, CurseHandler.TURMOIL)) {
-            attackLevel += (plr.skillManager.getMaxLevel(Skill.ATTACK) * 0.3 + plr.leechedBonuses[2]).toInt()
+        when {
+            PrayerHandler.isActivated(plr, PrayerHandler.CLARITY_OF_THOUGHT) -> {
+                attackLevel += (plr.skillManager.getMaxLevel(Skill.ATTACK) * 0.05).toInt()
+            }
+            PrayerHandler.isActivated(plr, PrayerHandler.IMPROVED_REFLEXES) -> {
+                attackLevel += (plr.skillManager.getMaxLevel(Skill.ATTACK) * 0.1).toInt()
+            }
+            PrayerHandler.isActivated(plr, PrayerHandler.INCREDIBLE_REFLEXES) -> {
+                attackLevel += (plr.skillManager.getMaxLevel(Skill.ATTACK) * 0.15).toInt()
+            }
+            PrayerHandler.isActivated(plr, PrayerHandler.CHIVALRY) -> {
+                attackLevel += (plr.skillManager.getMaxLevel(Skill.ATTACK) * 0.15).toInt()
+            }
+            PrayerHandler.isActivated(plr, PrayerHandler.PIETY) -> {
+                attackLevel += (plr.skillManager.getMaxLevel(Skill.ATTACK) * 0.2).toInt()
+            }
+            CurseHandler.isActivated(plr, CurseHandler.LEECH_ATTACK) -> {
+                attackLevel += (plr.skillManager.getMaxLevel(Skill.ATTACK) * 0.05 + plr.leechedBonuses[2]).toInt()
+            }
+            CurseHandler.isActivated(plr, CurseHandler.TURMOIL) -> {
+                attackLevel += (plr.skillManager.getMaxLevel(Skill.ATTACK) * 0.3 + plr.leechedBonuses[2]).toInt()
+            }
         }
         if (EquipmentBonus.voidMelee(plr)) {
             attackLevel += (plr.skillManager.getMaxLevel(Skill.ATTACK) * 0.1).toInt()
@@ -139,22 +139,31 @@ object DesolaceFormulas {
     fun getMeleeDefence(plr: Player): Int {
         var defenceLevel = plr.skillManager.getCurrentLevel(Skill.DEFENCE)
         val i = plr.bonusManager.defenceBonus[bestMeleeDef(plr)].toInt()
-        if (plr.prayerActive[PrayerHandler.THICK_SKIN]) {
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.05).toInt()
-        } else if (plr.prayerActive[PrayerHandler.ROCK_SKIN]) {
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.1).toInt()
-        } else if (plr.prayerActive[PrayerHandler.STEEL_SKIN]) {
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.15).toInt()
-        } else if (plr.prayerActive[PrayerHandler.CHIVALRY]) {
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.2).toInt()
-        } else if (plr.prayerActive[PrayerHandler.PIETY]) {
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.25).toInt()
-        } else if (plr.prayerActive[PrayerHandler.RIGOUR]) {
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.25).toInt()
-        } else if (plr.prayerActive[PrayerHandler.AUGURY]) {
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.25).toInt()
-        } else if (plr.curseActive[CurseHandler.TURMOIL]) { // turmoil
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.15).toInt()
+        when {
+            plr.prayerActive[PrayerHandler.THICK_SKIN] -> {
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.05).toInt()
+            }
+            plr.prayerActive[PrayerHandler.ROCK_SKIN] -> {
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.1).toInt()
+            }
+            plr.prayerActive[PrayerHandler.STEEL_SKIN] -> {
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.15).toInt()
+            }
+            plr.prayerActive[PrayerHandler.CHIVALRY] -> {
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.2).toInt()
+            }
+            plr.prayerActive[PrayerHandler.PIETY] -> {
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.25).toInt()
+            }
+            plr.prayerActive[PrayerHandler.RIGOUR] -> {
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.25).toInt()
+            }
+            plr.prayerActive[PrayerHandler.AUGURY] -> {
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.25).toInt()
+            }
+            plr.curseActive[CurseHandler.TURMOIL] -> { // turmoil
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.15).toInt()
+            }
         }
         return (defenceLevel + defenceLevel * 0.15 + (i + i * 0.05)).toInt()
     }
@@ -186,6 +195,7 @@ object DesolaceFormulas {
         when (plr.fightType.style) {
             FightStyle.AGGRESSIVE, FightStyle.ACCURATE -> return 3
             FightStyle.CONTROLLED -> return 1
+            else -> {}
         }
         return 0
     }
@@ -211,16 +221,22 @@ object DesolaceFormulas {
         //boolean hasVoid = EquipmentBonus.wearingVoid(plr);//, CombatType.RANGED);
         val accuracy: Double = if (plr.isSpecialActivated) plr.combatSpecial.accuracyBonus else 1.0
         rangeLevel *= accuracy.toInt()
-        if (plr.curseActive[PrayerHandler.SHARP_EYE] || plr.curseActive[CurseHandler.SAP_RANGER]) {
-            rangeLevel *= 1.05.toInt()
-        } else if (plr.prayerActive[PrayerHandler.HAWK_EYE]) {
-            rangeLevel *= 1.10.toInt()
-        } else if (plr.prayerActive[PrayerHandler.EAGLE_EYE]) {
-            rangeLevel *= 1.15.toInt()
-        } else if (plr.prayerActive[PrayerHandler.RIGOUR]) {
-            rangeLevel *= 1.22.toInt()
-        } else if (plr.curseActive[CurseHandler.LEECH_RANGED]) {
-            rangeLevel *= 1.10.toInt()
+        when {
+            plr.curseActive[PrayerHandler.SHARP_EYE] || plr.curseActive[CurseHandler.SAP_RANGER] -> {
+                rangeLevel *= 1.05.toInt()
+            }
+            plr.prayerActive[PrayerHandler.HAWK_EYE] -> {
+                rangeLevel *= 1.10.toInt()
+            }
+            plr.prayerActive[PrayerHandler.EAGLE_EYE] -> {
+                rangeLevel *= 1.15.toInt()
+            }
+            plr.prayerActive[PrayerHandler.RIGOUR] -> {
+                rangeLevel *= 1.22.toInt()
+            }
+            plr.curseActive[CurseHandler.LEECH_RANGED] -> {
+                rangeLevel *= 1.10.toInt()
+            }
         }
         if (EquipmentBonus.voidRange(plr)) {
             rangeLevel *= 1.10.toInt()
@@ -250,22 +266,31 @@ object DesolaceFormulas {
     @JvmStatic
     fun getRangedDefence(plr: Player): Int {
         var defenceLevel = plr.skillManager.getCurrentLevel(Skill.DEFENCE)
-        if (plr.prayerActive[PrayerHandler.THICK_SKIN]) {
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.05).toInt()
-        } else if (plr.prayerActive[PrayerHandler.ROCK_SKIN]) {
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.1).toInt()
-        } else if (plr.prayerActive[PrayerHandler.STEEL_SKIN]) {
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.15).toInt()
-        } else if (plr.prayerActive[PrayerHandler.CHIVALRY]) {
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.2).toInt()
-        } else if (plr.prayerActive[PrayerHandler.PIETY]) {
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.25).toInt()
-        } else if (plr.prayerActive[PrayerHandler.RIGOUR]) {
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.25).toInt()
-        } else if (plr.prayerActive[PrayerHandler.AUGURY]) {
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.25).toInt()
-        } else if (plr.curseActive[CurseHandler.TURMOIL]) { // turmoil
-            defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.20 + plr.leechedBonuses[0]).toInt()
+        when {
+            plr.prayerActive[PrayerHandler.THICK_SKIN] -> {
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.05).toInt()
+            }
+            plr.prayerActive[PrayerHandler.ROCK_SKIN] -> {
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.1).toInt()
+            }
+            plr.prayerActive[PrayerHandler.STEEL_SKIN] -> {
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.15).toInt()
+            }
+            plr.prayerActive[PrayerHandler.CHIVALRY] -> {
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.2).toInt()
+            }
+            plr.prayerActive[PrayerHandler.PIETY] -> {
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.25).toInt()
+            }
+            plr.prayerActive[PrayerHandler.RIGOUR] -> {
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.25).toInt()
+            }
+            plr.prayerActive[PrayerHandler.AUGURY] -> {
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.25).toInt()
+            }
+            plr.curseActive[CurseHandler.TURMOIL] -> { // turmoil
+                defenceLevel += (plr.skillManager.getMaxLevel(Skill.DEFENCE) * 0.20 + plr.leechedBonuses[0]).toInt()
+            }
         }
         return (defenceLevel + plr.bonusManager.defenceBonus[4] + plr.bonusManager.defenceBonus[4] / 2).toInt()
     }
@@ -275,16 +300,22 @@ object DesolaceFormulas {
         //boolean voidEquipment = EquipmentBonus.wearingVoid(plr);//, CombatType.MAGIC);
         var attackLevel = plr.skillManager.getCurrentLevel(Skill.MAGIC)
         attackLevel *= if (plr.isSpecialActivated) plr.combatSpecial.accuracyBonus.toInt() else 1
-        if (plr.prayerActive[PrayerHandler.MYSTIC_WILL] || plr.curseActive[CurseHandler.SAP_MAGE]) {
-            attackLevel *= 1.05.toInt()
-        } else if (plr.prayerActive[PrayerHandler.MYSTIC_LORE]) {
-            attackLevel *= 1.10.toInt()
-        } else if (plr.prayerActive[PrayerHandler.MYSTIC_MIGHT]) {
-            attackLevel *= 1.15.toInt()
-        } else if (plr.prayerActive[PrayerHandler.AUGURY]) {
-            attackLevel *= 1.22.toInt()
-        } else if (plr.curseActive[CurseHandler.LEECH_MAGIC]) {
-            attackLevel *= 1.18.toInt()
+        when {
+            plr.prayerActive[PrayerHandler.MYSTIC_WILL] || plr.curseActive[CurseHandler.SAP_MAGE] -> {
+                attackLevel *= 1.05.toInt()
+            }
+            plr.prayerActive[PrayerHandler.MYSTIC_LORE] -> {
+                attackLevel *= 1.10.toInt()
+            }
+            plr.prayerActive[PrayerHandler.MYSTIC_MIGHT] -> {
+                attackLevel *= 1.15.toInt()
+            }
+            plr.prayerActive[PrayerHandler.AUGURY] -> {
+                attackLevel *= 1.22.toInt()
+            }
+            plr.curseActive[CurseHandler.LEECH_MAGIC] -> {
+                attackLevel *= 1.18.toInt()
+            }
         }
         if (EquipmentBonus.voidMage(plr)) {
             attackLevel *= 1.3.toInt()
@@ -393,103 +424,103 @@ object DesolaceFormulas {
 
 
     //TODO::attack delays
-    fun getAttackDelay(plr: Player): Int {
-        val id = plr.equipment.items[Equipment.WEAPON_SLOT].id
-        val s = ItemDefinition.forId(id).name.lowercase(Locale.getDefault())
-        if (id == -1) return 4 // unarmed
-        if (id == 18357 || id == 14684) return 4
-        val rangedData = plr.rangedWeaponData
-        if (rangedData != null) {
-            var speed = rangedData.type.attackDelay
-            if (plr.fightType == FightType.SHORTBOW_RAPID || plr.fightType == FightType.DART_RAPID || plr.fightType == FightType.KNIFE_RAPID || plr.fightType == FightType.THROWNAXE_RAPID || plr.fightType == FightType.JAVELIN_RAPID || plr.fightType == FightType.BLOWPIPE_RAPID) {
-                speed--
-            }
-            return speed
-        }
-        if (id == 18365) return 3 else if (id == 18349) //CCbow and rapier
-            return 4
-        if (id == 22034) return 4
-        if (id == 18353) // cmaul
-            return 7 // chaotic maul
-        if (id == 6818) return 1
-        if (id == 22010) return 1
-        if (id == 20000) return 4 // gs	
-        if (id == 22008) return 4 // abyssal tentacle == same speed as rapier	
-        if (id == 20001) return 4 // gs	
-        if (id == 20002) return 4 // gs	
-        if (id == 20003) return 4 // gs	
-        if (id == 18349) return 4 // chaotic rapier
-        if (id == 14024) return 4 // drygore rapier
-        if (id == 14023) return 5 // drygore long
-        if (id == 18353) // cmaul
-            return 7 // chaotic maul
-        if (id == 16877) return 4 // dung 16877 shortbow
-        if (id == 19143) return 3 // sara shortbow
-        if (id == 19146) return 4 // guthix shortbow
-        if (id == 19149) return 3 // zammy shortbow
-        if (id == 20171) //zaryte
-            return 5
-        if (id == 12926) //blowpipe
-            return 3
-        if (id == 14018) //tempest
-            return 4
-        when (id) {
-            18357 -> return 4
-            11235, 13405, 15701, 15702, 15703, 15704, 19146 -> return 9
-            13879 -> return 8
-            15241 -> return 8
-            11730 -> return 4
-            14484 -> return 5
-            13883 -> return 6
-            10887, 6528, 15039 -> return 7
-            13905 -> return 5
-            13907 -> return 5
-            18353 -> return 7
-            18349 -> return 4
-            20000, 20001, 20002, 20003 -> return 4
-            16403 -> return 5
-            22010 -> return 1
-        }
-        if (s.endsWith("greataxe")) return 7 else if (s == "torags hammers") return 5 else if (s == "guthans warspear") return 5 else if (s == "veracs flail") return 5 else if (s == "ahrims staff") return 6 else if (s == "crossbow") return 4 else if (s.contains(
-                "staff"
-            )
-        ) {
-            return if (s.contains("zamarok") || s.contains("guthix") || s.contains("saradomian") || s.contains("slayer") || s.contains(
-                    "ancient"
-                )
-            ) 4 else 5
-        } else if (s.contains("aril")) {
-            if (s.contains("composite") || s == "seercull") return 5 else if (s.contains("Ogre")) return 8 else if (s.contains(
-                    "short"
-                ) || s.contains("hunt") || s.contains("sword")
-            ) return 4 else if (s.contains("long") || s.contains("crystal")) return 6 else if (s.contains("'bow")) return 4
-            return 5
-        } else if (s.contains("dagger")) return 4 else if (s.contains("godsword") || s.contains("2h")) return 6 else if (s.contains(
-                "longsword"
-            )
-        ) return 5 else if (s.contains("sword")) return 4 else if (s.contains("scimitar")) return 4 else if (s.contains(
-                "katana"
-            )
-        ) return 4 else if (s.contains("tempest")) return 4 else if (s.contains("blowpipe")) return 3 else if (s.contains(
-                "mace"
-            )
-        ) return 5 else if (s.contains("battleaxe")) return 6 else if (s.contains("pickaxe")) return 5 else if (s.contains(
-                "thrownaxe"
-            )
-        ) return 5 else if (s.contains("axe")) return 5 else if (s.contains("warhammer")) return 6 else if (s.contains("2h")) return 7 else if (s.contains(
-                "spear"
-            )
-        ) return 5 else if (s.contains("claw")) return 4 else if (s.contains("halberd")) return 7 else if (s == "granite maul") return 7 else if (s == "toktz-xil-ak") // sword
-            return 4 else if (s == "tzhaar-ket-em") // mace
-            return 5 else if (s == "tzhaar-ket-om") // maul
-            return 7 else if (s == "chaotic maul") // maul
-            return 7 else if (s == "toktz-xil-ek") // knife
-            return 4 else if (s == "toktz-xil-ul") // rings
-            return 4 else if (s == "toktz-mej-tal") // staff
-            return 6 else if (s.contains("whip")) return 4 else if (s.contains("dart")) return 3 else if (s.contains("death-touched")) return 10 else if (s.contains(
-                "knife"
-            )
-        ) return 3 else if (s.contains("javelin")) return 6
-        return 5
-    }
+//    fun getAttackDelay(plr: Player): Int {
+//        val id = plr.equipment.items[Equipment.WEAPON_SLOT].id
+//        val s = ItemDefinition.forId(id).name.lowercase(Locale.getDefault())
+//        if (id == -1) return 4 // unarmed
+//        if (id == 18357 || id == 14684) return 4
+//        val rangedData = plr.rangedWeaponData
+//        if (rangedData != null) {
+//            var speed = rangedData.type.attackDelay
+//            if (plr.fightType == FightType.SHORTBOW_RAPID || plr.fightType == FightType.DART_RAPID || plr.fightType == FightType.KNIFE_RAPID || plr.fightType == FightType.THROWNAXE_RAPID || plr.fightType == FightType.JAVELIN_RAPID || plr.fightType == FightType.BLOWPIPE_RAPID) {
+//                speed--
+//            }
+//            return speed
+//        }
+//        if (id == 18365) return 3 else if (id == 18349) //CCbow and rapier
+//            return 4
+//        if (id == 22034) return 4
+//        if (id == 18353) // cmaul
+//            return 7 // chaotic maul
+//        if (id == 6818) return 1
+//        if (id == 22010) return 1
+//        if (id == 20000) return 4 // gs
+//        if (id == 22008) return 4 // abyssal tentacle == same speed as rapier
+//        if (id == 20001) return 4 // gs
+//        if (id == 20002) return 4 // gs
+//        if (id == 20003) return 4 // gs
+//        if (id == 18349) return 4 // chaotic rapier
+//        if (id == 14024) return 4 // drygore rapier
+//        if (id == 14023) return 5 // drygore long
+//        if (id == 18353) // cmaul
+//            return 7 // chaotic maul
+//        if (id == 16877) return 4 // dung 16877 shortbow
+//        if (id == 19143) return 3 // sara shortbow
+//        if (id == 19146) return 4 // guthix shortbow
+//        if (id == 19149) return 3 // zammy shortbow
+//        if (id == 20171) //zaryte
+//            return 5
+//        if (id == 12926) //blowpipe
+//            return 3
+//        if (id == 14018) //tempest
+//            return 4
+//        when (id) {
+//            18357 -> return 4
+//            11235, 13405, 15701, 15702, 15703, 15704, 19146 -> return 9
+//            13879 -> return 8
+//            15241 -> return 8
+//            11730 -> return 4
+//            14484 -> return 5
+//            13883 -> return 6
+//            10887, 6528, 15039 -> return 7
+//            13905 -> return 5
+//            13907 -> return 5
+//            18353 -> return 7
+//            18349 -> return 4
+//            20000, 20001, 20002, 20003 -> return 4
+//            16403 -> return 5
+//            22010 -> return 1
+//        }
+//        if (s.endsWith("greataxe")) return 7 else if (s == "torags hammers") return 5 else if (s == "guthans warspear") return 5 else if (s == "veracs flail") return 5 else if (s == "ahrims staff") return 6 else if (s == "crossbow") return 4 else if (s.contains(
+//                "staff"
+//            )
+//        ) {
+//            return if (s.contains("zamarok") || s.contains("guthix") || s.contains("saradomian") || s.contains("slayer") || s.contains(
+//                    "ancient"
+//                )
+//            ) 4 else 5
+//        } else if (s.contains("aril")) {
+//            if (s.contains("composite") || s == "seercull") return 5 else if (s.contains("Ogre")) return 8 else if (s.contains(
+//                    "short"
+//                ) || s.contains("hunt") || s.contains("sword")
+//            ) return 4 else if (s.contains("long") || s.contains("crystal")) return 6 else if (s.contains("'bow")) return 4
+//            return 5
+//        } else if (s.contains("dagger")) return 4 else if (s.contains("godsword") || s.contains("2h")) return 6 else if (s.contains(
+//                "longsword"
+//            )
+//        ) return 5 else if (s.contains("sword")) return 4 else if (s.contains("scimitar")) return 4 else if (s.contains(
+//                "katana"
+//            )
+//        ) return 4 else if (s.contains("tempest")) return 4 else if (s.contains("blowpipe")) return 3 else if (s.contains(
+//                "mace"
+//            )
+//        ) return 5 else if (s.contains("battleaxe")) return 6 else if (s.contains("pickaxe")) return 5 else if (s.contains(
+//                "thrownaxe"
+//            )
+//        ) return 5 else if (s.contains("axe")) return 5 else if (s.contains("warhammer")) return 6 else if (s.contains("2h")) return 7 else if (s.contains(
+//                "spear"
+//            )
+//        ) return 5 else if (s.contains("claw")) return 4 else if (s.contains("halberd")) return 7 else if (s == "granite maul") return 7 else if (s == "toktz-xil-ak") // sword
+//            return 4 else if (s == "tzhaar-ket-em") // mace
+//            return 5 else if (s == "tzhaar-ket-om") // maul
+//            return 7 else if (s == "chaotic maul") // maul
+//            return 7 else if (s == "toktz-xil-ek") // knife
+//            return 4 else if (s == "toktz-xil-ul") // rings
+//            return 4 else if (s == "toktz-mej-tal") // staff
+//            return 6 else if (s.contains("whip")) return 4 else if (s.contains("dart")) return 3 else if (s.contains("death-touched")) return 10 else if (s.contains(
+//                "knife"
+//            )
+//        ) return 3 else if (s.contains("javelin")) return 6
+//        return 5
+//    }
 }
