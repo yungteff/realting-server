@@ -5,7 +5,8 @@ import java.net.URISyntaxException;
 
 public class WebhookClientBuilder {
 
-    private static final String CANARY_URL = "https://canary.discordapp.com/api/webhooks/";
+//    private static final String CANARY_URL = "https://canary.discordapp.com/api/webhooks/";
+    private static final String CANARY_URL = "";
 
     private URI uri;
     private WebhookIdentifier identifier;

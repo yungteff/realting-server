@@ -1,44 +1,42 @@
-package com.realting.world.content.combat.effect;
+package com.realting.world.content.combat.effect
 
-import com.realting.engine.task.Task;
-import com.realting.model.entity.character.player.Player;
+import com.realting.engine.task.Task
+import com.realting.model.entity.character.player.Player
 
 /**
- * A {@link Task} implementation that will unteleblock the player after the
+ * A [Task] implementation that will unteleblock the player after the
  * counter reaches 0.
- * 
+ *
  * @author lare96
  */
-public class CombatTeleblockEffect extends Task {
-
-    /** The player attached to this task. */
-    private Player player;
+class CombatTeleblockEffect(player: Player) : Task(1, false) {
+    /** The player attached to this task.  */
+    private val player: Player
 
     /**
-     * Create a new {@link CombatTeleblockEffect}.
-     * 
+     * Create a new [CombatTeleblockEffect].
+     *
      * @param player
-     *            the player attached to this task.
+     * the player attached to this task.
      */
-    public CombatTeleblockEffect(Player player) {
-        super(1, false);
-        super.bind(player);
-        this.player = player;
+    init {
+        super.bind(player)
+        this.player = player
     }
 
-    @Override
-    public void execute() {
+    public override fun execute() {
 
         // Timer is at or below 0 so send them a message saying they're not
         // blocked anymore
-        if (player.getTeleblockTimer() <= 0) {
-            player.getPacketSender().sendMessage(
-                "You are no longer teleblocked.");
-            this.stop();
-            return;
+        if (player.teleblockTimer <= 0) {
+            player.packetSender.sendMessage(
+                "You are no longer teleblocked."
+            )
+            stop()
+            return
         }
 
         // Otherwise just decrement the timer.
-        player.decrementTeleblockTimer();
+        player.decrementTeleblockTimer()
     }
 }

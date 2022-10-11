@@ -90,19 +90,19 @@ class Farming(private val player: Player) {
     }
 
     fun click(player: Player, x: Int, y: Int, option: Int): Boolean {
-        if (option == 1) for (i in FarmingPatches.values().indices) {
-            val patch = FarmingPatches.values()[i]
-            if (x >= patch.x && y >= patch.y && x <= patch.x2 && y <= patch.y2) {
-                if (x == 3054 && y == 3307 && patch != FarmingPatches.SOUTH_FALADOR_FLOWER) continue
-                if (patch == FarmingPatches.SOUTH_FALADOR_ALLOTMENT_SOUTH) {
-                    player.packetSender.sendMessage("This patch is currently disabled.")
-                    return true
-                }
-                if (inhabited(x, y) || patches[i] == null) break
-                patches[i]!!.click(player, option, i)
-                return true
-            }
-        }
+//        if (option == 1) for (i in FarmingPatches.values().indices) {
+//            val patch = FarmingPatches.values()[i]
+//            if (x >= patch.x && y >= patch.y && x <= patch.x2 && y <= patch.y2) {
+//                if (x == 3054 && y == 3307 && patch != FarmingPatches.SOUTH_FALADOR_FLOWER) continue
+//                if (patch == FarmingPatches.SOUTH_FALADOR_ALLOTMENT_SOUTH) {
+//                    player.packetSender.sendMessage("This patch is currently disabled.")
+//                    return true
+//                }
+//                if (inhabited(x, y) || patches[i] == null) break
+//                patches[i]!!.click(player, option, i)
+//                return true
+//            }
+//        }
         for (i in plants.indices) {
             if (plants[i] != null) {
                 val patch = plants[i]!!.getPatch()
