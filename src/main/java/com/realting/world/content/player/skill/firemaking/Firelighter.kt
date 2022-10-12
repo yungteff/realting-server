@@ -37,40 +37,6 @@ enum class Firelighter(//new Item[] {new Item(1511), new Item(10327)}, new Item(
                 }
             }
             TaskManager.submit(player.currentTask)
-        } /*public static void handleFirelighter(Player player, int firelighterid) {
-		if (!player.getClickDelay().elapsed(100)) {
-			return;
-		}
-		if (!player.getInventory().contains(1511)) {
-			player.getPacketSender().sendMessage("You'll need some normal logs to use a firelighter.");
-			return;
-		}
-		
-		for (int i = 0; i < Firelighter.values().length; i++) {
-			
-			if (Firelighter.values()[i].getLighterId() == firelighterid) {
-				int q = i;
-				int logCount = player.getInventory().getAmount(1511); //1511 == normal log id
-				//player.getInventory().delete(1511, logCount);
-				//player.getInventory().add(Firelighter.values()[i].getColoredLogId(), logCount);
-				player.setCurrentTask(new Task(1, player, true) {
-					int amount = 0;
-					@Override
-					public void execute() {
-						player.getInventory().delete(1511, 1);
-						player.performAnimation(new Animation(7211)); //CHANGE
-						player.getInventory().add(Firelighter.values()[q].getColoredLogId(), 1);
-						amount++;
-						if(amount >= logCount)
-							stop();
-					}
-				});
-				TaskManager.submit(player.getCurrentTask());
-			}
-			
-		}
-		
-		player.getClickDelay().reset();
-	}*/
+        }
     }
 }

@@ -111,7 +111,7 @@ object WildernessObelisks {
     /*
 	 * The obelisks
 	 */
-    val obelisks = arrayOfNulls<GameObject>(4)
+    val obelisks = arrayOf<GameObject>()
 
     /*
 	 * Are the obelisks activated?

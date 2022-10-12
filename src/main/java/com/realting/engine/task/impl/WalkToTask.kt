@@ -1,68 +1,67 @@
-package com.realting.engine.task.impl;
+package com.realting.engine.task.impl
 
-import com.realting.model.Locations;
-import com.realting.model.Position;
-import com.realting.model.entity.character.player.Player;
+import com.realting.model.Locations
+import com.realting.model.Position
+import com.realting.model.entity.character.player.Player
 
 /**
  * Represents a movement action for a game character.
  * @author Gabriel Hannason
  */
+class WalkToTask(
+    /**
+     * The associated game character.
+     */
+    private val player: Player?,
+    /**
+     * The destination the game character will move to.
+     */
+    private val destination: Position?, distance: Int,
+    /**
+     * The task a player must execute upon reaching said destination.
+     */
+    private val finalizedTask: FinalizedMovementTask
+) {
+    interface FinalizedMovementTask {
+        fun execute()
+    }
 
-public class WalkToTask {
+    private var distance = -1
 
-	public interface FinalizedMovementTask {
-		public void execute();
-	}
+    /**
+     * The WalkToTask constructor.
+     * @param entity            The associated game character.
+     * @param destination        The destination the game character will move to.
+     * @param finalizedTask        The task a player must execute upon reaching said destination.
+     */
+    init {
+        this.distance = distance
+    }
 
-	/**
-	 * The WalkToTask constructor.
-	 * @param entity			The associated game character.
-	 * @param destination		The destination the game character will move to.
-	 * @param finalizedTask		The task a player must execute upon reaching said destination.
-	 */
-	public WalkToTask(Player entity, Position destination, int distance, FinalizedMovementTask finalizedTask) {
-		this.player = entity;
-		this.destination = destination;
-		this.finalizedTask = finalizedTask;
-		this.distance = distance;
-	}
-
-	private int distance = -1;
-
-	/**
-	 * The associated game character.
-	 */
-	private final Player player;
-
-	/**
-	 * The destination the game character will move to.
-	 */
-	private Position destination;
-
-	/**
-	 * The task a player must execute upon reaching said destination.
-	 */
-	private final FinalizedMovementTask finalizedTask;
-
-	/**
-	 * Executes the action if distance is correct
-	 */
-	public void tick() {
-		if(player == null)
-			return;
-		if(!player.isRegistered()) {
-			player.setWalkToTask(null);
-			return;
-		}
-		if(player.isTeleporting() || player.getConstitution() <= 0 || destination == null) {
-			player.setWalkToTask(null);
-			return;
-		}
-		if (Locations.goodDistance(player.getPosition().getX(), player.getPosition().getY(), destination.getX(), destination.getY(), distance) || destination.equals(player.getPosition())) {
-			finalizedTask.execute();
-			player.setEntityInteraction(null);
-			player.setWalkToTask(null);
-		}
-	}
+    /**
+     * Executes the action if distance is correct
+     */
+    fun tick() {
+        if (player == null) return
+        if (!player.isRegistered) {
+            player.walkToTask = null
+            return
+        }
+        if (player.isTeleporting || player.constitution <= 0 || destination == null) {
+            player.walkToTask = null
+            return
+        }
+        if (Locations.goodDistance(
+                player.position.x,
+                player.position.y,
+                destination.x,
+                destination.y,
+                distance
+            ) || destination == player.position
+        ) {
+            finalizedTask.execute()
+            player.setEntityInteraction(null)
+            player.walkToTask = null
+        }
+    }
 }

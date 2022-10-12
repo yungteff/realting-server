@@ -59,7 +59,7 @@ object Firemaking {
             player.performAnimation(Animation(733))
             player.movementQueue.isLockedMovement = true
         }
-        player.currentTask = object : Task(if (addingToFire) 2 else cycle, player, if (addingToFire) true else false) {
+        player.currentTask = object : Task(if (addingToFire) 2 else cycle, player, addingToFire) {
             var added = 0
             public override fun execute() {
                 player.packetSender.sendInterfaceRemoval()
