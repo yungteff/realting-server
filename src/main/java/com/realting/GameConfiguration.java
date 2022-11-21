@@ -15,7 +15,7 @@ public class GameConfiguration {
         configuration.port = 13377;
         configuration.discordBotEnabled = false;
         configuration.encryptPasswords = false;
-        configuration.debug = false;
+        configuration.debug = true;
         return configuration;
     }
 

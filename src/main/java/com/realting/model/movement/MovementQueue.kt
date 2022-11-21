@@ -426,7 +426,7 @@ class MovementQueue(
         private const val MAXIMUM_SIZE = 100
 
         @JvmStatic
-        fun canWalk(from: Position?, to: Position?, size: Int): Boolean {
+        fun canWalk(from: Position, to: Position, size: Int): Boolean {
             return RegionClipping.canMove(from, to, size, size)
         }
 

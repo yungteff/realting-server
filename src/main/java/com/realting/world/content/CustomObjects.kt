@@ -73,7 +73,7 @@ object CustomObjects {
         }
     }
 
-    fun deleteObject(p: Player, `object`: GameObject?) {
+    fun deleteObject(p: Player, `object`: GameObject) {
         p.packetSender.sendObjectRemoval(`object`)
         if (RegionClipping.objectExists(`object`)) {
             RegionClipping.removeObject(`object`)
