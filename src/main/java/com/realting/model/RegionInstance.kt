@@ -1,128 +1,81 @@
-package com.realting.model;
+package com.realting.model
 
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import com.realting.world.World;
-import com.realting.world.content.minigames.Barrows;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.player.Player;
+import com.realting.model.entity.character.CharacterEntity
+import com.realting.model.entity.character.npc.NPC
+import com.realting.model.entity.character.player.Player
+import com.realting.world.World
+import com.realting.world.content.minigames.Barrows.killBarrowsNpc
+import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * Handles a custom region instance for a player
  * @author Gabriel
  */
-public class RegionInstance {
+open class RegionInstance(var owner: Player, val type: RegionInstanceType) {
+    enum class RegionInstanceType {
+        BARROWS, THE_SIX, GRAVEYARD, FIGHT_CAVE, WARRIORS_GUILD, NOMAD, RECIPE_FOR_DISASTER, CONSTRUCTION_HOUSE, CONSTRUCTION_DUNGEON, TRIO, KRAKEN, ZULRAH
+    }
 
-	public enum RegionInstanceType {
-		BARROWS,
-		THE_SIX,
-		GRAVEYARD,
-		FIGHT_CAVE,
-		WARRIORS_GUILD,
-		NOMAD,
-		RECIPE_FOR_DISASTER,
-		CONSTRUCTION_HOUSE,
-		CONSTRUCTION_DUNGEON,
-		TRIO,
-		KRAKEN,
-		ZULRAH;
-	}
+    val npcsList: CopyOnWriteArrayList<NPC> = CopyOnWriteArrayList()
+    var playersList: CopyOnWriteArrayList<Player>? = null
 
-	private Player owner;
-	private RegionInstanceType type;
-	private CopyOnWriteArrayList<NPC> npcsList;
-	private CopyOnWriteArrayList<Player> playersList;
-	
-	public RegionInstance(Player p, RegionInstanceType type) {
-		this.owner = p;
-		this.type = type;
-		this.npcsList = new CopyOnWriteArrayList<NPC>();
-		if(type == RegionInstanceType.CONSTRUCTION_HOUSE || type == RegionInstanceType.THE_SIX) {
-			this.playersList = new CopyOnWriteArrayList<Player>();
-		}
-	}
+    init {
+        if (type == RegionInstanceType.CONSTRUCTION_HOUSE || type == RegionInstanceType.THE_SIX) {
+            playersList = CopyOnWriteArrayList()
+        }
+    }
 
-	public void destruct() {
-		for(NPC n : npcsList) {
-			if(n != null && n.getConstitution() > 0 && World.getNpcs().get(n.getIndex()) != null && !n.isDying()) {
-				
-				if(type == RegionInstanceType.WARRIORS_GUILD) {
-					
-					if(n.getId() >= 4278 && n.getId() <= 4284) {
-						owner.getMinigameAttributes().getWarriorsGuildAttributes().setSpawnedArmour(false);
-					}
-					
-				} else if(type == RegionInstanceType.BARROWS) {
+    open fun destruct() {
+        for (n in npcsList) {
+            if (n != null && n.constitution > 0 && World.getNpcs()[n.index] != null && !n.isDying) {
+                if (type == RegionInstanceType.WARRIORS_GUILD) {
+                    if (n.id >= 4278 && n.id <= 4284) {
+                        owner.minigameAttributes.warriorsGuildAttributes.setSpawnedArmour(false)
+                    }
+                } else if (type == RegionInstanceType.BARROWS) {
+                    if (n.id >= 2024 && n.id <= 2034) {
+                        killBarrowsNpc(owner, n, false)
+                    }
+                }
+                World.deregister(n)
+                //System.out.println("Is this running?");
+            }
+        }
+        npcsList.clear()
+        owner.regionInstance = null
+        //System.out.println("Is this ru222nning?");
+    }
 
-					if(n.getId() >= 2024 && n.getId() <= 2034) {
-						Barrows.killBarrowsNpc(owner, n, false);
-					}
-					
-				}
-				
-				World.deregister(n);
-				//System.out.println("Is this running?");
-			}
-		}
-		npcsList.clear();
-		owner.setRegionInstance(null);
-		//System.out.println("Is this ru222nning?");
-	}
+    open fun add(c: CharacterEntity) {
+        if (type == RegionInstanceType.CONSTRUCTION_HOUSE) {
+            if (c.isPlayer) {
+                playersList!!.add(c as Player)
+            } else if (c.isNpc) {
+                npcsList.add(c as NPC)
+            }
+            if (c.regionInstance == null || c.regionInstance !== this) {
+                c.regionInstance = this
+            }
+        }
+    }
 
-	public void add(CharacterEntity c) {
-		if(type == RegionInstanceType.CONSTRUCTION_HOUSE) {
-			if(c.isPlayer()) {
-				playersList.add((Player)c);
-			} else if(c.isNpc()) {
-				npcsList.add((NPC)c);
-			}
+    open fun remove(c: CharacterEntity) {
+        if (type == RegionInstanceType.CONSTRUCTION_HOUSE) {
+            if (c.isPlayer) {
+                playersList!!.remove(c as Player)
+                if (owner === c) {
+                    destruct()
+                }
+            } else if (c.isNpc) {
+                npcsList.remove(c as NPC)
+            }
+            if (c.regionInstance != null && c.regionInstance === this) {
+                c.regionInstance = null
+            }
+        }
+    }
 
-			if(c.getRegionInstance() == null || c.getRegionInstance() != this) {
-				c.setRegionInstance(this);
-			}
-		}
-	}
-
-	public void remove(CharacterEntity c) {
-		if(type == RegionInstanceType.CONSTRUCTION_HOUSE) {
-			if(c.isPlayer()) {
-				playersList.remove((Player)c);
-				if(owner == ((Player)c)) {
-					destruct();
-				}
-			} else if(c.isNpc()) {
-				npcsList.remove((NPC)c);
-			}
-
-			if(c.getRegionInstance() != null && c.getRegionInstance() == this) {
-				c.setRegionInstance(null);
-			}
-		}
-	}
-
-	public Player getOwner() {
-		return owner;
-	}
-
-	public void setOwner(Player owner) {
-		this.owner = owner;
-	}
-
-	public RegionInstanceType getType() {
-		return type;
-	}
-
-	public CopyOnWriteArrayList<NPC> getNpcsList() {
-		return npcsList;
-	}
-
-	public CopyOnWriteArrayList<Player> getPlayersList() {
-		return playersList;
-	}
-
-	@Override
-	public boolean equals(Object other) {
-		return (RegionInstanceType)other == type;
-	}
+    override fun equals(other: Any?): Boolean {
+        return other as RegionInstanceType? == type
+    }
 }
