@@ -2,10 +2,10 @@ package com.realting.model.entity.character.npc;
 
 import com.realting.model.Locations;
 import com.realting.model.Locations.Location;
+import com.realting.model.entity.character.player.Player;
 import com.realting.world.content.combat.CombatFactory;
 import com.realting.world.content.combat.strategy.impl.bosses.Nex;
 import com.realting.world.content.player.skill.dungeoneering.Dungeoneering;
-import com.realting.model.entity.character.player.Player;
 
 /**
  * Handles the behavior of aggressive {@link Npc}s around players within the
@@ -58,7 +58,7 @@ public final class NpcAggression {
 			}
 
 			// Check if the entity is within distance.
-			if (Locations.goodDistance(npc.getPosition(), player.getPosition(), npc.getAggressionDistance()) || gwdMob) {
+			if (Locations.goodDistance(npc.getEntityPosition(), player.getEntityPosition(), npc.getAggressionDistance()) || gwdMob) {
 		
 				if (player.getTolerance().elapsed() > (NPC_TOLERANCE_SECONDS * 1000) && player.getLocation() != Location.GODWARS_DUNGEON && player.getLocation() != Location.DAGANNOTH_DUNGEON && !dung) {
 					break;
@@ -79,7 +79,7 @@ public final class NpcAggression {
 					continue;
 				}
 
-				if(Location.ignoreFollowDistance(npc) || gwdMob || npc.getDefaultPosition().getDistance(player.getPosition()) < 7 + npc.getMovementCoordinator().getCoordinator().getRadius() || dung) {
+				if(Location.ignoreFollowDistance(npc) || gwdMob || npc.getDefaultPosition().getDistance(player.getEntityPosition()) < 7 + npc.getMovementCoordinator().getCoordinator().getRadius() || dung) {
 					if(CombatFactory.checkHook(npc, player)) {
 						player.setTargeted(true);
 						npc.getCombatBuilder().attack(player);

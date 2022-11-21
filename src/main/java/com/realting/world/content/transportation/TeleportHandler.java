@@ -55,7 +55,7 @@ public class TeleportHandler {
 						player.performGraphic(teleportType.getEndGraphic());
 						
 						if(Dungeoneering.doingDungeoneering(player)) {
-							final Position dungEntrance = Objects.requireNonNull(Objects.requireNonNull(player.getMinigameAttributes().getDungeoneeringAttributes().getParty()).getDungeoneeringFloor()).getEntrance().copy().setZ(player.getPosition().getZ());
+							final Position dungEntrance = Objects.requireNonNull(Objects.requireNonNull(player.getMinigameAttributes().getDungeoneeringAttributes().getParty()).getDungeoneeringFloor()).getEntrance().copy().setZ(player.getEntityPosition().getZ());
 							player.moveTo(dungEntrance).setPosition(dungEntrance);
 						} else {
 							player.moveTo(targetLocation).setPosition(targetLocation);

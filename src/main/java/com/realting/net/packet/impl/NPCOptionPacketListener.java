@@ -59,7 +59,7 @@ public class NPCOptionPacketListener implements PacketListener {
 			player.getMovementQueue().reset();
 			return;
 		}
-		player.setWalkToTask(new WalkToTask(player, npc.getPosition(), npc.getSize(), new FinalizedMovementTask() {
+		player.setWalkToTask(new WalkToTask(player, npc.getEntityPosition(), npc.getSize(), new FinalizedMovementTask() {
 			@Override
 			public void execute() {
 				if(SummoningData.beastOfBurden(npc.getId())) {
@@ -163,17 +163,17 @@ public class NPCOptionPacketListener implements PacketListener {
 					break;
 				case 5:
 				case 4:
-					npc.setPositionToFace(player.getPosition());
+					npc.setPositionToFace(player.getEntityPosition());
 					DialogueManager.start(player, 167);
 					break;
 				case 1:
 				case 2:
 				case 3:
-					npc.setPositionToFace(player.getPosition());
+					npc.setPositionToFace(player.getEntityPosition());
 					DialogueManager.start(player, 165);
 					break;
 				case 2238:
-					npc.setPositionToFace(player.getPosition());
+					npc.setPositionToFace(player.getEntityPosition());
 					DialogueManager.start(player, 155);
 					break;
 				case 1152:
@@ -198,7 +198,7 @@ public class NPCOptionPacketListener implements PacketListener {
 					ShopManager.getShops().get(78).open(player);
 					break;
 				case 947:
-					if(player.getPosition().getX() >= 3092) {
+					if(player.getEntityPosition().getX() >= 3092) {
 						player.getMovementQueue().reset();
 						GrandExchange.open(player);
 					}
@@ -296,7 +296,7 @@ public class NPCOptionPacketListener implements PacketListener {
 					break;
 				case 3789:
 					player.getPacketSender().sendInterface(18730);
-					player.getPacketSender().sendString(18729, "Commendations: "+Integer.toString(player.getPointsHandler().getCommendations()));
+					player.getPacketSender().sendString(18729, "Commendations: "+ player.getPointsHandler().getCommendations());
 					break;
 				case 2948:
 					DialogueManager.start(player, WarriorsGuild.warriorsGuildDialogue(player));
@@ -470,9 +470,9 @@ public class NPCOptionPacketListener implements PacketListener {
 					break;
 				}
 				if(!(npc.getId() >= 8705 && npc.getId() <= 8710)) {
-					npc.setPositionToFace(player.getPosition());
+					npc.setPositionToFace(player.getEntityPosition());
 				}
-				player.setPositionToFace(npc.getPosition());
+				player.setPositionToFace(npc.getEntityPosition());
 			}
 		}));
 	}
@@ -520,7 +520,7 @@ public class NPCOptionPacketListener implements PacketListener {
 		final int npcId = npc.getId();
 		if(player.getRights() == PlayerRights.DEVELOPER)
 			player.getPacketSender().sendMessage("Second click npc id: "+npcId);
-		player.setWalkToTask(new WalkToTask(player, npc.getPosition(), npc.getSize(), new FinalizedMovementTask() {
+		player.setWalkToTask(new WalkToTask(player, npc.getEntityPosition(), npc.getSize(), new FinalizedMovementTask() {
 			@Override
 			public void execute() {
 				if (PickpocketData.forNpc(npc.getId()) != null) {
@@ -602,7 +602,7 @@ public class NPCOptionPacketListener implements PacketListener {
 					ShopManager.getShops().get(28).open(player);
 					break;
 				case 605:
-					player.getPacketSender().sendMessage("").sendMessage("You currently have "+player.getPointsHandler().getVotingPoints()+" Voting points.").sendMessage("You can earn points and coins by voting. To do so, simply use the ::vote command.");;
+					player.getPacketSender().sendMessage("").sendMessage("You currently have "+player.getPointsHandler().getVotingPoints()+" Voting points.").sendMessage("You can earn points and coins by voting. To do so, simply use the ::vote command.");
 					ShopManager.getShops().get(90).open(player);
 					break;
 				case 1597:
@@ -680,8 +680,8 @@ public class NPCOptionPacketListener implements PacketListener {
 				//begin ironman second click handles
 
 				}
-				npc.setPositionToFace(player.getPosition());
-				player.setPositionToFace(npc.getPosition());
+				npc.setPositionToFace(player.getEntityPosition());
+				player.setPositionToFace(npc.getEntityPosition());
 			}
 		}));
 	}
@@ -693,11 +693,11 @@ public class NPCOptionPacketListener implements PacketListener {
 		final NPC npc = World.getNpcs().get(index);
 		if (npc == null)
 			return;
-		player.setEntityInteraction(npc).setPositionToFace(npc.getPosition().copy());
-		npc.setPositionToFace(player.getPosition());
+		player.setEntityInteraction(npc).setPositionToFace(npc.getEntityPosition().copy());
+		npc.setPositionToFace(player.getEntityPosition());
 		if(player.getRights() == PlayerRights.DEVELOPER)
 			player.getPacketSender().sendMessage("Third click npc id: "+npc.getId());
-		player.setWalkToTask(new WalkToTask(player, npc.getPosition(), npc.getSize(), new FinalizedMovementTask() {
+		player.setWalkToTask(new WalkToTask(player, npc.getEntityPosition(), npc.getSize(), new FinalizedMovementTask() {
 			@Override
 			public void execute() {
 				switch(npc.getId()) {
@@ -787,8 +787,8 @@ public class NPCOptionPacketListener implements PacketListener {
 						ShopManager.getShops().get(0).open(player);
 					break;
 				}
-				npc.setPositionToFace(player.getPosition());
-				player.setPositionToFace(npc.getPosition());
+				npc.setPositionToFace(player.getEntityPosition());
+				player.setPositionToFace(npc.getEntityPosition());
 			}
 		}));
 	}
@@ -803,7 +803,7 @@ public class NPCOptionPacketListener implements PacketListener {
 		player.setEntityInteraction(npc);
 		if(player.getRights() == PlayerRights.DEVELOPER)
 			player.getPacketSender().sendMessage("Fourth click npc id: "+npc.getId());
-		player.setWalkToTask(new WalkToTask(player, npc.getPosition(), npc.getSize(), new FinalizedMovementTask() {
+		player.setWalkToTask(new WalkToTask(player, npc.getEntityPosition(), npc.getSize(), new FinalizedMovementTask() {
 			@Override
 			public void execute() {
 				switch(npc.getId()) {
@@ -830,8 +830,8 @@ public class NPCOptionPacketListener implements PacketListener {
 					player.getPacketSender().sendInterface(36000);
 					break;
 				}
-				npc.setPositionToFace(player.getPosition());
-				player.setPositionToFace(npc.getPosition());
+				npc.setPositionToFace(player.getEntityPosition());
+				player.setPositionToFace(npc.getEntityPosition());
 			}
 		}));
 	}
@@ -888,7 +888,7 @@ public class NPCOptionPacketListener implements PacketListener {
 				return;
 			}
 
-			player.setPositionToFace(n.getPosition());
+			player.setPositionToFace(n.getEntityPosition());
 			player.setCastSpell(spell);
 			if(player.getCombatBuilder().getStrategy() == null) {
 				player.getCombatBuilder().determineStrategy();

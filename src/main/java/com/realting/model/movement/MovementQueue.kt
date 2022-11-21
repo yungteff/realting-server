@@ -98,7 +98,7 @@ class MovementQueue(
      * //     * @param clipped Can the step walk through objects?
      */
     fun walkStep(x: Int, y: Int) {
-        val position = character.position.copy()
+        val position = character.entityPosition.copy()
         position.x = position.x + x
         position.y = position.y + y
         addStep(position)
@@ -146,9 +146,9 @@ class MovementQueue(
     }
 
     fun canWalk(deltaX: Int, deltaY: Int): Boolean {
-        val to = Position(character.position.x + deltaX, character.position.y + deltaY, character.position.z)
-        return if (character.position.z == -1 && to.z == -1 && character.isNpc && !(character as NPC).isSummoningNpc || character.location === Locations.Location.RECIPE_FOR_DISASTER) true else canWalk(
-            character.position, to, character.size
+        val to = Position(character.entityPosition.x + deltaX, character.entityPosition.y + deltaY, character.entityPosition.z)
+        return if (character.entityPosition.z == -1 && to.z == -1 && character.isNpc && !(character as NPC).isSummoningNpc || character.location === Locations.Location.RECIPE_FOR_DISASTER) true else canWalk(
+            character.entityPosition, to, character.size
         )
     }
     /*
@@ -166,7 +166,7 @@ class MovementQueue(
      * @return The last point.
      */
     private val last: Point
-        get() = points.peekLast() ?: Point(character.position, Direction.NONE)
+        get() = points.peekLast() ?: Point(character.entityPosition, Direction.NONE)
 
     /**
      * @return true if the character is moving.
@@ -192,11 +192,11 @@ class MovementQueue(
             }
             if (walkPoint != null && walkPoint.direction != Direction.NONE) {
                 if (followCharacter != null) {
-                    if (walkPoint.position == followCharacter!!.position) {
+                    if (walkPoint.position == followCharacter!!.entityPosition) {
                         return
                     } else {
                         if (!followCharacter!!.movementQueue.isRunToggled) {
-                            if (character.position.isWithinDistance(followCharacter!!.position, 2)) {
+                            if (character.entityPosition.isWithinDistance(followCharacter!!.entityPosition, 2)) {
                                 runPoint = null
                             }
                         }
@@ -204,22 +204,22 @@ class MovementQueue(
                 }
                 if (!isPlayer && !character.combatBuilder.isAttacking) {
                     if ((character as NPC).isSummoningNpc && !character.summoningCombat()) {
-                        if (!canWalk(character.position, walkPoint.position, character.size)) {
+                        if (!canWalk(character.entityPosition, walkPoint.position, character.size)) {
                             return
                         }
                     }
                 }
-                character.position = walkPoint.position
+                character.entityPosition = walkPoint.position
                 character.primaryDirection = walkPoint.direction
                 character.lastDirection = walkPoint.direction
             }
             if (runPoint != null && runPoint.direction != Direction.NONE) {
                 if (followCharacter != null) {
-                    if (walkPoint.position == followCharacter!!.position) {
+                    if (walkPoint.position == followCharacter!!.entityPosition) {
                         return
                     }
                 }
-                character.position = runPoint.position
+                character.entityPosition = runPoint.position
                 character.secondaryDirection = runPoint.direction
                 character.lastDirection = runPoint.direction
                 if (isPlayer) {
@@ -237,8 +237,8 @@ class MovementQueue(
         get() = points.size == 0
 
     fun handleRegionChange() {
-        val diffX = (character.position.x - character.lastKnownRegion.regionX * 8)
-        val diffY = (character.position.y - character.lastKnownRegion.regionY * 8)
+        val diffX = (character.entityPosition.x - character.lastKnownRegion.regionX * 8)
+        val diffY = (character.entityPosition.y - character.lastKnownRegion.regionY * 8)
         var regionChanged = false
         if (diffX < 16) regionChanged = true else if (diffX >= 88) regionChanged = true
         if (diffY < 16) regionChanged = true else if (diffY >= 88) regionChanged = true
@@ -264,8 +264,8 @@ class MovementQueue(
                     val combatFollowing = character.combatBuilder.isAttacking
                     if (!Locations.Location.ignoreFollowDistance(character)) {
                         val summNpc = followCharacter!!.isPlayer && character.isNpc && (character as NPC).isSummoningNpc
-                        if (!character.position.isWithinDistance(
-                                followCharacter!!.position, if (summNpc) 10 else if (combatFollowing) 40 else 20
+                        if (!character.entityPosition.isWithinDistance(
+                                followCharacter!!.entityPosition, if (summNpc) 10 else if (combatFollowing) 40 else 20
                             )
                         ) {
                             character.setEntityInteraction(null)
@@ -284,7 +284,7 @@ class MovementQueue(
                     // away.
 
                     //If combat follow, let the combat factory handle it
-                    if (character.position == followCharacter!!.position) {
+                    if (character.entityPosition == followCharacter!!.entityPosition) {
                         character.movementQueue.reset()
                         if (followCharacter!!.movementQueue.isMovementDone) stepAway(
                             character
@@ -308,20 +308,20 @@ class MovementQueue(
                     }
 
                     // If we are within 1 square we don't need to move.
-                    if (Locations.goodDistance(character.position, followCharacter!!.position, 1)) {
+                    if (Locations.goodDistance(character.entityPosition, followCharacter!!.entityPosition, 1)) {
                         return
                     }
                     if (character.isNpc && (character as NPC).isSummoningNpc && (followCharacter!!.location === Locations.Location.HOME_BANK || followCharacter!!.location === Locations.Location.EDGEVILLE || followCharacter!!.location === Locations.Location.VARROCK)) {
                         character.getMovementQueue().walkStep(
-                            getMove(character.position.x, followCharacter!!.position.x, 1), getMove(
-                                character.position.y - 1, followCharacter!!.position.y, 1
+                            getMove(character.entityPosition.x, followCharacter!!.entityPosition.x, 1), getMove(
+                                character.entityPosition.y - 1, followCharacter!!.entityPosition.y, 1
                             )
                         )
                     } else {
                         findPath(
                             character,
-                            followCharacter!!.position.x,
-                            followCharacter!!.position.y - character.size,
+                            followCharacter!!.entityPosition.x,
+                            followCharacter!!.entityPosition.y - character.size,
                             true,
                             character.size,
                             character.size
@@ -403,7 +403,7 @@ class MovementQueue(
     /**
      * If this entity's movement is locked.
      */
-    public var isLockedMovement = false
+    var isLockedMovement = false
 
     /**
      * Sets if this entity can move or not.

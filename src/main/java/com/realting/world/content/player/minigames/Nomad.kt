@@ -1,14 +1,16 @@
 package com.realting.world.content.minigames
 
 import com.realting.engine.task.Task
-import com.realting.model.RegionInstance.RegionInstanceType
 import com.realting.engine.task.TaskManager
-import com.realting.world.World
-import com.realting.world.content.dialogue.DialogueManager
-import com.realting.world.content.PlayerPanel
-import com.realting.model.*
+import com.realting.model.Graphic
+import com.realting.model.Position
+import com.realting.model.RegionInstance
+import com.realting.model.RegionInstance.RegionInstanceType
 import com.realting.model.entity.character.npc.NPC
 import com.realting.model.entity.character.player.Player
+import com.realting.world.World
+import com.realting.world.content.PlayerPanel
+import com.realting.world.content.dialogue.DialogueManager
 
 /**
  * @author Gabriel Hannason
@@ -24,7 +26,7 @@ object Nomad {
             var tick = 0
             public override fun execute() {
                 if (tick >= 4) {
-                    val n = NPC(8528, Position(p.position.x, p.position.y - 2, p.position.z)).setSpawnedFor(p)
+                    val n = NPC(8528, Position(p.entityPosition.x, p.entityPosition.y - 2, p.entityPosition.z)).setSpawnedFor(p)
                     World.register(n)
                     p.regionInstance.npcsList.add(n)
                     n.combatBuilder.attack(p)

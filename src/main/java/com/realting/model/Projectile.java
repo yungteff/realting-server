@@ -2,10 +2,10 @@ package com.realting.model;
 
 import com.realting.engine.task.Task;
 import com.realting.engine.task.TaskManager;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.world.World;
 import com.realting.model.entity.Entity;
+import com.realting.model.entity.character.CharacterEntity;
 import com.realting.model.entity.character.player.Player;
+import com.realting.world.World;
 
 /**
  * A graphic propelled through the air by some sort of spell, weapon, or other
@@ -105,7 +105,7 @@ public final class Projectile {
      */
     public Projectile(Entity source, Entity victim, int projectileId,
         int delay, int speed, int startHeight, int endHeight, int curve) {
-        this(source.getPosition(), victim.getPosition(),
+        this(source.getEntityPosition(), victim.getEntityPosition(),
             (victim.isPlayer() ? -victim.getIndex() - 1
                 : victim.getIndex() + 1), projectileId, delay, speed,
             startHeight, endHeight, curve);
@@ -121,7 +121,7 @@ public final class Projectile {
                 continue;
             }
 
-            if (start.isViewableFrom(player.getPosition())) {
+            if (start.isViewableFrom(player.getEntityPosition())) {
                 player.getPacketSender().sendProjectile(start, offset, 0,
                     speed, projectileId, startHeight, endHeight, lockon, delay);
 

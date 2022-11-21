@@ -817,7 +817,7 @@ public class DialogueOptions {
 					if(player.getSlayer().getSlayerMaster().getPosition() != null) {
 						TeleportHandler.teleportPlayer(player, new Position(player.getSlayer().getSlayerMaster().getPosition().getX(), player.getSlayer().getSlayerMaster().getPosition().getY(), player.getSlayer().getSlayerMaster().getPosition().getZ()), player.getSpellbook().getTeleportType());
 						if(player.getSkillManager().getCurrentLevel(Skill.SLAYER) <= 50)
-							player.getPacketSender().sendMessage("").sendMessage("You can train Slayer with a friend by using a Slayer gem on them.").sendMessage("Slayer gems can be bought from all Slayer masters.");;
+							player.getPacketSender().sendMessage("").sendMessage("You can train Slayer with a friend by using a Slayer gem on them.").sendMessage("Slayer gems can be bought from all Slayer masters.");
 					}
 					break;
 				case 31:
@@ -917,7 +917,7 @@ public class DialogueOptions {
 							player.getPacketSender().sendMessage("Your partner cannot be teleported to at the moment. Are they in combat/minigame/wild?");
 							break;
 						} else {
-							TeleportHandler.teleportPlayer(player, new Position(partner.getPosition().getX(), partner.getPosition().getY(), partner.getPosition().getZ()), TeleportType.NORMAL);
+							TeleportHandler.teleportPlayer(player, new Position(partner.getEntityPosition().getX(), partner.getEntityPosition().getY(), partner.getEntityPosition().getZ()), TeleportType.NORMAL);
 							player.getPacketSender().sendMessage("Teleporting you to "+partner.getUsername()+"!");
 						}
 					} else {
@@ -1129,7 +1129,7 @@ public class DialogueOptions {
 				case 42:
 					player.getPacketSender().sendInterfaceRemoval();
 					if(player.getInteractingObject() != null && player.getInteractingObject().getDefinition() != null && player.getInteractingObject().getDefinition().getName().equalsIgnoreCase("flowers")) {
-						if(CustomObjects.objectExists(player.getInteractingObject().getPosition())) {
+						if(CustomObjects.objectExists(player.getInteractingObject().getEntityPosition())) {
 							player.getInventory().add(FlowersData.forObject(player.getInteractingObject().getId()).getItemId(), 1);
 							CustomObjects.deleteGlobalObject(player.getInteractingObject());
 							player.setInteractingObject(null);
@@ -1172,14 +1172,14 @@ public class DialogueOptions {
 				case 72:
 					if(player.getClickDelay().elapsed(1000)) {
 						if(Dungeoneering.doingDungeoneering(player)) {
-							Dungeoneering.leave(player, false, player.getMinigameAttributes().getDungeoneeringAttributes().getParty().getOwner() == player ? false : true);
+							Dungeoneering.leave(player, false, player.getMinigameAttributes().getDungeoneeringAttributes().getParty().getOwner() != player);
 							player.getClickDelay().reset();
 						}
 					}
 					break;
 				case 73:
 					player.getPacketSender().sendInterfaceRemoval();
-					player.moveTo(new Position(3653, player.getPosition().getY()));
+					player.moveTo(new Position(3653, player.getEntityPosition().getY()));
 					break;
 				case 74:
 					player.getPacketSender().sendMessage("The ghost teleports you away.");
@@ -1220,7 +1220,7 @@ public class DialogueOptions {
 					trioMinigame.handleTokenRemoval(player);
 					break;
 				case 154:
-					player.moveTo(new Position(player.getPosition().getX(), player.getPosition().getY(), 2));
+					player.moveTo(new Position(player.getEntityPosition().getX(), player.getEntityPosition().getY(), 2));
 					player.getPacketSender().sendInterfaceRemoval();
 					break;
 			}
@@ -1293,7 +1293,7 @@ public class DialogueOptions {
 					player.getMinigameAttributes().getDungeoneeringAttributes().setPartyInvitation(null);
 					break;
 				case 154:
-					player.moveTo(new Position(player.getPosition().getX(), player.getPosition().getY(), 0));
+					player.moveTo(new Position(player.getEntityPosition().getX(), player.getEntityPosition().getY(), 0));
 					player.getPacketSender().sendInterfaceRemoval();
 					break;
 			}
@@ -1370,7 +1370,7 @@ public class DialogueOptions {
 					break;
 				case 48:
 					if(player.getInteractingObject() != null) {
-						Mining.startMining(player, new GameObject(24444, player.getInteractingObject().getPosition()));
+						Mining.startMining(player, new GameObject(24444, player.getInteractingObject().getEntityPosition()));
 					}
 					player.getPacketSender().sendInterfaceRemoval();
 					break;
@@ -1491,7 +1491,7 @@ public class DialogueOptions {
 					break;
 				case 48:
 					if(player.getInteractingObject() != null) {
-						Mining.startMining(player, new GameObject(24445, player.getInteractingObject().getPosition()));
+						Mining.startMining(player, new GameObject(24445, player.getInteractingObject().getEntityPosition()));
 					}
 					player.getPacketSender().sendInterfaceRemoval();
 					break;

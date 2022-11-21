@@ -48,19 +48,19 @@ class Revenant : CombatStrategy {
             return true
         }
         val attkType = if (Misc.getRandom(5) <= 2 && Locations.goodDistance(
-                revenant.position, revenant.position, 2
+                revenant.entityPosition, revenant.entityPosition, 2
             )
         ) CombatType.MELEE else if (Misc.getRandom(10) <= 5) CombatType.MAGIC else CombatType.RANGED
         when (attkType) {
             CombatType.MELEE -> {
                 revenant.performAnimation(Animation(revenant.definition.attackAnimation))
-                revenant.combatBuilder.container = CombatContainer(revenant, victim!!, 1, 1, CombatType.MELEE, true)
+                revenant.combatBuilder.container = CombatContainer(revenant, victim, 1, 1, CombatType.MELEE, true)
             }
             CombatType.MAGIC, CombatType.RANGED -> {
                 val revData = REVENANT_DATA.getData(revenant.id)
                 revenant.isChargingAttack = true
                 revenant.performAnimation(if (attkType === CombatType.MAGIC) revData!!.magicAttack else revData!!.rangedAttack)
-                revenant.combatBuilder.container = CombatContainer(revenant, victim!!, 1, 2, attkType, true)
+                revenant.combatBuilder.container = CombatContainer(revenant, victim, 1, 2, attkType, true)
                 TaskManager.submit(object : Task(1, revenant, false) {
                     var tick = 0
                     public override fun execute() {

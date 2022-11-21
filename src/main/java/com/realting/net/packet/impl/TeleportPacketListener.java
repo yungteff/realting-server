@@ -15,13 +15,13 @@ public class TeleportPacketListener implements PacketListener {
         int y = packet.readByte();
         if (player.getRights() == PlayerRights.DEVELOPER) {
             Position teleport = new Position(
-                    player.getPosition().getX() - (player.getPosition().getLocalX(player.getLastKnownRegion()) - x),
-                    player.getPosition().getY() - (player.getPosition().getLocalY(player.getLastKnownRegion()) - y),
-                    player.getPosition().getZ()
+                    player.getEntityPosition().getX() - (player.getEntityPosition().getLocalX(player.getLastKnownRegion()) - x),
+                    player.getEntityPosition().getY() - (player.getEntityPosition().getLocalY(player.getLastKnownRegion()) - y),
+                    player.getEntityPosition().getZ()
             );
 
             player.moveTo(teleport);
-            player.getPacketSender().sendMessage("Teleported to: " + teleport.toString());
+            player.getPacketSender().sendMessage("Teleported to: " + teleport);
         }
     }
 }

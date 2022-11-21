@@ -28,7 +28,7 @@ object TheSix {
             }
         }
         val z = (player.index + 1) * 4
-        val orig = player.position.copy()
+        val orig = player.entityPosition.copy()
         val pos = Position(2384, 4721, z)
         if (player.currentClanChat == null || player.currentClanChat.name == null) {
             player.packetSender.sendMessage("You need to be in a clan chat, make or join one.")
@@ -119,7 +119,7 @@ object TheSix {
 
     @JvmStatic
     fun spawn(player: Player, clan: Boolean) {
-        val z = player.position.z
+        val z = player.entityPosition.z
         //CustomObjects.spawnGlobalObjectWithinDistance(new GameObject(2273, new Position(2384, 4715, z), 10, 1));
         //CustomObjects.spawnGlobalObjectWithinDistance(new GameObject(1864, new Position(2383, 4715, z), 10, 1));
         //CustomObjects.spawnGlobalObjectWithinDistance(new GameObject(1864, new Position(2382, 4715, z), 10, 1));

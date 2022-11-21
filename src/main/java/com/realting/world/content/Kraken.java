@@ -5,13 +5,13 @@ import com.realting.engine.task.TaskManager;
 import com.realting.engine.task.impl.CeilingCollapseTask;
 import com.realting.model.Position;
 import com.realting.model.RegionInstance;
-import com.realting.world.World;
 import com.realting.model.entity.character.npc.NPC;
 import com.realting.model.entity.character.player.Player;
+import com.realting.world.World;
 
 public class Kraken {
 
-	private static enum WhirpoolData {
+	private enum WhirpoolData {
 
 		SMALL_POOL_1(2895, new Position(3679, 9884)),
 		SMALL_POOL_2(2900, new Position(3676, 9884)),
@@ -41,7 +41,7 @@ public class Kraken {
 		KrakenInstance kInstance = new KrakenInstance(player);
 
 		for(WhirpoolData d : WhirpoolData.values()) {
-			NPC whirpool = new NPC(d.npc, new Position(d.spawn.getX(), d.spawn.getY(), player.getPosition().getZ()));
+			NPC whirpool = new NPC(d.npc, new Position(d.spawn.getX(), d.spawn.getY(), player.getEntityPosition().getZ()));
 			kInstance.getNpcsList().add(whirpool);
 			World.register(whirpool);
 		}
@@ -68,7 +68,7 @@ public class Kraken {
 				@Override
 				protected void execute() {
 					int npcToSpawn = kraken ? 2007 : 3580;
-					Position positionToSpawn = kraken ? new Position(3677, 9887, player.getPosition().getZ()) : new Position(d.spawn.getX() + 2, d.spawn.getY() + 1, player.getPosition().getZ());
+					Position positionToSpawn = kraken ? new Position(3677, 9887, player.getEntityPosition().getZ()) : new Position(d.spawn.getX() + 2, d.spawn.getY() + 1, player.getEntityPosition().getZ());
 					NPC spawn = new NPC(npcToSpawn, positionToSpawn);
 					player.getRegionInstance().getNpcsList().add(spawn);
 					World.register(spawn);
@@ -92,7 +92,7 @@ public class Kraken {
 
 		}
 
-		private boolean[] disturbedPool = new boolean[5];
+		private final boolean[] disturbedPool = new boolean[5];
 
 		public boolean disturbedPool(int index) {
 			return disturbedPool[index];

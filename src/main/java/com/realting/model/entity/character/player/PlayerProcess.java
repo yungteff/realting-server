@@ -11,7 +11,7 @@ public class PlayerProcess {
 	/*
 	 * The player (owner) of this instance
 	 */
-	private Player player;
+	private final Player player;
 
 	/*
 	 * The loyalty tick, once this reaches 6, the player
@@ -34,7 +34,7 @@ public class PlayerProcess {
 
 	public PlayerProcess(Player player) {
 		this.player = player;
-		this.previousHeight = player.getPosition().getZ();
+		this.previousHeight = player.getEntityPosition().getZ();
 	}
 
 	public void sequence() {
@@ -50,9 +50,9 @@ public class PlayerProcess {
 
 		/** MISC **/
 
-		if(previousHeight != player.getPosition().getZ()) {
+		if(previousHeight != player.getEntityPosition().getZ()) {
 			GroundItemManager.handleRegionChange(player);
-			previousHeight = player.getPosition().getZ();
+			previousHeight = player.getEntityPosition().getZ();
 		}
 
 		if(!player.isInActive()) {

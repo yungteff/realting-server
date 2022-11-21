@@ -145,11 +145,11 @@ class HitQueue {
                     if (victim!!.isPlayer && container.combatType == CombatType.DRAGON_FIRE) {
                         val p = victim as Player
                         if (Misc.getRandom(4) <= 3 && p.equipment.items[Equipment.SHIELD_SLOT].id == 11283) {
-                            p.positionToFace = attacker.position.copy()
+                            p.positionToFace = attacker.entityPosition.copy()
                             CombatFactory.chargeDragonFireShield(p)
                         }
                         if (p.equipment.items[Equipment.SHIELD_SLOT].id == 1540 || p.equipment.items[Equipment.SHIELD_SLOT].id == 13655) {
-                            p.positionToFace = attacker.position.copy()
+                            p.positionToFace = attacker.entityPosition.copy()
                             CombatFactory.sendFireMessage(p)
                         }
                         if (damage >= 160) {

@@ -7,8 +7,8 @@ import com.realting.model.Graphic;
 import com.realting.model.Hit;
 import com.realting.model.Hitmask;
 import com.realting.model.Locations.Location;
-import com.realting.util.Misc;
 import com.realting.model.entity.character.player.Player;
+import com.realting.util.Misc;
 
 /**
  * Barrows
@@ -21,11 +21,11 @@ public class CeilingCollapseTask extends Task {
 		this.player = player;
 	}
 
-	private Player player;
+	private final Player player;
 
 	@Override
 	public void execute() {
-		if(player == null || !player.isRegistered() || player.getLocation() != Location.BARROWS && player.getLocation() != Location.KRAKEN || player.getLocation() != Location.ZULRAH || player.getLocation() == Location.BARROWS && player.getPosition().getY() < 8000) {
+		if(player == null || !player.isRegistered() || player.getLocation() != Location.BARROWS && player.getLocation() != Location.KRAKEN || player.getLocation() != Location.ZULRAH || player.getLocation() == Location.BARROWS && player.getEntityPosition().getY() < 8000) {
 			player.getPacketSender().sendCameraNeutrality();
 			stop();
 			return;

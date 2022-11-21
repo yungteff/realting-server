@@ -84,14 +84,14 @@ class ChaosElemental : CombatStrategy {
         cE.isChargingAttack = true
         TaskManager.submit(object : Task(1, cE, false) {
             public override fun execute() {
-                cE.combatBuilder.container = CombatContainer(cE, victim!!, 1, 2, data.combatType, true)
+                cE.combatBuilder.container = CombatContainer(cE, victim, 1, 2, data.combatType, true)
                 if (data.endGraphic != null) victim.performGraphic(data.endGraphic!!)
                 cE.isChargingAttack = false
                 if (Misc.getRandom(50) <= 2) {
                     cE.performGraphic(teleGraphic)
                     victim.performGraphic(teleGraphic)
-                    val randomX = victim.position.x - Misc.getRandom(30)
-                    val randomY = victim.position.y
+                    val randomX = victim.entityPosition.x - Misc.getRandom(30)
+                    val randomY = victim.entityPosition.y
                     if (RegionClipping.getClipping(randomX, randomY, 0) == 0) {
                         victim.moveTo(Position(randomX, randomY))
                         (victim as Player?)!!.packetSender.sendMessage("The Chaos elemental has teleported you away!")

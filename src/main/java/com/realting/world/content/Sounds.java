@@ -6,8 +6,8 @@ import com.realting.model.Position;
 import com.realting.model.container.impl.Equipment;
 import com.realting.model.definitions.ItemDefinition;
 import com.realting.model.definitions.NpcDefinition;
-import com.realting.util.Misc;
 import com.realting.model.entity.character.player.Player;
+import com.realting.util.Misc;
 
 public class Sounds {
 
@@ -36,7 +36,7 @@ public class Sounds {
 			this.sounds = sounds;
 		}
 
-		private int[] sounds;
+		private final int[] sounds;
 
 		public int[] getSounds() {
 			return sounds;
@@ -696,7 +696,7 @@ public class Sounds {
 	 * @return
 	 */
 	public static int getAreaID(Player player) {
-		final Position location = player.getPosition().copy();
+		final Position location = player.getEntityPosition().copy();
 		if (location.getX() >= 2625 && location.getX() <= 2687 && location.getY() >= 4670 && location.getY() <= 4735) 
 			return 1;
 		if ((location.getX() >= 2368 && location.getX() <= 2376 && location.getY() >= 3127 && location.getY() <= 3135 && location.getZ() == 1) || (location.getX() >= 2423 && location.getX() <= 2431 && location.getY() >= 3072 && location.getY() <= 3080 && location.getZ() == 1)) 
@@ -808,8 +808,8 @@ public class Sounds {
 		if (location.getX() >= 3463 && location.getX() <= 3515 && location.getY() >= 9469 && location.getY() <= 9524) 
 			return 53;
 		if (location.getX() >= 3200 && location.getX() <= 3303 && location.getY() >= 3273 && location.getY() <= 3353) 
-			return 54;;
-			if (location.getX() >= 3274 && location.getX() <= 3328 && location.getY() >= 3315 && location.getY() <= 3353) 
+			return 54;
+        if (location.getX() >= 3274 && location.getX() <= 3328 && location.getY() >= 3315 && location.getY() <= 3353)
 				return 55;
 			if (location.getX() >= 3274 && location.getX() <= 3266 && location.getY() >= 3323 && location.getY() <= 3327) 
 				return 56;

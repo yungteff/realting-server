@@ -27,21 +27,21 @@ class BandosAvatar : CombatStrategy {
             return true
         }
         if (Locations.goodDistance(
-                bandosAvatar.position.copy(),
-                victim!!.position.copy(),
+                bandosAvatar.entityPosition.copy(),
+                victim.entityPosition.copy(),
                 1
             ) && Misc.getRandom(5) <= 3
         ) {
             bandosAvatar.performAnimation(Animation(bandosAvatar.definition.attackAnimation))
             bandosAvatar.combatBuilder.container = CombatContainer(bandosAvatar, victim, 1, 1, CombatType.MELEE, true)
         } else if (!Locations.goodDistance(
-                bandosAvatar.position.copy(),
-                victim.position.copy(),
+                bandosAvatar.entityPosition.copy(),
+                victim.entityPosition.copy(),
                 3
             ) && Misc.getRandom(5) == 1
         ) {
             bandosAvatar.isChargingAttack = true
-            val pos = Position(victim.position.x - 2 + Misc.getRandom(4), victim.position.y - 2 + Misc.getRandom(4))
+            val pos = Position(victim.entityPosition.x - 2 + Misc.getRandom(4), victim.entityPosition.y - 2 + Misc.getRandom(4))
             (victim as Player?)!!.packetSender.sendGlobalGraphic(Graphic(1549), pos)
             bandosAvatar.performAnimation(Animation(11246))
             bandosAvatar.forceChat("You shall perish!")
@@ -75,8 +75,8 @@ class BandosAvatar : CombatStrategy {
                             bandosAvatar.performAnimation(Animation(11245))
                             for (toAttack in Misc.getCombinedPlayerList(victim as Player?)) {
                                 if (toAttack != null && Locations.goodDistance(
-                                        bandosAvatar.position,
-                                        toAttack.position,
+                                        bandosAvatar.entityPosition,
+                                        toAttack.entityPosition,
                                         7
                                     ) && toAttack.constitution > 0
                                 ) {

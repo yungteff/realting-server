@@ -35,7 +35,7 @@ open class Entity(position: Position) {
     /**
      * The default position the entity is in.
      */
-    var position = GameSettings.DEFAULT_POSITION.copy()
+    var entityPosition = GameSettings.DEFAULT_POSITION.copy()
     /**
      * Gets this entity's first position upon entering their
      * current map region.
@@ -81,7 +81,7 @@ open class Entity(position: Position) {
      * @param position the world position
      */
     fun setPosition(position: Position): Entity {
-        this.position = position
+        this.entityPosition = position
         return this
     }
 

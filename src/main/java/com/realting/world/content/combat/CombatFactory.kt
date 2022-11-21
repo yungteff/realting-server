@@ -878,20 +878,20 @@ class CombatFactory private constructor() {
             // Here we check if the victim has teleported away.
             if (victim.isPlayer) {
                 if ((victim as Player?)!!.isTeleporting || !Locations.Location.ignoreFollowDistance(entity) && !Locations.goodDistance(
-                        victim.position, entity!!.position, 40
+                        victim.entityPosition, entity.entityPosition, 40
                     ) || (victim as Player?)!!.isPlayerLocked
                 ) {
-                    entity!!.combatBuilder.cooldown = 10
+                    entity.combatBuilder.cooldown = 10
                     entity.movementQueue.followCharacter = null
                     return false
                 }
             }
-            if (victim.isPlayer && entity!!.isPlayer && zarytebow(entity as Player?) && victim != null && entity != null && entity.location !== Locations.Location.FREE_FOR_ALL_ARENA) {
+            if (victim.isPlayer && entity.isPlayer && zarytebow(entity as Player?) && victim != null && entity != null && entity.location !== Locations.Location.FREE_FOR_ALL_ARENA) {
                 //	((Player)entity).getPacketSender().sendMessage("Zaryte bow is disabled in PvP");
                 //   entity.getCombatBuilder().testReset(true);
                 return false
             }
-            if (victim.isNpc && entity!!.isPlayer) {
+            if (victim.isNpc && entity.isPlayer) {
                 val npc = victim as NPC?
                 if (npc!!.spawnedFor != null && npc.spawnedFor.index != (entity as Player?)!!.index) {
                     (entity as Player?)!!.packetSender.sendMessage("That's not your enemy to fight.")
@@ -963,7 +963,7 @@ class CombatFactory private constructor() {
                         return false
                     }
                 }
-                if (npc.id == 4291 && entity.position.z == 2 && !(entity as Player?)!!.minigameAttributes.warriorsGuildAttributes.enteredTokenRoom()) {
+                if (npc.id == 4291 && entity.entityPosition.z == 2 && !(entity as Player?)!!.minigameAttributes.warriorsGuildAttributes.enteredTokenRoom()) {
                     (entity as Player?)!!.packetSender.sendMessage("You cannot reach that.")
                     entity.combatBuilder.reset(true)
                     return false
@@ -971,7 +971,7 @@ class CombatFactory private constructor() {
             }
 
             // Here we check if we are already in combat with another entity.
-            if (entity!!.combatBuilder.lastAttacker != null && !Locations.inMulti(entity) && entity.combatBuilder.isBeingAttacked && victim != entity.combatBuilder.lastAttacker) {
+            if (entity.combatBuilder.lastAttacker != null && !Locations.inMulti(entity) && entity.combatBuilder.isBeingAttacked && victim != entity.combatBuilder.lastAttacker) {
                 if (entity.isPlayer) (entity as Player?)!!.packetSender.sendMessage("You are already under attack!")
                 entity.combatBuilder.reset(true)
                 return false
@@ -1010,7 +1010,7 @@ class CombatFactory private constructor() {
                 if (victim.isPlayer) {
                     if (!properLocation(entity as Player?, victim as Player?)) {
                         entity.combatBuilder.reset(true)
-                        entity.positionToFace = victim.position
+                        entity.positionToFace = victim.entityPosition
                         return false
                     }
                 }
@@ -1025,10 +1025,10 @@ class CombatFactory private constructor() {
             if (entity.isNpc) {
                 val n = entity as NPC?
                 if (!Locations.Location.ignoreFollowDistance(n) && !Nex.nexMob(n!!.id) && !n.isSummoningNpc) { //Stops combat for npcs if too far away
-                    if (n.position.isWithinDistance(victim.position, 1)) {
+                    if (n.entityPosition.isWithinDistance(victim.entityPosition, 1)) {
                         return true
                     }
-                    if (!n.position.isWithinDistance(
+                    if (!n.entityPosition.isWithinDistance(
                             n.defaultPosition, 10 + n.movementCoordinator.coordinator.radius
                         )
                     ) {
@@ -1054,8 +1054,8 @@ class CombatFactory private constructor() {
 
         @JvmStatic
         fun checkAttackDistance(attackerEntity: CharacterEntity, victimEntity: CharacterEntity): Boolean {
-            val attacker = attackerEntity.position
-            val victim = victimEntity.position
+            val attacker = attackerEntity.entityPosition
+            val victim = victimEntity.entityPosition
 
             if (attackerEntity.isNpc && (attackerEntity as NPC).isSummoningNpc) {
                 return Locations.goodDistance(attacker, victim, attackerEntity.size)
@@ -1573,7 +1573,7 @@ class CombatFactory private constructor() {
                     // The retribution prayer effect.
                     if (PrayerHandler.isActivated(victim, PrayerHandler.RETRIBUTION) && victim.constitution < 1) {
                         victim.performGraphic(Graphic(437))
-                        if (p.position.isWithinDistance(victim.position, RETRIBUTION_RADIUS)) {
+                        if (p.entityPosition.isWithinDistance(victim.entityPosition, RETRIBUTION_RADIUS)) {
                             p.dealDamage(
                                 Hit(
                                     target,
@@ -1586,7 +1586,7 @@ class CombatFactory private constructor() {
                     } else if (CurseHandler.isActivated(victim, CurseHandler.WRATH) && victim.constitution < 1) {
                         victim.performGraphic(Graphic(2259))
                         victim.performAnimation(Animation(12583))
-                        if (p.position.isWithinDistance(victim.position, RETRIBUTION_RADIUS)) {
+                        if (p.entityPosition.isWithinDistance(victim.entityPosition, RETRIBUTION_RADIUS)) {
                             p.performGraphic(Graphic(2260))
                             p.dealDamage(
                                 Hit(

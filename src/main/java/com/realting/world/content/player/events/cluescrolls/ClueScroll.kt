@@ -5,11 +5,8 @@ import com.realting.model.Position
 import com.realting.model.definitions.ItemDefinition
 import com.realting.model.entity.character.player.Player
 import com.realting.util.Misc
-import com.realting.world.content.cluescrolls.ClueScroll
-import com.realting.world.content.PlayerLogs
 import com.realting.world.World
-import java.lang.Exception
-import java.util.ArrayList
+import com.realting.world.content.PlayerLogs
 
 enum class ClueScroll  //private static int easyCasket = 3511;
 //private static int mediumCasket = 2802;
@@ -482,7 +479,7 @@ enum class ClueScroll  //private static int easyCasket = 3511;
         @JvmStatic
         fun handleClueDig(player: Player): Boolean {
             for (i in values().indices) {
-                if (player.inventory.contains(values()[i].clueId) && player.position.x == values()[i].digTile!!.x && player.position.y == values()[i].digTile!!.y) {
+                if (player.inventory.contains(values()[i].clueId) && player.entityPosition.x == values()[i].digTile!!.x && player.entityPosition.y == values()[i].digTile!!.y) {
                     if (player.rights.OwnerDeveloperOnly()) {
                         player.packetSender.sendMessage("[debug] You are on: " + values()[i].digTile!!.x + ", " + values()[i].digTile!!.y + ", index: " + i)
                     }

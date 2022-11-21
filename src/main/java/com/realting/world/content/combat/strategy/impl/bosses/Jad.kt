@@ -38,13 +38,13 @@ class Jad : CombatStrategy {
         }
         val random = Misc.getRandom(10)
         if (random <= 8 && Locations.goodDistance(
-                jad.position.x, jad.position.y, victim.position.x, victim.position.y, 3
+                jad.entityPosition.x, jad.entityPosition.y, victim.entityPosition.x, victim.entityPosition.y, 3
             )
         ) {
             jad.performAnimation(anim2)
             jad.combatBuilder.container = CombatContainer(jad, victim, 1, 2, CombatType.MELEE, true)
         } else if (random <= 4 || !Locations.goodDistance(
-                jad.position.x, jad.position.y, victim.position.x, victim.position.y, 14
+                jad.entityPosition.x, jad.entityPosition.y, victim.entityPosition.x, victim.entityPosition.y, 14
             )
         ) {
             jad.combatBuilder.container = CombatContainer(jad, victim, 1, 2, CombatType.MAGIC, true)

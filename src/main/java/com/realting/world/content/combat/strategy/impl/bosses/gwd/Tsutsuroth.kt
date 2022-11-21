@@ -31,7 +31,7 @@ class Tsutsuroth : CombatStrategy {
         }
         val target = victim as Player?
         val style = if (Misc.getRandom(8) >= 6 && Locations.goodDistance(
-                tsutsuroth.position, victim.position, 2
+                tsutsuroth.entityPosition, victim.entityPosition, 2
             )
         ) CombatType.MELEE else CombatType.MAGIC
         if (style === CombatType.MELEE) {
@@ -60,7 +60,7 @@ class Tsutsuroth : CombatStrategy {
                     when (tick) {
                         0 -> for (t in Misc.getCombinedPlayerList(target)) {
                             if (t == null || t.location !== Locations.Location.GODWARS_DUNGEON || t.isTeleporting) continue
-                            if (t.position.distanceToPoint(tsutsuroth.position.x, tsutsuroth.position.y) > 20) continue
+                            if (t.entityPosition.distanceToPoint(tsutsuroth.entityPosition.x, tsutsuroth.entityPosition.y) > 20) continue
                             Projectile(tsutsuroth, target, graphic1.id, 44, 3, 43, 43, 0).sendProjectile()
                         }
                         2 -> {

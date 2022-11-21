@@ -26,21 +26,21 @@ class Brandon : CombatStrategy {
         }
         val random = Misc.getRandom(10)
         if (random <= 8 && Locations.goodDistance(
-                Brandon.position.x,
-                Brandon.position.y,
-                victim!!.position.x,
-                victim.position.y,
+                Brandon.entityPosition.x,
+                Brandon.entityPosition.y,
+                victim!!.entityPosition.x,
+                victim.entityPosition.y,
                 3
             )
         ) {
             Brandon.performAnimation(attack_anim1)
             Brandon.combatBuilder.container = CombatContainer(Brandon, victim, 1, CombatType.MELEE, true)
-            Projectile(Brandon, victim, projectile1.getId(), 44, 3, 43, 31, 0).sendProjectile()
+            Projectile(Brandon, victim, projectile1.id, 44, 3, 43, 31, 0).sendProjectile()
         } else if (random <= 4 || !Locations.goodDistance(
-                Brandon.position.x,
-                Brandon.position.y,
-                victim!!.position.x,
-                victim.position.y,
+                Brandon.entityPosition.x,
+                Brandon.entityPosition.y,
+                victim!!.entityPosition.x,
+                victim.entityPosition.y,
                 8
             )
         ) {

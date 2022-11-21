@@ -1,15 +1,15 @@
 package com.realting.world.content.player.skill.hunter
 
-import com.realting.world.content.player.skill.hunter.Trap.TrapState
-import java.util.concurrent.CopyOnWriteArrayList
-import com.realting.model.movement.MovementQueue
 import com.realting.engine.task.impl.HunterTrapsTask
-import com.realting.model.container.impl.Equipment
 import com.realting.model.*
+import com.realting.model.container.impl.Equipment
 import com.realting.model.entity.character.npc.NPC
 import com.realting.model.entity.character.player.Player
+import com.realting.model.movement.MovementQueue
 import com.realting.util.Misc
 import com.realting.world.content.CustomObjects
+import com.realting.world.content.player.skill.hunter.Trap.TrapState
+import java.util.concurrent.CopyOnWriteArrayList
 
 object Hunter {
     /**
@@ -63,18 +63,18 @@ object Hunter {
         if (!client.clickDelay.elapsed(2000)) return false
         for (trap in traps) {
             if (trap == null) continue
-            if (trap.gameObject.position.x == client.position.x && trap.gameObject.position.y == client.position.y) {
+            if (trap.gameObject.entityPosition.x == client.entityPosition.x && trap.gameObject.entityPosition.y == client.entityPosition.y) {
                 client.packetSender.sendMessage(
                     "There is already a trap here, please place yours somewhere else."
                 )
                 return false
             }
         }
-        val x = client.position.x
-        val y = client.position.y
+        val x = client.entityPosition.x
+        val y = client.entityPosition.y
         for (npc in HUNTER_NPC_LIST) {
             if (npc == null || !npc.isVisible) continue
-            if (x == npc.position.x && y == npc.position.y || x == npc.defaultPosition.x && y == npc.defaultPosition.y) {
+            if (x == npc.entityPosition.x && y == npc.entityPosition.y || x == npc.defaultPosition.x && y == npc.defaultPosition.y) {
                 client.packetSender.sendMessage(
                     "You cannot place your trap right here, try placing it somewhere else."
                 )
@@ -95,7 +95,7 @@ object Hunter {
         if (client.trapsLaid > 0) {
             for (trap in traps) {
                 if (trap.owner != null && trap.owner!!.username == client.username && !Locations.goodDistance(
-                        trap.gameObject.position, client.position, 50
+                        trap.gameObject.entityPosition, client.entityPosition, 50
                     )
                 ) {
                     deregister(trap)
@@ -112,8 +112,8 @@ object Hunter {
      * @return
      */
     fun goodArea(client: Player): Boolean {
-        val x = client.position.x
-        val y = client.position.y
+        val x = client.entityPosition.x
+        val y = client.entityPosition.y
         return x in 2758..2965 && y >= 2880 && y <= 2954
     }
 
@@ -152,7 +152,7 @@ object Hunter {
      */
     fun getTrapForGameObject(`object`: GameObject): Trap? {
         for (trap in traps) {
-            if (trap.gameObject.position == `object`.position) return trap
+            if (trap.gameObject.entityPosition == `object`.entityPosition) return trap
         }
         return null
     }
@@ -200,7 +200,7 @@ object Hunter {
             client.clickDelay.reset()
             client.movementQueue.reset()
             MovementQueue.stepAway(client)
-            client.positionToFace = trap.gameObject.position
+            client.positionToFace = trap.gameObject.entityPosition
             client.performAnimation(Animation(827))
             if (trap is SnareTrap) {
                 client.packetSender.sendMessage("You set up a bird snare..")
@@ -238,7 +238,7 @@ object Hunter {
     @JvmStatic
     fun lootTrap(client: Player, trap: GameObject?) {
         if (trap != null) {
-            client.positionToFace = trap.position
+            client.positionToFace = trap.entityPosition
             val theTrap = getTrapForGameObject(trap)
             if (theTrap != null) {
                 if (theTrap.owner != null) if (theTrap.owner === client) {
@@ -362,13 +362,13 @@ object Hunter {
             if (trap is SnareTrap) register(
                 SnareTrap(
                     GameObject(
-                        getObjectIDByNPCID(npc.id), Position(trap.gameObject.position.x, trap.gameObject.position.y)
+                        getObjectIDByNPCID(npc.id), Position(trap.gameObject.entityPosition.x, trap.gameObject.entityPosition.y)
                     ), TrapState.CAUGHT, 100, trap.owner
                 )
             ) else register(
                 BoxTrap(
                     GameObject(
-                        getObjectIDByNPCID(npc.id), Position(trap.gameObject.position.x, trap.gameObject.position.y)
+                        getObjectIDByNPCID(npc.id), Position(trap.gameObject.entityPosition.x, trap.gameObject.entityPosition.y)
                     ), TrapState.CAUGHT, 100, trap.owner
                 )
             )

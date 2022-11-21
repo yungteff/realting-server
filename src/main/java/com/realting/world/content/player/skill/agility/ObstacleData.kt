@@ -3,9 +3,9 @@ package com.realting.world.content.player.skill.agility
 import com.realting.engine.task.Task
 import com.realting.engine.task.TaskManager
 import com.realting.model.*
-import com.realting.world.content.dialogue.DialogueManager
 import com.realting.model.entity.character.player.Player
 import com.realting.util.Misc
+import com.realting.world.content.dialogue.DialogueManager
 
 /**
  * Messy as fuck, what ever
@@ -99,7 +99,7 @@ enum class ObstacleData(val `object`: Int, private val mustWalk: Boolean) {
             player.packetSender.sendMessage("You climb the branch..")
             TaskManager.submit(object : Task(2, player, false) {
                 public override fun execute() {
-                    player.moveTo(Position(player.position.x, player.position.y, 0))
+                    player.moveTo(Position(player.entityPosition.x, player.entityPosition.y, 0))
                     Agility.addExperience(player, 42)
                     player.setCrossedObstacle(4, true).isCrossingObstacle = false
                     stop()
@@ -109,7 +109,7 @@ enum class ObstacleData(val `object`: Int, private val mustWalk: Boolean) {
     },
     NETS_2(2286, false) {
         override fun cross(player: Player?) {
-            if (player!!.position.y != 3425) {
+            if (player!!.entityPosition.y != 3425) {
                 player.isCrossingObstacle = false
                 return
             }
@@ -117,7 +117,7 @@ enum class ObstacleData(val `object`: Int, private val mustWalk: Boolean) {
             player.performAnimation(Animation(828))
             TaskManager.submit(object : Task(2, player, false) {
                 public override fun execute() {
-                    player.moveTo(Position(player.position.x, player.position.y + 2, 0))
+                    player.moveTo(Position(player.entityPosition.x, player.entityPosition.y + 2, 0))
                     Agility.addExperience(player, 15)
                     player.setCrossedObstacle(5, true).isCrossingObstacle = false
                     stop()
@@ -220,7 +220,7 @@ enum class ObstacleData(val `object`: Int, private val mustWalk: Boolean) {
                 var tick = 0
                 public override fun execute() {
                     tick++
-                    if (tick == 1) player.moveTo(Position(player.position.x, 3553, 0))
+                    if (tick == 1) player.moveTo(Position(player.entityPosition.x, 3553, 0))
                     if (!success) {
                         player.moveTo(Position(2550, 9950, 0))
                         Agility.addExperience(player, 18)
@@ -230,14 +230,14 @@ enum class ObstacleData(val `object`: Int, private val mustWalk: Boolean) {
                         return
                     }
                     if (tick >= 3) {
-                        player.moveTo(Position(player.position.x, 3549, 0))
+                        player.moveTo(Position(player.entityPosition.x, 3549, 0))
                         stop()
                     }
                 }
 
                 override fun stop() {
                     setEventRunning(false)
-                    player.setCrossedObstacle(0, if (success) true else false).isCrossingObstacle = false
+                    player.setCrossedObstacle(0, success).isCrossingObstacle = false
                     Agility.addExperience(player, 75 * 3)
                     player.packetSender.sendMessage("You manage to swing yourself across.")
                 }
@@ -315,7 +315,7 @@ enum class ObstacleData(val `object`: Int, private val mustWalk: Boolean) {
     },
     BALANCE_LEDGE(2302, true) {
         override fun cross(player: Player?) {
-            if (player!!.position.x != 2536) {
+            if (player!!.entityPosition.x != 2536) {
                 player.isCrossingObstacle = false
                 return
             }
@@ -377,22 +377,22 @@ enum class ObstacleData(val `object`: Int, private val mustWalk: Boolean) {
     },
     RAMP(1948, false) {
         override fun cross(player: Player?) {
-            if (player!!.position.x != 2535 && player.position.x != 2538 && player.position.x != 2542 && player.position.x != 2541) {
+            if (player!!.entityPosition.x != 2535 && player.entityPosition.x != 2538 && player.entityPosition.x != 2542 && player.entityPosition.x != 2541) {
                 player.packetSender.sendMessage("You cannot jump over the wall from this side!")
                 player.isCrossingObstacle = false
                 return
             }
-            val first = player.position.x == 2535
-            val oneStep = player.position.x == 2537 || player.position.x == 2542
-            player.positionToFace = player.interactingObject.position.copy()
+            val first = player.entityPosition.x == 2535
+            val oneStep = player.entityPosition.x == 2537 || player.entityPosition.x == 2542
+            player.positionToFace = player.interactingObject.entityPosition.copy()
             player.packetSender.sendMessage("You attempt to jump over the wall...")
             player.performAnimation(Animation(1115))
             TaskManager.submit(object : Task(1, player, false) {
                 public override fun execute() {
                     player.packetSender.sendClientRightClickRemoval()
-                    player.moveTo(Position(player.position.x + if (oneStep) 1 else 2, 3553))
+                    player.moveTo(Position(player.entityPosition.x + if (oneStep) 1 else 2, 3553))
                     player.setCrossingObstacle(false).setCrossedObstacle(if (first) 5 else 6, true)
-                    if (player.position.x == 2543 && player.position.y == 3553) {
+                    if (player.entityPosition.x == 2543 && player.entityPosition.y == 3553) {
                         if (Agility.passedAllObstacles(player)) {
                             DialogueManager.start(player, 57)
                             player.inventory.add(2996, 4)
@@ -417,8 +417,8 @@ enum class ObstacleData(val `object`: Int, private val mustWalk: Boolean) {
                     player.isCrossingObstacle = false
                     player.moveTo(
                         Position(
-                            if (player.position.x > 2610) 2209 else 2546,
-                            if (player.position.y < 3550) 5348 else 9951,
+                            if (player.entityPosition.x > 2610) 2209 else 2546,
+                            if (player.entityPosition.y < 3550) 5348 else 9951,
                             0
                         )
                     )
@@ -438,7 +438,7 @@ enum class ObstacleData(val `object`: Int, private val mustWalk: Boolean) {
                 public override fun execute() {
                     tick++
                     player.movementQueue.walkStep(0, 1)
-                    if (player.position.y == 3930 || tick >= 15) {
+                    if (player.entityPosition.y == 3930 || tick >= 15) {
                         player.moveTo(Position(2998, 3931, 0))
                         stop()
                     }
@@ -466,7 +466,7 @@ enum class ObstacleData(val `object`: Int, private val mustWalk: Boolean) {
                 public override fun execute() {
                     tick++
                     player.movementQueue.walkStep(0, -1)
-                    if (player.position.y == 3917 || tick >= 15) {
+                    if (player.entityPosition.y == 3917 || tick >= 15) {
                         player.moveTo(Position(2998, 3916))
                         stop()
                     }
@@ -494,7 +494,7 @@ enum class ObstacleData(val `object`: Int, private val mustWalk: Boolean) {
                 public override fun execute() {
                     tick++
                     player.movementQueue.walkStep(0, -1)
-                    if (player.position.y == 3917 || tick >= 15) {
+                    if (player.entityPosition.y == 3917 || tick >= 15) {
                         player.moveTo(Position(2998, 3916))
                         stop()
                     }
@@ -538,7 +538,7 @@ enum class ObstacleData(val `object`: Int, private val mustWalk: Boolean) {
     },
     ROPE_SWING_2(2283, true) {
         override fun cross(player: Player?) {
-            if (player!!.position.y > 3953) {
+            if (player!!.entityPosition.y > 3953) {
                 player.packetSender.sendMessage("You must be positioned infront of the Ropeswing to do that.")
                 player.isCrossingObstacle = false
                 return
@@ -562,11 +562,11 @@ enum class ObstacleData(val `object`: Int, private val mustWalk: Boolean) {
                             return
                         } else {
                             player.positionToFace = Position(3005, 3960, 0)
-                            player.moveTo(Position(player.position.x, 3954, 0))
+                            player.moveTo(Position(player.entityPosition.x, 3954, 0))
                         }
                     }
                     if (tick >= 3) {
-                        player.moveTo(Position(player.position.x, 3958, 0))
+                        player.moveTo(Position(player.entityPosition.x, 3958, 0))
                         player.positionToFace = Position(3005, 3960, 0)
                         stop()
                     }
@@ -575,7 +575,7 @@ enum class ObstacleData(val `object`: Int, private val mustWalk: Boolean) {
                 override fun stop() {
                     setEventRunning(false)
                     player.packetSender.sendMessage("You manage to swing yourself across.")
-                    player.setCrossedObstacle(3, if (fail) false else true).isCrossingObstacle = false
+                    player.setCrossedObstacle(3, !fail).isCrossingObstacle = false
                     Agility.addExperience(player, if (fail) 10 else 250)
                 }
             })
@@ -591,7 +591,7 @@ enum class ObstacleData(val `object`: Int, private val mustWalk: Boolean) {
                     tick++
                     player.performAnimation(Animation(769))
                     if (tick == 4 || tick == 7 || tick == 10 || tick == 13 || tick == 16) {
-                        player.moveTo(Position(player.position.x - 1, player.position.y))
+                        player.moveTo(Position(player.entityPosition.x - 1, player.entityPosition.y))
                     } else if (tick >= 17) {
                         player.moveTo(Position(2996, 3960, 0))
                         //Agility.addExperience(player, 250);
@@ -629,7 +629,7 @@ enum class ObstacleData(val `object`: Int, private val mustWalk: Boolean) {
 
                 override fun stop() {
                     setEventRunning(false)
-                    player.setCrossedObstacle(5, if (fail) false else true).setCrossingObstacle(false).skillAnimation =
+                    player.setCrossedObstacle(5, !fail).setCrossingObstacle(false).skillAnimation =
                         -1
                     Agility.addExperience(player, if (fail) 10 else 250)
                     player.updateFlag.flag(Flag.APPEARANCE)
@@ -685,7 +685,7 @@ enum class ObstacleData(val `object`: Int, private val mustWalk: Boolean) {
         override fun cross(player: Player?) {
             player!!.setCrossingObstacle(true).skillAnimation = 762
             player.updateFlag.flag(Flag.APPEARANCE)
-            val moveX = if (player.position.x > 2683) 2686 else 2683
+            val moveX = if (player.entityPosition.x > 2683) 2686 else 2683
             player.moveTo(Position(moveX, 9506))
             TaskManager.submit(object : Task(1, player, true) {
                 var tick = 0

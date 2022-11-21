@@ -1,10 +1,10 @@
 package com.realting.model.input.impl;
 
+import com.realting.model.entity.character.player.Player;
 import com.realting.model.input.EnterAmount;
 import com.realting.world.content.player.skill.firemaking.Firemaking;
 import com.realting.world.content.player.skill.firemaking.Logdata;
 import com.realting.world.content.player.skill.firemaking.Logdata.logData;
-import com.realting.model.entity.character.player.Player;
 
 public class EnterAmountOfLogsToAdd extends EnterAmount {
 
@@ -13,7 +13,7 @@ public class EnterAmountOfLogsToAdd extends EnterAmount {
 	public void handleAmount(Player player, int amount) {
 		Firemaking.lightFire(player, -1, true, amount);
 		if(player.getInteractingObject() != null)
-			player.setPositionToFace(player.getInteractingObject().getPosition());
+			player.setPositionToFace(player.getInteractingObject().getEntityPosition());
 	}
 	
 	public static void openInterface(Player player) {

@@ -28,7 +28,7 @@ class Gritch : CombatStrategy {
             gritch.combatBuilder.attackTimer = 4
             return true
         }
-        if (Locations.goodDistance(gritch.position.copy(), victim!!.position.copy(), 1) && Misc.getRandom(5) <= 3) {
+        if (Locations.goodDistance(gritch.entityPosition.copy(), victim.entityPosition.copy(), 1) && Misc.getRandom(5) <= 3) {
             gritch.performAnimation(Animation(gritch.definition.attackAnimation))
             gritch.combatBuilder.container = CombatContainer(gritch, victim, 1, 1, CombatType.MELEE, true)
         } else {

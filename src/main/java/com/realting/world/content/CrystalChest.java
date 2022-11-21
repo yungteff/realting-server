@@ -1,8 +1,5 @@
 package com.realting.world.content;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.realting.engine.task.Task;
 import com.realting.engine.task.TaskManager;
 import com.realting.model.Animation;
@@ -10,8 +7,11 @@ import com.realting.model.GameObject;
 import com.realting.model.Graphic;
 import com.realting.model.Item;
 import com.realting.model.definitions.ItemDefinition;
-import com.realting.util.Misc;
 import com.realting.model.entity.character.player.Player;
+import com.realting.util.Misc;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CrystalChest {
 
@@ -44,7 +44,7 @@ public class CrystalChest {
 						p.getPacketSender().sendMessage("..and find an item!");
 					}
 					if (chest != null && !command) {
-						CustomObjects.objectRespawnTask(p, new GameObject(173 , chest.getPosition().copy(), 10, 0), chest, 10);
+						CustomObjects.objectRespawnTask(p, new GameObject(173 , chest.getEntityPosition().copy(), 10, 0), chest, 10);
 					}
 					stop();
 					break;

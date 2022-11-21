@@ -1,8 +1,5 @@
 package com.realting.world.content.player.skill.construction;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import com.realting.engine.task.Task;
 import com.realting.engine.task.TaskManager;
 import com.realting.model.Animation;
@@ -11,12 +8,15 @@ import com.realting.model.Position;
 import com.realting.model.RegionInstance.RegionInstanceType;
 import com.realting.model.Skill;
 import com.realting.model.definitions.ItemDefinition;
-import com.realting.util.Misc;
-import com.realting.world.World;
-import com.realting.world.content.dialogue.DialogueManager;
 import com.realting.model.entity.character.npc.NPC;
 import com.realting.model.entity.character.npc.NPCMovementCoordinator.Coordinator;
 import com.realting.model.entity.character.player.Player;
+import com.realting.util.Misc;
+import com.realting.world.World;
+import com.realting.world.content.dialogue.DialogueManager;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Construction {
 
@@ -160,8 +160,8 @@ public class Construction {
 			HouseFurniture portal = findNearestPortal(p);
 			int toX = ConstructionData.BASE_X + ((portal.getRoomX() + 1) * 8);
 			int toY = ConstructionData.BASE_Y + ((portal.getRoomY() + 1) * 8);
-			Servant npc = (Servant) new NPC(p.getHouseServant(), new Position(toX + 3, toY + 1, p.getPosition().getZ()));
-			((House) p.getRegionInstance()).add(npc);
+			Servant npc = (Servant) new NPC(p.getHouseServant(), new Position(toX + 3, toY + 1, p.getEntityPosition().getZ()));
+			p.getRegionInstance().add(npc);
 			World.register(npc);
 		}
 		if (p.isBuildingMode()) {
@@ -743,7 +743,7 @@ public class Construction {
 			}
 		} else if (s.isMutiple()) {
 
-			Room room = p.getRegionInstance().getOwner().getHouseRooms()[p.inConstructionDungeon() ? 4 : p.getPosition().getZ()][myTiles[0] - 1][myTiles[1] - 1];
+			Room room = p.getRegionInstance().getOwner().getHouseRooms()[p.inConstructionDungeon() ? 4 : p.getEntityPosition().getZ()][myTiles[0] - 1][myTiles[1] - 1];
 			for (ConstructionData.HotSpots find : hsses) {
 				if (find.getObjectId() != s.getObjectId())
 					continue;
@@ -781,7 +781,7 @@ public class Construction {
 			case 13501:
 			case 13503:
 			case 13505:
-				int myTiles[] = getMyChunk(p);
+				int[] myTiles = getMyChunk(p);
 				Room room = p.getRegionInstance().getOwner().getHouseRooms()[1][myTiles[0] - 1][myTiles[1] - 1];
 				if (room == null) {
 					p.getPacketSender().sendMessage("These stairs lead nowhere.");
@@ -851,7 +851,7 @@ public class Construction {
 			int[] myTiles = getMyChunk(p);
 			for (HouseFurniture pf : p.getHouseFurniture()) {
 				if (pf.getRoomX() == myTiles[0] - 1 && pf.getRoomY() == myTiles[1] - 1) {
-					if (pf.getHotSpot(p.getHouseRooms()[p.inConstructionDungeon() ? 4 : p.getPosition().getZ()][myTiles[0] - 1][myTiles[1] - 1]
+					if (pf.getHotSpot(p.getHouseRooms()[p.inConstructionDungeon() ? 4 : p.getEntityPosition().getZ()][myTiles[0] - 1][myTiles[1] - 1]
 							.getRotation()) == hs) {
 						if (pf.getFurnitureId() != fur.getFurnitureId()) {
 							return "This is an upgradeable piece of furniture. (build the furniture before this first)";
@@ -971,11 +971,11 @@ public class Construction {
 					/**
 					 * Remove room
 					 */
-					if (p.getPosition().getZ() == 0 && !p.inConstructionDungeon())
+					if (p.getEntityPosition().getZ() == 0 && !p.inConstructionDungeon())
 						deleteRoom(p, 0);
 					if (p.inConstructionDungeon())
 						deleteRoom(p, 4);
-					if (p.getPosition().getZ() == 1) {
+					if (p.getEntityPosition().getZ() == 1) {
 						deleteRoom(p, 1);
 					}
 					return true;
@@ -1480,18 +1480,18 @@ public class Construction {
 					return true;
 				}
 				if (p.getDialogueActionId() == 422) {
-					if (p.getPosition().getZ() == 0 && !p.inConstructionDungeon())
+					if (p.getEntityPosition().getZ() == 0 && !p.inConstructionDungeon())
 						deleteRoom(p, 0);
 					if (p.inConstructionDungeon())
 						deleteRoom(p, 4);
-					if (p.getPosition().getZ() == 1) {
+					if (p.getEntityPosition().getZ() == 1) {
 						deleteRoom(p, 1);
 					}
 					return true;
 				}
 				if (p.getDialogueActionId() == 419) {
 
-					int myTiles[] = getMyChunk(p);
+					int[] myTiles = getMyChunk(p);
 					Room room = p.getRegionInstance().getOwner().getHouseRooms()[4][myTiles[0] - 1][myTiles[1] - 1];
 					if (room != null) {
 						p.getPacketSender().sendMessage("Error handling room.");
@@ -1504,7 +1504,7 @@ public class Construction {
 				}
 				if (p.getDialogueActionId() == 438) {
 
-					int myTiles[] = getMyChunk(p);
+					int[] myTiles = getMyChunk(p);
 					Room room = p.getRegionInstance().getOwner().getHouseRooms()[4][myTiles[0] - 1][myTiles[1] - 1];
 					if (room != null) {
 						p.getPacketSender().sendMessage("You did something retarded and now there is a under you for some reason.");
@@ -1517,7 +1517,7 @@ public class Construction {
 				}
 				if (p.getDialogueActionId() == 416) {
 
-					int myTiles[] = getMyChunk(p);
+					int[] myTiles = getMyChunk(p);
 					Room room = p.getRegionInstance().getOwner().getHouseRooms()[0][myTiles[0] - 1][myTiles[1] - 1];
 					Room room_1 = p.getRegionInstance().getOwner().getHouseRooms()[1][myTiles[0] - 1][myTiles[1] - 1];
 					if (room.getType() != ConstructionData.EMPTY) {
@@ -1534,7 +1534,7 @@ public class Construction {
 
 				if (p.getDialogueActionId() == 414) {
 
-					int myTiles[] = getMyChunk(p);
+					int[] myTiles = getMyChunk(p);
 					Room room = p.getRegionInstance().getOwner().getHouseRooms()[1][myTiles[0] - 1][myTiles[1] - 1];
 					Room room_1 = p.getRegionInstance().getOwner().getHouseRooms()[0][myTiles[0] - 1][myTiles[1] - 1];
 					if (room != null) {
@@ -1571,73 +1571,73 @@ public class Construction {
 				break;
 
 			case 28647:
-				createRoom(ConstructionData.PARLOUR, p, p.getPosition().getZ());
+				createRoom(ConstructionData.PARLOUR, p, p.getEntityPosition().getZ());
 				return true;
 			case 28651:
-				createRoom(ConstructionData.GARDEN, p, p.getPosition().getZ());
+				createRoom(ConstructionData.GARDEN, p, p.getEntityPosition().getZ());
 				return true;
 			case 28655:
-				createRoom(ConstructionData.KITCHEN, p, p.getPosition().getZ());
+				createRoom(ConstructionData.KITCHEN, p, p.getEntityPosition().getZ());
 				return true;
 			case 28659:
-				createRoom(ConstructionData.DINING_ROOM, p, p.getPosition().getZ());
+				createRoom(ConstructionData.DINING_ROOM, p, p.getEntityPosition().getZ());
 				return true;
 			case 28663:
-				createRoom(ConstructionData.WORKSHOP, p, p.getPosition().getZ());
+				createRoom(ConstructionData.WORKSHOP, p, p.getEntityPosition().getZ());
 				return true;
 			case 28667:
-				createRoom(ConstructionData.BEDROOM, p, p.getPosition().getZ());
+				createRoom(ConstructionData.BEDROOM, p, p.getEntityPosition().getZ());
 				return true;
 			case 28671:
-				createRoom(ConstructionData.SKILL_ROOM, p, p.getPosition().getZ());
+				createRoom(ConstructionData.SKILL_ROOM, p, p.getEntityPosition().getZ());
 				return true;
 			case 28675:
-				createRoom(ConstructionData.GAMES_ROOM, p, p.getPosition().getZ());
+				createRoom(ConstructionData.GAMES_ROOM, p, p.getEntityPosition().getZ());
 				return true;
 			case 28679:
-				createRoom(ConstructionData.COMBAT_ROOM, p, p.getPosition().getZ());
+				createRoom(ConstructionData.COMBAT_ROOM, p, p.getEntityPosition().getZ());
 				return true;
 			case 28683:
-				createRoom(ConstructionData.QUEST_ROOM, p, p.getPosition().getZ());
+				createRoom(ConstructionData.QUEST_ROOM, p, p.getEntityPosition().getZ());
 				return true;
 			case 28687:
-				createRoom(ConstructionData.MENAGERY, p, p.getPosition().getZ());
+				createRoom(ConstructionData.MENAGERY, p, p.getEntityPosition().getZ());
 				return true;
 			case 28691:
-				createRoom(ConstructionData.STUDY, p, p.getPosition().getZ());
+				createRoom(ConstructionData.STUDY, p, p.getEntityPosition().getZ());
 				return true;
 			case 28695:
-				createRoom(ConstructionData.COSTUME_ROOM, p, p.getPosition().getZ());
+				createRoom(ConstructionData.COSTUME_ROOM, p, p.getEntityPosition().getZ());
 				return true;
 			case 28699:
-				createRoom(ConstructionData.CHAPEL, p, p.getPosition().getZ());
+				createRoom(ConstructionData.CHAPEL, p, p.getEntityPosition().getZ());
 				return true;
 			case 28703:
-				createRoom(ConstructionData.PORTAL_ROOM, p, p.getPosition().getZ());
+				createRoom(ConstructionData.PORTAL_ROOM, p, p.getEntityPosition().getZ());
 				return true;
 			case 28707:
-				createRoom(ConstructionData.FORMAL_GARDEN, p, p.getPosition().getZ());
+				createRoom(ConstructionData.FORMAL_GARDEN, p, p.getEntityPosition().getZ());
 				return true;
 			case 28711:
-				createRoom(ConstructionData.THRONE_ROOM, p, p.getPosition().getZ());
+				createRoom(ConstructionData.THRONE_ROOM, p, p.getEntityPosition().getZ());
 				return true;
 			case 28715:
-				createRoom(ConstructionData.OUBLIETTE, p, p.getPosition().getZ());
+				createRoom(ConstructionData.OUBLIETTE, p, p.getEntityPosition().getZ());
 				return true;
 			case 28719:
-				createRoom(ConstructionData.CORRIDOR, p, p.getPosition().getZ());
+				createRoom(ConstructionData.CORRIDOR, p, p.getEntityPosition().getZ());
 				return true;
 			case 28723:
-				createRoom(ConstructionData.JUNCTION, p, p.getPosition().getZ());
+				createRoom(ConstructionData.JUNCTION, p, p.getEntityPosition().getZ());
 				return true;
 			case 28727:
-				createRoom(ConstructionData.DUNGEON_STAIR_ROOM, p, p.getPosition().getZ());
+				createRoom(ConstructionData.DUNGEON_STAIR_ROOM, p, p.getEntityPosition().getZ());
 				return true;
 			case 28731:
-				createRoom(ConstructionData.PIT, p, p.getPosition().getZ());
+				createRoom(ConstructionData.PIT, p, p.getEntityPosition().getZ());
 				return true;
 			case 28735:
-				createRoom(ConstructionData.TREASURE_ROOM, p, p.getPosition().getZ());
+				createRoom(ConstructionData.TREASURE_ROOM, p, p.getEntityPosition().getZ());
 				return true;
 		}
 		return false;
@@ -1670,15 +1670,13 @@ public class Construction {
 		if (direction == UP) {
 			yOff = 1;
 		}
-		Room room = p.getRegionInstance().getOwner().getHouseRooms()[p.inConstructionDungeon() ? 4 : p.getPosition().getZ()][myTiles[0]
+		Room room = p.getRegionInstance().getOwner().getHouseRooms()[p.inConstructionDungeon() ? 4 : p.getEntityPosition().getZ()][myTiles[0]
 				- 1 + xOff][myTiles[1] - 1 + yOff];
 		if (room == null)
 			return false;
-		if (room.getType() == ConstructionData.BUILDABLE
-				|| room.getType() == ConstructionData.EMPTY
-				|| room.getType() == ConstructionData.DUNGEON_EMPTY)
-			return false;
-		return true;
+		return room.getType() != ConstructionData.BUILDABLE
+				&& room.getType() != ConstructionData.EMPTY
+				&& room.getType() != ConstructionData.DUNGEON_EMPTY;
 	}
 
 	public static boolean handleRemoveClick(int obX, int obY, int objectId,
@@ -1727,9 +1725,9 @@ public class Construction {
 			}
 		}
 		int[] myTiles = getMyChunk(p);
-		int roomRot = p.getRegionInstance().getOwner().getHouseRooms()[p.inConstructionDungeon() ? 4 : p.getPosition().getZ()][myTiles[0] - 1][myTiles[1] - 1]
+		int roomRot = p.getRegionInstance().getOwner().getHouseRooms()[p.inConstructionDungeon() ? 4 : p.getEntityPosition().getZ()][myTiles[0] - 1][myTiles[1] - 1]
 				.getRotation();
-		Room room = p.getRegionInstance().getOwner().getHouseRooms()[p.inConstructionDungeon() ? 4 : p.getPosition().getZ()][myTiles[0] - 1][myTiles[1] - 1];
+		Room room = p.getRegionInstance().getOwner().getHouseRooms()[p.inConstructionDungeon() ? 4 : p.getEntityPosition().getZ()][myTiles[0] - 1][myTiles[1] - 1];
 		ArrayList<ConstructionData.HotSpots> hsses = ConstructionData.HotSpots.forObjectId_3(f
 				.getHotSpotId());
 		if (hsses.isEmpty())
@@ -1789,14 +1787,14 @@ public class Construction {
 				hs = ConstructionData.HotSpots.BEDROOM_RUG_3;
 		}
 		doFurniturePlace(hs, f, hsses, myTiles, obX, obY, roomRot, p, true,
-				p.getPosition().getZ());
+				p.getEntityPosition().getZ());
 		p.performAnimation(new Animation(3685));
 		Iterator<HouseFurniture> iterator = p.getHouseFurniture().iterator();
 		while (iterator.hasNext()) {
 			HouseFurniture pf = iterator.next();
 			if (pf.getRoomX() != myTiles[0] - 1
 					|| pf.getRoomY() != myTiles[1] - 1
-					|| pf.getRoomZ() != (p.inConstructionDungeon() ? 4 : p.getPosition().getZ()))
+					|| pf.getRoomZ() != (p.inConstructionDungeon() ? 4 : p.getEntityPosition().getZ()))
 				continue;
 			if (pf.getStandardXOff() == hs.getXOffset()
 					&& pf.getStandardYOff() == hs.getYOffset())
@@ -1809,7 +1807,7 @@ public class Construction {
 										   Player p) {
 
 		int[] myTiles = getMyChunk(p);
-		int roomRot = p.getRegionInstance().getOwner().getHouseRooms()[p.inConstructionDungeon() ? 4 : p.getPosition().getZ()][myTiles[0] - 1][myTiles[1] - 1]
+		int roomRot = p.getRegionInstance().getOwner().getHouseRooms()[p.inConstructionDungeon() ? 4 : p.getEntityPosition().getZ()][myTiles[0] - 1][myTiles[1] - 1]
 				.getRotation();
 
 		ArrayList<ConstructionData.HotSpots> hsses = ConstructionData.HotSpots
@@ -1821,7 +1819,7 @@ public class Construction {
 		p.setBuildFurnitureY(obY);
 		p.setBuildFuritureId(objectId);
 		ConstructionData.HotSpots hs = null;
-		int myRoom = p.getHouseRooms()[p.inConstructionDungeon() ? 4 : p.getPosition().getZ()][myTiles[0] - 1][myTiles[1] - 1].getType();
+		int myRoom = p.getHouseRooms()[p.inConstructionDungeon() ? 4 : p.getEntityPosition().getZ()][myTiles[0] - 1][myTiles[1] - 1].getType();
 		if (hsses.size() == 1)
 			hs = hsses.get(0);
 		else {
@@ -1999,7 +1997,7 @@ public class Construction {
 		}
 		house.getOwner().getHouseRooms()[p.inConstructionDungeon() ? 4 : toHeight][(myTiles[0] - 1) + xOff][(myTiles[1] - 1)
 				+ yOff] = new Room(rotation, roomType, 0);
-		p.setConstructionCoords(new int[]{p.getPosition().getX(), p.getPosition().getY()});
+		p.setConstructionCoords(new int[]{p.getEntityPosition().getX(), p.getEntityPosition().getY()});
 		p.getRegionInstance().destruct();
 		createPalette(p);
 		/*if (p.getFields().inDungeon()) {
@@ -2043,20 +2041,20 @@ public class Construction {
 		}
 		int chunkX = (myTiles[0] - 1) + xOff;
 		int chunkY = (myTiles[1] - 1) + yOff;
-		Room r = p.getRegionInstance().getOwner().getHouseRooms()[p.inConstructionDungeon() ? 4 : p.getPosition().getZ()][chunkX][chunkY];
+		Room r = p.getRegionInstance().getOwner().getHouseRooms()[p.inConstructionDungeon() ? 4 : p.getEntityPosition().getZ()][chunkX][chunkY];
 		ConstructionData.RoomData rd = ConstructionData.RoomData.forID(r.getType());
 		int toRot = (wise == 0 ? ConstructionData.RoomData.getNextEligibleRotationClockWise(rd, direction, r.getRotation()) :
 				ConstructionData.RoomData.getNextEligibleRotationCounterClockWise(rd, direction, r.getRotation()));
 		Palette.PaletteTile tile = new Palette.PaletteTile(rd.getX(), rd.getY(), 0, toRot);
-		p.getPacketSender().sendObjectsRemoval(chunkX, chunkY, p.getPosition().getZ());
+		p.getPacketSender().sendObjectsRemoval(chunkX, chunkY, p.getEntityPosition().getZ());
 		House house = p.getRegionInstance().getType() == RegionInstanceType.CONSTRUCTION_HOUSE ? (House) p.getRegionInstance() : ((HouseDungeon) p.getRegionInstance()).getHouse();
 		if (p.inConstructionDungeon()) {
 			house.getSecondaryPalette().setTile(chunkX, chunkY, 0, tile);
 		} else {
-			house.getPalette().setTile(chunkX, chunkY, p.getPosition().getZ(), tile);
+			house.getPalette().setTile(chunkX, chunkY, p.getEntityPosition().getZ(), tile);
 		}
-		p.getRegionInstance().getOwner().getHouseRooms()[p.inConstructionDungeon() ? 4 : p.getPosition().getZ()][chunkX][chunkY].setRotation(toRot);
-		p.setConstructionCoords(new int[]{p.getPosition().getX(), p.getPosition().getY()});
+		p.getRegionInstance().getOwner().getHouseRooms()[p.inConstructionDungeon() ? 4 : p.getEntityPosition().getZ()][chunkX][chunkY].setRotation(toRot);
+		p.setConstructionCoords(new int[]{p.getEntityPosition().getX(), p.getEntityPosition().getY()});
 		p.getRegionInstance().destruct();
 		createPalette(p);
 		/*if (p.getFields().inDungeon()) {
@@ -2130,9 +2128,9 @@ public class Construction {
 				return;
 			}
 		}
-		p.getPacketSender().sendObjectsRemoval(chunkX, chunkY, p.getPosition().getZ());
+		p.getPacketSender().sendObjectsRemoval(chunkX, chunkY, p.getEntityPosition().getZ());
 		House house = p.getRegionInstance().getType() == RegionInstanceType.CONSTRUCTION_HOUSE ? (House) p.getRegionInstance() : ((HouseDungeon) p.getRegionInstance()).getHouse();
-		if (p.getPosition().getZ() == 0) {
+		if (p.getEntityPosition().getZ() == 0) {
 			if (p.inConstructionDungeon()) {
 				house.getSecondaryPalette().setTile(chunkX, chunkY, 0,
 						tile);
@@ -2152,7 +2150,7 @@ public class Construction {
 			}
 			p.getRegionInstance().getOwner().getHouseRooms()[p.inConstructionDungeon() ? 4 : toHeight][chunkX][chunkY] = null;
 		}
-		p.setConstructionCoords(new int[]{p.getPosition().getX(), p.getPosition().getY()});
+		p.setConstructionCoords(new int[]{p.getEntityPosition().getX(), p.getEntityPosition().getY()});
 		p.getRegionInstance().destruct();
 		createPalette(p);
 	/*	if (p.getFields().inDungeon()) {
@@ -2236,13 +2234,9 @@ public class Construction {
 						if (pf.getRoomX() == myTiles[0] - 1
 								&& pf.getRoomY() == myTiles[1] - 1) {
 							if (pf.getHotSpot(c.getHouseRooms()[c.inConstructionDungeon() ? 4
-									: c.getPosition().getZ()][myTiles[0] - 1][myTiles[1] - 1]
+									: c.getEntityPosition().getZ()][myTiles[0] - 1][myTiles[1] - 1]
 									.getRotation()) == hs) {
-								if (pf.getFurnitureId() != fur.getFurnitureId()) {
-									canMake = false;
-								} else {
-									canMake = true;
-								}
+								canMake = pf.getFurnitureId() == fur.getFurnitureId();
 							}
 						}
 					}
@@ -2283,7 +2277,7 @@ public class Construction {
 		if (hsses.isEmpty())
 			return;
 		int[] myTiles = getMyChunk(p);
-		int toHeight = (p.getRegionInstance().getType() == RegionInstanceType.CONSTRUCTION_DUNGEON ? 4 : p.getPosition().getZ());
+		int toHeight = (p.getRegionInstance().getType() == RegionInstanceType.CONSTRUCTION_DUNGEON ? 4 : p.getEntityPosition().getZ());
 		int roomRot = p.getRegionInstance().getOwner().getHouseRooms()[toHeight][myTiles[0] - 1][myTiles[1] - 1].getRotation();
 		int myRoomType = p.getRegionInstance().getOwner().getHouseRooms()[toHeight][myTiles[0] - 1][myTiles[1] - 1].getType();
 		ConstructionData.HotSpots s = null;
@@ -2323,7 +2317,7 @@ public class Construction {
 			return;
 		}
 		doFurniturePlace(s, f, hsses, myTiles, actualX, actualY, roomRot, p,
-				false, p.getPosition().getZ());
+				false, p.getEntityPosition().getZ());
 		HouseFurniture pf = new HouseFurniture(myTiles[0] - 1,
 				myTiles[1] - 1, toHeight, s.getHotSpotId(), f.getFurnitureId(),
 				s.getXOffset(), s.getYOffset());
@@ -2350,8 +2344,8 @@ public class Construction {
 				int maxX = ((ConstructionData.BASE_X + 7) + (x * 8));
 				int minY = ((ConstructionData.BASE_Y) + (y * 8));
 				int maxY = ((ConstructionData.BASE_Y + 7) + (y * 8));
-				if (p.getPosition().getX() >= minX && p.getPosition().getX() <= maxX && p.getPosition().getY() >= minY
-						&& p.getPosition().getY() <= maxY) {
+				if (p.getEntityPosition().getX() >= minX && p.getEntityPosition().getX() <= maxX && p.getEntityPosition().getY() >= minY
+						&& p.getEntityPosition().getY() <= maxY) {
 					return new int[]{x, y};
 				}
 			}
@@ -2376,12 +2370,12 @@ public class Construction {
 
 	public static int getXTilesOnTile(int[] tile, Player p) {
 		int baseX = ConstructionData.BASE_X + (tile[0] * 8);
-		return p.getPosition().getX() - baseX;
+		return p.getEntityPosition().getX() - baseX;
 	}
 
 	public static int getYTilesOnTile(int[] tile, Player p) {
 		int baseY = ConstructionData.BASE_Y + (tile[1] * 8);
-		return p.getPosition().getY() - baseY;
+		return p.getEntityPosition().getY() - baseY;
 	}
 
 	public static int getXTilesOnTile(int[] tile, int myX) {

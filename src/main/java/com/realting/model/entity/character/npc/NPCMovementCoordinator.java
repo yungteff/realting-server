@@ -15,7 +15,7 @@ import com.realting.world.clip.region.RegionClipping;
 public class NPCMovementCoordinator {
 
 	/** The npc we are coordinating movement for. */
-	private NPC npc;
+	private final NPC npc;
 
 	/** The coordinate state this npc is in. */
 	private CoordinateState coordinateState;
@@ -63,8 +63,8 @@ public class NPCMovementCoordinator {
 	}
 
 	public void updateCoordinator() {
-		int deltaX = npc.getPosition().getX() - npc.getDefaultPosition().getX();
-		int deltaY = npc.getPosition().getY() - npc.getDefaultPosition().getY();
+		int deltaX = npc.getEntityPosition().getX() - npc.getDefaultPosition().getX();
+		int deltaY = npc.getEntityPosition().getY() - npc.getDefaultPosition().getY();
 		
 		if((deltaX > coordinator.getRadius()) || (deltaY > coordinator.getRadius())) {
 			if(Location.ignoreFollowDistance(npc) || npc.getMovementQueue().getFollowCharacter() != null || npc.getCombatBuilder().isAttacking() || npc.getCombatBuilder().isBeingAttacked()) {
@@ -79,19 +79,19 @@ public class NPCMovementCoordinator {
 	private Position generateLocalPosition() {
 		int dir = -1;
 		int x = 0, y = 0;
-		if (!RegionClipping.blockedNorth(npc.getPosition()))
+		if (!RegionClipping.blockedNorth(npc.getEntityPosition()))
 		{
 			dir = 0;
 		}
-		else if (!RegionClipping.blockedEast(npc.getPosition()))
+		else if (!RegionClipping.blockedEast(npc.getEntityPosition()))
 		{
 			dir = 4;
 		}
-		else if (!RegionClipping.blockedSouth(npc.getPosition()))
+		else if (!RegionClipping.blockedSouth(npc.getEntityPosition()))
 		{
 			dir = 8;
 		}
-		else if (!RegionClipping.blockedWest(npc.getPosition()))
+		else if (!RegionClipping.blockedWest(npc.getEntityPosition()))
 		{
 			dir = 12;
 		}
@@ -101,7 +101,7 @@ public class NPCMovementCoordinator {
 
 		if (random == 0)
 		{
-			if (!RegionClipping.blockedNorth(npc.getPosition()))
+			if (!RegionClipping.blockedNorth(npc.getEntityPosition()))
 			{
 				y = 1;
 				found = true;
@@ -109,7 +109,7 @@ public class NPCMovementCoordinator {
 		}
 		else if (random == 1)
 		{
-			if (!RegionClipping.blockedEast(npc.getPosition()))
+			if (!RegionClipping.blockedEast(npc.getEntityPosition()))
 			{
 				x = 1;
 				found = true;
@@ -117,7 +117,7 @@ public class NPCMovementCoordinator {
 		}
 		else if (random == 2)
 		{
-			if (!RegionClipping.blockedSouth(npc.getPosition()))
+			if (!RegionClipping.blockedSouth(npc.getEntityPosition()))
 			{
 				y = -1;
 				found = true;
@@ -125,7 +125,7 @@ public class NPCMovementCoordinator {
 		}
 		else if (random == 3)
 		{
-			if (!RegionClipping.blockedWest(npc.getPosition()))
+			if (!RegionClipping.blockedWest(npc.getEntityPosition()))
 			{
 				x = -1;
 				found = true;
@@ -155,19 +155,19 @@ public class NPCMovementCoordinator {
 		int spawnX = npc.getDefaultPosition().getX();
 		int spawnY = npc.getDefaultPosition().getY();
 		if (x == 1) {
-			if (npc.getPosition().getX() + x > spawnX + 1)
+			if (npc.getEntityPosition().getX() + x > spawnX + 1)
 				return null;
 		}
 		if (x == -1) {
-			if (npc.getPosition().getX() - x < spawnX - 1)
+			if (npc.getEntityPosition().getX() - x < spawnX - 1)
 				return null;
 		}
 		if (y == 1) {
-			if (npc.getPosition().getY() + y > spawnY + 1)
+			if (npc.getEntityPosition().getY() + y > spawnY + 1)
 				return null;
 		}
 		if (y == -1) {
-			if (npc.getPosition().getY() - y < spawnY - 1)
+			if (npc.getEntityPosition().getY() - y < spawnY - 1)
 				return null;
 		}
 		return new Position(x, y);

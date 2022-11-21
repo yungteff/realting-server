@@ -2,6 +2,10 @@ package com.realting.model;
 
 import com.realting.GameSettings;
 import com.realting.model.RegionInstance.RegionInstanceType;
+import com.realting.model.entity.Entity;
+import com.realting.model.entity.character.CharacterEntity;
+import com.realting.model.entity.character.npc.NPC;
+import com.realting.model.entity.character.player.Player;
 import com.realting.util.Misc;
 import com.realting.world.World;
 import com.realting.world.content.PlayerLogs;
@@ -11,19 +15,8 @@ import com.realting.world.content.combat.CombatFactory;
 import com.realting.world.content.combat.pvp.BountyHunter;
 import com.realting.world.content.combat.strategy.impl.bosses.Scorpia;
 import com.realting.world.content.dialogue.DialogueManager;
-import com.realting.world.content.minigames.Barrows;
-import com.realting.world.content.minigames.FightCave;
-import com.realting.world.content.minigames.FightPit;
-import com.realting.world.content.minigames.Graveyard;
-import com.realting.world.content.minigames.Nomad;
-import com.realting.world.content.minigames.PestControl;
-import com.realting.world.content.minigames.RecipeForDisaster;
-import com.realting.world.content.minigames.TheSix;
+import com.realting.world.content.minigames.*;
 import com.realting.world.content.player.skill.dungeoneering.Dungeoneering;
-import com.realting.model.entity.Entity;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.player.Player;
 public class Locations {
 
 	public static void login(Player player) {
@@ -45,7 +38,7 @@ public class Locations {
 	public static int PLAYERS_IN_DUEL_ARENA;
 
 	public static boolean inMulti(CharacterEntity gc) {
-		int x = gc.getPosition().getX(), y = gc.getPosition().getY();
+		int x = gc.getEntityPosition().getX(), y = gc.getEntityPosition().getY();
 		if(gc.getLocation() == Location.WILDERNESS) {
 			if(x >= 3250 && x <= 3302 && y >= 3905 && y <= 3925
 					|| x >= 3020 && x <= 3055 && y >= 3684 && y <= 3711
@@ -331,8 +324,8 @@ public class Locations {
 				int x2 = 2908;
 				int y1 = 4381;
 				int y2 = 4403;
-				int currentx = player.getPosition().getX();
-				int currenty = player.getPosition().getY();
+				int currentx = player.getEntityPosition().getX();
+				int currenty = player.getEntityPosition().getY();
 				
 				boolean safe = currentx >= x1 && currentx <= x2 && currenty >= y1 && currenty <= y2;
 				if (safe) {
@@ -359,8 +352,8 @@ public class Locations {
 		WILDERNESS(new int[]{2940, 3392, 2986, 3012, 3653, 3720, 3650, 3653, 3150, 3199, 2994, 3041}, new int[]{3523, 3968, 10338, 10366, 3441, 3538, 3457, 3472, 3796, 3869, 3733, 3790}, false, true, true, true, true, true) {
 			@Override
 			public void process(Player player) {
-				int x = player.getPosition().getX();
-				int y = player.getPosition().getY();
+				int x = player.getEntityPosition().getX();
+				int y = player.getEntityPosition().getY();
 				boolean ghostTown = x >= 3650 && y <= 3538;
 				//boolean magebank = (x >= 3090 && x <= 3092 && y >= 3955 && y <= 3958);
 				//System.out.println("magebank "+magebank+", "+player.getPosition());
@@ -805,7 +798,7 @@ public class Locations {
 			public void logout(Player player) {
 				boolean dc = false;
 				if(player.getDueling().inDuelScreen && player.getDueling().duelingStatus != 5) {
-					player.getDueling().declineDuel(player.getDueling().duelingWith > 0 ? true : false);
+					player.getDueling().declineDuel(player.getDueling().duelingWith > 0);
 				} else if(player.getDueling().duelingStatus == 5) {
 					if(player.getDueling().duelingWith > -1) {
 						Player duelEnemy = World.getPlayers().get(player.getDueling().duelingWith);
@@ -865,32 +858,32 @@ public class Locations {
 			@Override
 			public void process(Player player) {
 
-				if ((player.getPosition().getX() == 2842 && player.getPosition().getY() == 5308) //ARMADYL
-						|| (player.getPosition().getX() == 2876 && player.getPosition().getY() == 5369) // BANDOS
-						|| (player.getPosition().getX() == 2936 && player.getPosition().getY() == 5331) // ZAMMY
-						|| (player.getPosition().getX() == 2907 && player.getPosition().getY() == 5272)) { //NORTH EAST, saradomin
-					player.moveTo(new Position(player.getPosition().getX() - 1, player.getPosition().getY() - 1, player.getPosition().getZ()));
+				if ((player.getEntityPosition().getX() == 2842 && player.getEntityPosition().getY() == 5308) //ARMADYL
+						|| (player.getEntityPosition().getX() == 2876 && player.getEntityPosition().getY() == 5369) // BANDOS
+						|| (player.getEntityPosition().getX() == 2936 && player.getEntityPosition().getY() == 5331) // ZAMMY
+						|| (player.getEntityPosition().getX() == 2907 && player.getEntityPosition().getY() == 5272)) { //NORTH EAST, saradomin
+					player.moveTo(new Position(player.getEntityPosition().getX() - 1, player.getEntityPosition().getY() - 1, player.getEntityPosition().getZ()));
 					player.getMovementQueue().reset();
 				}
-				if ((player.getPosition().getX() == 2842 && player.getPosition().getY() == 5296) //ARMADYL
-						|| (player.getPosition().getX() == 2876 && player.getPosition().getY() == 5351) //BANDOS
-						|| (player.getPosition().getX() == 2936 && player.getPosition().getY() == 5318) //ZAMMY
-						|| (player.getPosition().getX() == 2907 && player.getPosition().getY() == 5258)) { // saradomin, SOUTH EAST
-					player.moveTo(new Position(player.getPosition().getX() - 1, player.getPosition().getY() + 1, player.getPosition().getZ()));
+				if ((player.getEntityPosition().getX() == 2842 && player.getEntityPosition().getY() == 5296) //ARMADYL
+						|| (player.getEntityPosition().getX() == 2876 && player.getEntityPosition().getY() == 5351) //BANDOS
+						|| (player.getEntityPosition().getX() == 2936 && player.getEntityPosition().getY() == 5318) //ZAMMY
+						|| (player.getEntityPosition().getX() == 2907 && player.getEntityPosition().getY() == 5258)) { // saradomin, SOUTH EAST
+					player.moveTo(new Position(player.getEntityPosition().getX() - 1, player.getEntityPosition().getY() + 1, player.getEntityPosition().getZ()));
 					player.getMovementQueue().reset();
 				}
-				if ((player.getPosition().getX() == 2824 && player.getPosition().getY() == 5296) //ARMADYL
-						|| (player.getPosition().getX() == 2864 && player.getPosition().getY() == 5351) //BANDOS
-						|| (player.getPosition().getX() == 2918 && player.getPosition().getY() == 5318) //ZAMMY
-						|| (player.getPosition().getX() == 2895 && player.getPosition().getY() == 5258)) { // saradomin, SOUTH WEST
-					player.moveTo(new Position(player.getPosition().getX() + 1, player.getPosition().getY() + 1, player.getPosition().getZ()));
+				if ((player.getEntityPosition().getX() == 2824 && player.getEntityPosition().getY() == 5296) //ARMADYL
+						|| (player.getEntityPosition().getX() == 2864 && player.getEntityPosition().getY() == 5351) //BANDOS
+						|| (player.getEntityPosition().getX() == 2918 && player.getEntityPosition().getY() == 5318) //ZAMMY
+						|| (player.getEntityPosition().getX() == 2895 && player.getEntityPosition().getY() == 5258)) { // saradomin, SOUTH WEST
+					player.moveTo(new Position(player.getEntityPosition().getX() + 1, player.getEntityPosition().getY() + 1, player.getEntityPosition().getZ()));
 					player.getMovementQueue().reset();
 				}
-				if ((player.getPosition().getX() == 2824 && player.getPosition().getY() == 5308) //ARMADYL 
-						|| (player.getPosition().getX() == 2864 && player.getPosition().getY() == 5369) //BANDOS
-						|| (player.getPosition().getX() == 2918 && player.getPosition().getY() == 5331) //ZAMMY
-						|| (player.getPosition().getX() == 2895 && player.getPosition().getY() == 5272)) { // saradomin, NORTH WEST
-					player.moveTo(new Position(player.getPosition().getX() + 1, player.getPosition().getY() - 1, player.getPosition().getZ()));
+				if ((player.getEntityPosition().getX() == 2824 && player.getEntityPosition().getY() == 5308) //ARMADYL
+						|| (player.getEntityPosition().getX() == 2864 && player.getEntityPosition().getY() == 5369) //BANDOS
+						|| (player.getEntityPosition().getX() == 2918 && player.getEntityPosition().getY() == 5331) //ZAMMY
+						|| (player.getEntityPosition().getX() == 2895 && player.getEntityPosition().getY() == 5272)) { // saradomin, NORTH WEST
+					player.moveTo(new Position(player.getEntityPosition().getX() + 1, player.getEntityPosition().getY() - 1, player.getEntityPosition().getZ()));
 					player.getMovementQueue().reset();
 				}
 				
@@ -1060,13 +1053,14 @@ public class Locations {
 			this.firemakingAllowed = firemakingAllowed;
 			this.aidingAllowed = aidingAllowed;
 		}
-		private int[] x, y;
-		private boolean multi;
-		private boolean summonAllowed;
-		private boolean followingAllowed;
-		private boolean cannonAllowed;
-		private boolean firemakingAllowed;
-		private boolean aidingAllowed;
+		private final int[] x;
+		private final int[] y;
+		private final boolean multi;
+		private final boolean summonAllowed;
+		private final boolean followingAllowed;
+		private final boolean cannonAllowed;
+		private final boolean firemakingAllowed;
+		private final boolean aidingAllowed;
 
 		public int[] getX() {
 			return x;
@@ -1108,10 +1102,7 @@ public class Locations {
 
 		public static boolean inLocation(Entity gc, Location location) {
 			if(location == Location.DEFAULT) {
-				if(getLocation(gc) == Location.DEFAULT)
-					return true;
-				else
-					return false;
+				return getLocation(gc) == Location.DEFAULT;
 			}
 			/*if(gc instanceof Player) {
 				Player p = (Player)gc;
@@ -1128,7 +1119,7 @@ public class Locations {
 				}
 			}
 			 */
-			return inLocation(gc.getPosition().getX(), gc.getPosition().getY(), location);
+			return inLocation(gc.getEntityPosition().getX(), gc.getEntityPosition().getY(), location);
 		}
 
 		public static boolean inLocation(int absX, int absY, Location location) {

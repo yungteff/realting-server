@@ -34,36 +34,36 @@ class DungeoneeringParty(val ownerPlayer: Player) {
     fun invite(p: Player) {
         if (getOwner() == null || p === getOwner()) return
         if (hasEnteredDungeon) {
-            getOwner()!!.packetSender.sendMessage("You cannot invite anyone right now.")
+            getOwner().packetSender.sendMessage("You cannot invite anyone right now.")
             return
         }
         if (players.size >= 5) {
-            getOwner()!!.packetSender.sendMessage("Your party is full.")
+            getOwner().packetSender.sendMessage("Your party is full.")
             return
         }
         if (p.location !== Locations.Location.DUNGEONEERING || p.isTeleporting) {
-            getOwner()!!.packetSender.sendMessage("That player is not in Deamonheim.")
+            getOwner().packetSender.sendMessage("That player is not in Deamonheim.")
             return
         }
         if (players.contains(p)) {
-            getOwner()!!.packetSender.sendMessage("That player is already in your party.")
+            getOwner().packetSender.sendMessage("That player is already in your party.")
             return
         }
         if (p.minigameAttributes.dungeoneeringAttributes.party != null) {
-            getOwner()!!.packetSender.sendMessage("That player is currently in another party.")
+            getOwner().packetSender.sendMessage("That player is currently in another party.")
             return
         }
-        if (p.rights != PlayerRights.DEVELOPER && System.currentTimeMillis() - getOwner()!!.minigameAttributes.dungeoneeringAttributes.lastInvitation < 2000) {
-            getOwner()!!.packetSender.sendMessage("You must wait 2 seconds between each party invitation.")
+        if (p.rights != PlayerRights.DEVELOPER && System.currentTimeMillis() - getOwner().minigameAttributes.dungeoneeringAttributes.lastInvitation < 2000) {
+            getOwner().packetSender.sendMessage("You must wait 2 seconds between each party invitation.")
             return
         }
         if (p.busy()) {
-            getOwner()!!.packetSender.sendMessage("That player is currently busy.")
+            getOwner().packetSender.sendMessage("That player is currently busy.")
             return
         }
-        getOwner()!!.minigameAttributes.dungeoneeringAttributes.lastInvitation = System.currentTimeMillis()
+        getOwner().minigameAttributes.dungeoneeringAttributes.lastInvitation = System.currentTimeMillis()
         DialogueManager.start(p, DungPartyInvitation(getOwner(), p))
-        getOwner()!!.packetSender.sendMessage("An invitation has been sent to " + p.username + ".")
+        getOwner().packetSender.sendMessage("An invitation has been sent to " + p.username + ".")
     }
 
     fun add(p: Player) {
@@ -79,7 +79,7 @@ class DungeoneeringParty(val ownerPlayer: Player) {
             return
         }
         sendMessage("" + p.username + " has joined the party.")
-        p.packetSender.sendMessage("You've joined " + getOwner()!!.username + "'s party.")
+        p.packetSender.sendMessage("You've joined " + getOwner().username + "'s party.")
         players.add(p)
         p.minigameAttributes.dungeoneeringAttributes.party =
             ownerPlayer.minigameAttributes.dungeoneeringAttributes.party
@@ -119,7 +119,7 @@ class DungeoneeringParty(val ownerPlayer: Player) {
             }
             if (hasEnteredDungeon) {
                 for (npc in p.minigameAttributes.dungeoneeringAttributes.party!!.npcs) {
-                    if (npc != null && npc.position.z == p.position.z) World.deregister(npc)
+                    if (npc != null && npc.entityPosition.z == p.entityPosition.z) World.deregister(npc)
                 }
                 for (groundItem in p.minigameAttributes.dungeoneeringAttributes.party!!.groundItems) {
                     if (groundItem != null) GroundItemManager.remove(groundItem, true)
@@ -131,7 +131,7 @@ class DungeoneeringParty(val ownerPlayer: Player) {
                 if (hasEnteredDungeon) {
                     if (p.inventory.contains(Dungeoneering.DUNGEONEERING_GATESTONE_ID)) {
                         p.inventory.delete(Dungeoneering.DUNGEONEERING_GATESTONE_ID, 1)
-                        getOwner()!!.inventory.add(Dungeoneering.DUNGEONEERING_GATESTONE_ID, 1)
+                        getOwner().inventory.add(Dungeoneering.DUNGEONEERING_GATESTONE_ID, 1)
                     }
                 }
             }

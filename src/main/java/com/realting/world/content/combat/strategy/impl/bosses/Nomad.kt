@@ -28,7 +28,7 @@ class Nomad : CombatStrategy {
         }
         if (nomad!!.isChargingAttack) return true
         if (randomNomad >= 0 && randomNomad <= 15) {
-            val meleeDistance = Locations.goodDistance(nomad.position, target.position, 2)
+            val meleeDistance = Locations.goodDistance(nomad.entityPosition, target.entityPosition, 2)
             val heal = !nomad.hasHealed() && nomad.constitution < 4000
             if (meleeDistance) {
                 if (nomad.constitution > 0 && !heal) {

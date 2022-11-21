@@ -3,7 +3,6 @@ package com.realting.world.content.player.skill.woodcutting
 import com.realting.model.Skill
 import com.realting.model.container.impl.Equipment
 import com.realting.model.entity.character.player.Player
-import java.util.HashMap
 
 object WoodcuttingData {
     @JvmStatic
@@ -29,7 +28,7 @@ object WoodcuttingData {
         BRONZE(1351, 1, 879, 1.0), IRON(1349, 1, 877, 1.3), STEEL(1353, 6, 875, 1.5), BLACK(1361, 6, 873, 1.7), MITHRIL(
             1355, 21, 871, 1.9
         ),
-        ADAMANT(1357, 31, 869, 2.0), RUNE(1359, 41, 867, 2.2), ADZE(13661, 61, 406, 2.33),  //old anim = 10227
+        ADAMANT(1357, 31, 869, 2.0), RUNE(1359, 41, 867, 2.2), ADZE(13661, 61, 10227, 2.33),  //old anim = 10227
         DRAGON(6739, 61, 2846, 2.5), SACRED(14140, 61, 406, 2.5);
 
         companion object {

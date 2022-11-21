@@ -22,7 +22,7 @@ object TrapExecution {
             }
             if (trap is BoxTrap && npc.id != 5079 && npc.id != 5080) continue
             if (trap is SnareTrap && (npc.id == 5079 || npc.id == 5080)) continue
-            if (npc.position.isWithinDistance(trap.gameObject.position, 1)) {
+            if (npc.entityPosition.isWithinDistance(trap.gameObject.entityPosition, 1)) {
                 if (Misc.getRandom(100) < successFormula(trap, npc)) {
                     Hunter.catchNPC(trap, npc)
                     return
@@ -35,8 +35,8 @@ object TrapExecution {
         if (trap.owner!! == null) return 0
         var chance = 70
         if (Hunter.hasLarupia(trap.owner!!)) chance = chance + 10
-        chance = (chance + (trap.owner!!!!.skillManager.getCurrentLevel(Skill.HUNTER) / 1.5).toInt() + 10)
-        if (trap.owner!!!!.skillManager.getCurrentLevel(Skill.HUNTER) < 25) chance = (chance * 1.5).toInt() + 8
+        chance = (chance + (trap.owner!!.skillManager.getCurrentLevel(Skill.HUNTER) / 1.5).toInt() + 10)
+        if (trap.owner!!.skillManager.getCurrentLevel(Skill.HUNTER) < 25) chance = (chance * 1.5).toInt() + 8
         if (trap.owner!!.skillManager.getCurrentLevel(Skill.HUNTER) < 40) chance = (chance * 1.4).toInt() + 3
         if (trap.owner!!.skillManager.getCurrentLevel(Skill.HUNTER) < 50) chance = (chance * 1.3).toInt() + 1
         if (trap.owner!!.skillManager.getCurrentLevel(Skill.HUNTER) < 55) chance = (chance * 1.2).toInt()

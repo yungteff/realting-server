@@ -16,7 +16,7 @@ object Pickpocket {
     @JvmStatic
     fun handleNpc(player: Player, npc: NPC) {
         val data = PickpocketData.Companion.forNpc(npc.id)
-        player.positionToFace = npc.position
+        player.positionToFace = npc.entityPosition
         if (player.isFrozen || player.isStunned) {
             return
         }
@@ -35,7 +35,7 @@ object Pickpocket {
         if (shouldFail(player, data.requirement)) {
             player.movementQueue.stun(5)
             npc.forceChat(data.failMessage.random())
-            npc.positionToFace = player.position
+            npc.positionToFace = player.entityPosition
             if (npc.definition.attackAnimation > 0) {
                 npc.performAnimation(Animation(npc.definition.attackAnimation))
             } else {

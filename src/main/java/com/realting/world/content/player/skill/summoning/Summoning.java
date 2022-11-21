@@ -3,20 +3,15 @@ package com.realting.world.content.player.skill.summoning;
 import com.realting.engine.task.Task;
 import com.realting.engine.task.TaskManager;
 import com.realting.engine.task.impl.FamiliarSpawnTask;
-import com.realting.model.Animation;
-import com.realting.model.Graphic;
-import com.realting.model.GroundItem;
-import com.realting.model.Item;
+import com.realting.model.*;
 import com.realting.model.Locations.Location;
-import com.realting.model.Position;
-import com.realting.model.Skill;
 import com.realting.model.container.impl.BeastOfBurden;
 import com.realting.model.definitions.ItemDefinition;
-import com.realting.model.movement.MovementQueue;
-import com.realting.world.World;
 import com.realting.model.entity.character.GroundItemManager;
 import com.realting.model.entity.character.npc.NPC;
 import com.realting.model.entity.character.player.Player;
+import com.realting.model.movement.MovementQueue;
+import com.realting.world.World;
 
 /**
  * The summoning skill is based upon creating pouches that contain
@@ -75,9 +70,9 @@ public class Summoning {
 
 			unsummon(true, false);
 
-			NPC foll = new NPC(familiar.npcId, new Position(player.getPosition().getX(), player.getPosition().getY() + 1, player.getPosition().getZ()));
+			NPC foll = new NPC(familiar.npcId, new Position(player.getEntityPosition().getX(), player.getEntityPosition().getY() + 1, player.getEntityPosition().getZ()));
 			foll.performGraphic(new Graphic(1315));
-			foll.setPositionToFace(player.getPosition());
+			foll.setPositionToFace(player.getEntityPosition());
 			foll.setSummoningNpc(true);
 			foll.setEntityInteraction(player);
 			foll.getMovementQueue().setFollowCharacter(player);
@@ -120,7 +115,7 @@ public class Summoning {
 			unsummon(true, false);
 			player.getInventory().delete(bossPet.itemId, 1);
 		}
-		NPC foll = new NPC(bossPet.spawnNpcId, new Position(player.getPosition().getX(), player.getPosition().getY() + 1, player.getPosition().getZ()));
+		NPC foll = new NPC(bossPet.spawnNpcId, new Position(player.getEntityPosition().getX(), player.getEntityPosition().getY() + 1, player.getEntityPosition().getZ()));
 		for (int i = 0; i < BossPets.BossPet.values().length; i++) {
 			if (BossPets.BossPet.values()[i].spawnNpcId == bossPet.spawnNpcId) {
 				//player.getPacketSender().sendMessage("HEY IT WORKED U FUCKIN RETARD. INDEX: "+i);
@@ -132,7 +127,7 @@ public class Summoning {
 			}
 		}
 		foll.performGraphic(new Graphic(1315));
-		foll.setPositionToFace(player.getPosition());
+		foll.setPositionToFace(player.getEntityPosition());
 		foll.setSummoningNpc(true);
 		foll.setEntityInteraction(player);
 		foll.getMovementQueue().setFollowCharacter(player);
@@ -151,7 +146,7 @@ public class Summoning {
 			if(bob != null) {
 				if(bob.getValidItems().size() > 0) {
 					for(Item t : bob.getValidItems()) {
-						GroundItemManager.spawnGroundItem(player, new GroundItem(t, getFamiliar().getSummonNpc().getPosition().copy(), player.getUsername(), player.getHostAddress(), false, 120, true, 80));
+						GroundItemManager.spawnGroundItem(player, new GroundItem(t, getFamiliar().getSummonNpc().getEntityPosition().copy(), player.getUsername(), player.getHostAddress(), false, 120, true, 80));
 					}
 					player.getPacketSender().sendMessage("Your familiar has dropped its carried items on the floor.");
 				}
@@ -281,7 +276,7 @@ public class Summoning {
 
 	public void moveFollower(boolean forced) {
 		if(getFamiliar() != null && getFamiliar().getSummonNpc() != null) {
-			final Position movePos = new Position(player.getPosition().getX(), player.getPosition().getY() + 1, player.getPosition().getZ());
+			final Position movePos = new Position(player.getEntityPosition().getX(), player.getEntityPosition().getY() + 1, player.getEntityPosition().getZ());
 			if(forced || canSpawn(getFamiliar().getSummonNpc(), movePos)) {
 				getFamiliar().getSummonNpc().moveTo(movePos);
 				getFamiliar().getSummonNpc().performGraphic(new Graphic(1315));
@@ -297,7 +292,7 @@ public class Summoning {
 	}
 
 	public static boolean canSpawn(NPC n, Position pos) {
-		return MovementQueue.canWalk(n.getPosition(), pos, n.getSize());
+		return MovementQueue.canWalk(n.getEntityPosition(), pos, n.getSize());
 	}
 
 	public void login() {

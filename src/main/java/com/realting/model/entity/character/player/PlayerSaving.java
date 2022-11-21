@@ -1,11 +1,5 @@
 package com.realting.model.entity.character.player;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.logging.Level;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -15,6 +9,12 @@ import com.realting.util.Misc;
 import com.realting.util.json.ItemTypeAdapter;
 import org.apache.commons.lang3.text.WordUtils;
 import org.mindrot.jbcrypt.BCrypt;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.logging.Level;
 
 public  class PlayerSaving {
 	
@@ -59,7 +59,7 @@ public  class PlayerSaving {
 			object.addProperty("loyalty-title", player.getLoyaltyTitle().name());
 			/** HEX YELL COLORS **/
 			object.addProperty("yellhexcolor", player.getYellHex() == null ? "ffffff" : player.getYellHex());
-			object.add("position", builder.toJsonTree(player.getPosition()));
+			object.add("position", builder.toJsonTree(player.getEntityPosition()));
 			object.addProperty("online-status", player.getRelations().getStatus().name());
 			object.addProperty("given-starter", (player.didReceiveStarter())); 
 			object.addProperty("money-pouch", (player.getMoneyInPouch()));

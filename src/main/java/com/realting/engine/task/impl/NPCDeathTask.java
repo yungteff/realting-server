@@ -181,7 +181,7 @@ public class NPCDeathTask extends Task {
 		World.deregister(npc);
 
 		if(npc.getId() == 1158 || npc.getId() == 1160) {
-			KalphiteQueen.death(npc.getId(), npc.getPosition());
+			KalphiteQueen.death(npc.getId(), npc.getEntityPosition());
 		}
 		if(Nex.nexMob(npc.getId())) {
 			Nex.death(npc.getId());

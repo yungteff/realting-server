@@ -144,14 +144,14 @@ object Dungeoneering {
         World.register(smuggler)
         party.npcs.add(smuggler)
         for (n in party.dungeoneeringFloor!!.npcs[party.complexity - 1]) {
-            val npc = NPC(n.id, n.position.copy().setZ(height))
+            val npc = NPC(n.id, n.entityPosition.copy().setZ(height))
             World.register(npc)
             party.npcs.add(npc)
         }
         /*
 		 * Spawning objects
 		 */for (obj in party.dungeoneeringFloor!!.objects) {
-            CustomObjects.spawnGlobalObjectWithinDistance(GameObject(obj.id, obj.position.copy().setZ(height)))
+            CustomObjects.spawnGlobalObjectWithinDistance(GameObject(obj.id, obj.entityPosition.copy().setZ(height)))
         }
     }
 
@@ -165,7 +165,7 @@ object Dungeoneering {
         player.minigameAttributes.dungeoneeringAttributes.incrementDeaths()
         val party = player.minigameAttributes.dungeoneeringAttributes.party!!
         val pos = party.dungeoneeringFloor!!.entrance
-        player.moveTo(Position(pos.x, pos.y, player.position.z))
+        player.moveTo(Position(pos.x, pos.y, player.entityPosition.z))
         party.sendMessage("@red@" + player.username + " has died and been moved to the starting room.")
         if (player.skillManager.getMaxLevel(Skill.DUNGEONEERING) < 10) {
             party.sendMessage("@or2@However, because " + player.username + " has less than 10 dungeoneering,")
@@ -192,7 +192,7 @@ object Dungeoneering {
 
     @JvmStatic
     fun handleNpcDeath(p: Player, n: NPC) {
-        if (n.position.z == p.position.z) {
+        if (n.entityPosition.z == p.entityPosition.z) {
             val party = p.minigameAttributes.dungeoneeringAttributes.party!!
             if (!party.npcs.contains(n)) return
             party.npcs.remove(n)
@@ -207,7 +207,7 @@ object Dungeoneering {
                 GroundItemManager.spawnGroundItem(
                     p, GroundItem(
                         Item(ItemBinding.randomBindableItem),
-                        n.position.copy(),
+                        n.entityPosition.copy(),
                         "Dungeoneering",
                         false,
                         -1,
@@ -221,13 +221,13 @@ object Dungeoneering {
             } else if (random >= 100 && random <= 150) {
                 val amt = 3000 + Misc.getRandom(10000)
                 GroundItemManager.spawnGroundItem(
-                    p, GroundItem(Item(18201, amt), n.position.copy(), "Dungeoneering", false, -1, false, -1)
+                    p, GroundItem(Item(18201, amt), n.entityPosition.copy(), "Dungeoneering", false, -1, false, -1)
                 )
             } else if (random > 150 && random < 250) GroundItemManager.spawnGroundItem(
                 p, GroundItem(
                     misc[Misc.getRandom(
                         misc.size - 1
-                    )], n.position.copy(), "Dungeoneering", false, -1, false, -1
+                    )], n.entityPosition.copy(), "Dungeoneering", false, -1, false, -1
                 )
             )
         }

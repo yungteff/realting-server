@@ -1,14 +1,16 @@
 package com.realting.world.content.minigames
 
 import com.realting.engine.task.Task
-import com.realting.model.RegionInstance.RegionInstanceType
 import com.realting.engine.task.TaskManager
-import com.realting.world.World
-import com.realting.world.content.dialogue.DialogueManager
-import com.realting.model.*
+import com.realting.model.Locations
+import com.realting.model.Position
+import com.realting.model.RegionInstance
+import com.realting.model.RegionInstance.RegionInstanceType
 import com.realting.model.entity.character.npc.NPC
 import com.realting.model.entity.character.player.Player
 import com.realting.util.Misc
+import com.realting.world.World
+import com.realting.world.content.dialogue.DialogueManager
 
 object Graveyard {
     @JvmStatic
@@ -46,7 +48,7 @@ object Graveyard {
                 val zombieAmount = wave * 2
                 player.minigameAttributes.graveyardAttributes.requiredKills = zombieAmount
                 for (i in 0..zombieAmount) {
-                    val n = NPC(getSpawn(level), getSpawnPos(player.position.z)).setSpawnedFor(player)
+                    val n = NPC(getSpawn(level), getSpawnPos(player.entityPosition.z)).setSpawnedFor(player)
                     World.register(n)
                     player.regionInstance.npcsList.add(n)
                     n.combatBuilder.attack(player)

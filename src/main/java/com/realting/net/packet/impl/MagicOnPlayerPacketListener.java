@@ -4,13 +4,13 @@ import com.realting.model.Animation;
 import com.realting.model.Graphic;
 import com.realting.model.Locations.Location;
 import com.realting.model.Skill;
+import com.realting.model.entity.character.player.Player;
 import com.realting.net.packet.Packet;
 import com.realting.net.packet.PacketListener;
 import com.realting.world.World;
 import com.realting.world.content.combat.magic.CombatSpell;
 import com.realting.world.content.combat.magic.CombatSpells;
 import com.realting.world.content.player.skill.dungeoneering.UltimateIronmanHandler;
-import com.realting.model.entity.character.player.Player;
 
 public class MagicOnPlayerPacketListener implements PacketListener {
 
@@ -54,7 +54,7 @@ public class MagicOnPlayerPacketListener implements PacketListener {
 		// Start combat!
 		if (spell == CombatSpells.VENGEANCE_OTHER.getSpell()) {
 			player.getMovementQueue().reset();
-			player.setPositionToFace(attacked.getPosition());
+			player.setPositionToFace(attacked.getEntityPosition());
 			
 			if(player.getSkillManager().getCurrentLevel(Skill.MAGIC) < 93) {
 				player.getPacketSender().sendMessage("You need a Magic level of at least 93 to cast this spell.");
@@ -85,7 +85,7 @@ public class MagicOnPlayerPacketListener implements PacketListener {
 				player.getSkillManager().addExperience(Skill.MAGIC, 108);
 			}
 		} else {
-			player.setPositionToFace(attacked.getPosition());
+			player.setPositionToFace(attacked.getEntityPosition());
 			player.getCombatBuilder().resetCooldown();
 			player.setCastSpell(spell);
 			player.getCombatBuilder().attack(attacked);

@@ -1,19 +1,12 @@
 package com.realting.model.entity.character.updating;
 
-import java.util.Iterator;
-
-import com.realting.model.Appearance;
+import com.realting.model.*;
 import com.realting.model.ChatMessage.Message;
-import com.realting.model.Direction;
-import com.realting.model.Flag;
-import com.realting.model.Gender;
 import com.realting.model.Locations.Location;
-import com.realting.model.Position;
-import com.realting.model.Skill;
-import com.realting.model.UpdateFlag;
 import com.realting.model.container.impl.Equipment;
 import com.realting.model.definitions.ItemDefinition;
 import com.realting.model.entity.Entity;
+import com.realting.model.entity.character.player.Player;
 import com.realting.model.movement.MovementQueue;
 import com.realting.net.packet.ByteOrder;
 import com.realting.net.packet.Packet.PacketType;
@@ -21,7 +14,8 @@ import com.realting.net.packet.PacketBuilder;
 import com.realting.net.packet.PacketBuilder.AccessType;
 import com.realting.net.packet.ValueType;
 import com.realting.world.World;
-import com.realting.model.entity.character.player.Player;
+
+import java.util.Iterator;
 
 /**
  * Represents the associated player's player updating.
@@ -50,7 +44,7 @@ public class PlayerUpdating {
 		packet.putBits(8, player.getLocalPlayers().size());
 		for (Iterator<Player> playerIterator = player.getLocalPlayers().iterator(); playerIterator.hasNext();) {
 			Player otherPlayer = playerIterator.next();
-			if (World.getPlayers().get(otherPlayer.getIndex()) != null && otherPlayer.getPosition().isWithinDistance(player.getPosition()) && !otherPlayer.isNeedsPlacement()) {
+			if (World.getPlayers().get(otherPlayer.getIndex()) != null && otherPlayer.getEntityPosition().isWithinDistance(player.getEntityPosition()) && !otherPlayer.isNeedsPlacement()) {
 				updateOtherPlayerMovement(packet, otherPlayer);
 				if (otherPlayer.getUpdateFlag().isUpdateRequired()) {
 					appendUpdates(player, update, otherPlayer, false, false);
@@ -66,7 +60,7 @@ public class PlayerUpdating {
 		for(Player otherPlayer : World.getPlayers()) {
 			if (player.getLocalPlayers().size() >= 79 || playersAdded > MAX_NEW_PLAYERS_PER_CYCLE)
 				break;
-			if (otherPlayer == null || otherPlayer == player || player.getLocalPlayers().contains(otherPlayer) || !otherPlayer.getPosition().isWithinDistance(player.getPosition()))
+			if (otherPlayer == null || otherPlayer == player || player.getLocalPlayers().contains(otherPlayer) || !otherPlayer.getEntityPosition().isWithinDistance(player.getEntityPosition()))
 				continue;
 			player.getLocalPlayers().add(otherPlayer);
 			addPlayer(player, otherPlayer, packet);
@@ -94,8 +88,8 @@ public class PlayerUpdating {
 		builder.putBits(11, target.getIndex());
 		builder.putBits(1, 1);
 		builder.putBits(1, 1);
-		int yDiff = target.getPosition().getY() - player.getPosition().getY();
-		int xDiff = target.getPosition().getX() - player.getPosition().getX();
+		int yDiff = target.getEntityPosition().getY() - player.getEntityPosition().getY();
+		int xDiff = target.getEntityPosition().getX() - player.getEntityPosition().getX();
 		builder.putBits(5, yDiff);
 		builder.putBits(5, xDiff);
 	}
@@ -123,7 +117,7 @@ public class PlayerUpdating {
 			/*
 			 * This is the new player height.
 			 */
-			builder.putBits(2, player.getPosition().getZ());
+			builder.putBits(2, player.getEntityPosition().getZ());
 
 			/*
 			 * This indicates that the client should discard the walking queue.
@@ -139,9 +133,9 @@ public class PlayerUpdating {
 			 * These are the positions.
 			 */
 			builder.putBits(7,
-					player.getPosition().getLocalY(player.getLastKnownRegion()));
+					player.getEntityPosition().getLocalY(player.getLastKnownRegion()));
 			builder.putBits(7,
-					player.getPosition().getLocalX(player.getLastKnownRegion()));
+					player.getEntityPosition().getLocalX(player.getLastKnownRegion()));
 		} else /*
 		 * Otherwise, check if the player moved.
 		 */
@@ -420,7 +414,7 @@ public class PlayerUpdating {
 	 * @return			The PlayerUpdating instance.
 	 */
 	private static void updateForcedMovement(Player player, PacketBuilder builder, Player target) {
-		Position position = target.getPosition();
+		Position position = target.getEntityPosition();
 		Position myPosition = player.getLastKnownRegion();
 		builder.put((position.getLocalX(myPosition) + target.getForceMovement()[MovementQueue.FIRST_MOVEMENT_X]), ValueType.C);
 		builder.put((position.getLocalY(myPosition) + target.getForceMovement()[MovementQueue.FIRST_MOVEMENT_Y]), ValueType.S);

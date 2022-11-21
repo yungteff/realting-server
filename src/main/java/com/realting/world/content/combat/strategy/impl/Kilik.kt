@@ -29,13 +29,13 @@ class Kilik : CombatStrategy {
         }
         val random = Misc.getRandom(10)
         if (random <= 8 && Locations.goodDistance(
-                Kilik.position.x, Kilik.position.y, victim!!.position.x, victim.position.y, 3
+                Kilik.entityPosition.x, Kilik.entityPosition.y, victim!!.entityPosition.x, victim.entityPosition.y, 3
             )
         ) {
             Kilik.performAnimation(attack_anim1)
             Kilik.combatBuilder.container = CombatContainer(Kilik, victim, 1, CombatType.MELEE, true)
         } else if (random <= 4 || !Locations.goodDistance(
-                Kilik.position.x, Kilik.position.y, victim!!.position.x, victim.position.y, 8
+                Kilik.entityPosition.x, Kilik.entityPosition.y, victim!!.entityPosition.x, victim.entityPosition.y, 8
             )
         ) {
             Kilik.combatBuilder.container = CombatContainer(Kilik, victim!!, 1, 2, CombatType.MAGIC, true)

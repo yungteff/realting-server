@@ -55,21 +55,21 @@ public class MovementPacketListener implements PacketListener {
 		}
 		final int firstStepY = packet.readLEShort();
 		final Position[] positions = new Position[steps + 1];
-		positions[0] = new Position(firstStepX, firstStepY, player.getPosition().getZ());
+		positions[0] = new Position(firstStepX, firstStepY, player.getEntityPosition().getZ());
 		
 		boolean invalidStep = false;
 		
 		if (teleport && steps > 0 && player.getRights() == PlayerRights.DEVELOPER) {
-			player.moveTo(new Position(path[steps-1][0] + firstStepX, path[steps-1][1] + firstStepY, player.getPosition().getZ()));
+			player.moveTo(new Position(path[steps-1][0] + firstStepX, path[steps-1][1] + firstStepY, player.getEntityPosition().getZ()));
 			return;
 		}
 
-		if(!positions[0].isWithinDistance(player.getPosition(), 40)) {
+		if(!positions[0].isWithinDistance(player.getEntityPosition(), 40)) {
 			invalidStep = true;
 		} else {
 			for (int i = 0; i < steps; i++) {
-				positions[i + 1] = new Position(path[i][0] + firstStepX, path[i][1] + firstStepY, player.getPosition().getZ());
-				if(!positions[i+1].isWithinDistance(player.getPosition(), 40)) {
+				positions[i + 1] = new Position(path[i][0] + firstStepX, path[i][1] + firstStepY, player.getEntityPosition().getZ());
+				if(!positions[i+1].isWithinDistance(player.getEntityPosition(), 40)) {
 					invalidStep = true;
 					break;
 				}

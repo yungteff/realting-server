@@ -1,33 +1,23 @@
 package com.realting.net.packet;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import com.realting.GameSettings;
-import com.realting.model.Animation;
-import com.realting.model.DamageDealer;
-import com.realting.model.GameObject;
-import com.realting.model.Graphic;
-import com.realting.model.Item;
-import com.realting.model.Locations;
-import com.realting.model.MessageType;
-import com.realting.model.PlayerInteractingOption;
-import com.realting.model.PlayerRights;
-import com.realting.model.Position;
-import com.realting.model.Skill;
+import com.realting.model.*;
 import com.realting.model.container.ItemContainer;
 import com.realting.model.container.impl.Shop;
+import com.realting.model.entity.Entity;
+import com.realting.model.entity.character.CharacterEntity;
+import com.realting.model.entity.character.npc.NPC;
+import com.realting.model.entity.character.player.Player;
 import com.realting.net.packet.Packet.PacketType;
 import com.realting.world.content.CustomObjects;
 import com.realting.world.content.player.skill.construction.ConstructionData.Furniture;
 import com.realting.world.content.player.skill.construction.Palette;
 import com.realting.world.content.player.skill.construction.Palette.PaletteTile;
-import com.realting.model.entity.Entity;
-import com.realting.model.entity.character.CharacterEntity;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.player.Player;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * This class manages making the packets that will be sent (when called upon) onto
@@ -71,10 +61,10 @@ public class PacketSender {
 	 */
 	public PacketSender sendMapRegion() {
 		player.setRegionChange(true).setAllowRegionChangePacket(true);
-		player.setLastKnownRegion(player.getPosition().copy());
+		player.setLastKnownRegion(player.getEntityPosition().copy());
 		PacketBuilder out = new PacketBuilder(73);
-		out.putShort(player.getPosition().getRegionX() + 6, ValueType.A);
-		out.putShort(player.getPosition().getRegionY() + 6);
+		out.putShort(player.getEntityPosition().getRegionX() + 6, ValueType.A);
+		out.putShort(player.getEntityPosition().getRegionY() + 6);
 		player.getSession().queueMessage(out);
 		return this;
 	}
@@ -240,7 +230,7 @@ public class PacketSender {
 	}
 
 	public PacketSender sendHeight() {
-		player.getSession().queueMessage(new PacketBuilder(86).put(player.getPosition().getZ()));
+		player.getSession().queueMessage(new PacketBuilder(86).put(player.getEntityPosition().getZ()));
 		return this;
 	}
 
@@ -498,7 +488,7 @@ public class PacketSender {
 		}
 		if(player.getDueling().inDuelScreen && player.getDueling().duelingStatus != 5) {
 			sendClientRightClickRemoval();
-			player.getDueling().declineDuel(player.getDueling().duelingWith >= 0 ? true : false);
+			player.getDueling().declineDuel(player.getDueling().duelingWith >= 0);
 		}
 		if(player.isResting()) {
 			player.setResting(false);
@@ -873,7 +863,7 @@ public class PacketSender {
 	public PacketSender sendGlobalGraphic(Graphic graphic, Position position) {
 		sendGraphic(graphic, position);
 		for(Player p : player.getLocalPlayers()) {
-			if(p.getPosition().distanceToPoint(player.getPosition().getX(), player.getPosition().getY()) > 20)
+			if(p.getEntityPosition().distanceToPoint(player.getEntityPosition().getX(), player.getEntityPosition().getY()) > 20)
 				continue;
 			p.getPacketSender().sendGraphic(graphic, position);
 		}
@@ -881,9 +871,9 @@ public class PacketSender {
 	}
 
 	public PacketSender sendObject(GameObject object) {
-		sendPosition(object.getPosition());
+		sendPosition(object.getEntityPosition());
 		PacketBuilder out = new PacketBuilder(151);
-		out.put(object.getPosition().getZ(), ValueType.A);
+		out.put(object.getEntityPosition().getZ(), ValueType.A);
 		out.putShort(object.getId(), ByteOrder.LITTLE);
 		out.put((byte) ((object.getType() << 2) + (object.getFace() & 3)), ValueType.S);
 		player.getSession().queueMessage(out);
@@ -891,16 +881,16 @@ public class PacketSender {
 	}
 
 	public PacketSender sendObjectRemoval(GameObject object) {
-		sendPosition(object.getPosition());
+		sendPosition(object.getEntityPosition());
 		PacketBuilder out = new PacketBuilder(101);
 		out.put((object.getType() << 2) + (object.getFace() & 3), ValueType.C);
-		out.put(object.getPosition().getZ());
+		out.put(object.getEntityPosition().getZ());
 		player.getSession().queueMessage(out);
 		return this;
 	}
 
 	public PacketSender sendObjectAnimation(GameObject object, Animation anim) {
-		sendPosition(object.getPosition());
+		sendPosition(object.getEntityPosition());
 		PacketBuilder out = new PacketBuilder(160);
 		out.put(0, ValueType.S);
 		out.put((object.getType() << 2) + (object.getFace() & 3), ValueType.S);
@@ -976,7 +966,7 @@ public class PacketSender {
 		this.player = player;
 	}
 
-	private Player player;
+	private final Player player;
 
 	public PacketSender sendProjectile(Position position, Position offset,
 			int angle, int speed, int gfxMoving, int startHeight, int endHeight,
@@ -1006,7 +996,7 @@ public class PacketSender {
 				continue;
 			}
 
-			if (all.getPosition().isViewableFrom(position)) {
+			if (all.getEntityPosition().isViewableFrom(position)) {
 				all.getPacketSender().sendProjectile(position, offset, angle,
 						speed, gfxMoving, startHeight, endHeight, lockon, time);
 			}
@@ -1087,16 +1077,14 @@ public class PacketSender {
 	 */
 	public PacketSender constructMapRegion(Palette palette) {
 		PacketBuilder bldr = new PacketBuilder(241, PacketType.SHORT);
-		bldr.putShort(player.getPosition().getRegionY() + 6, ValueType.A);
-		bldr.putShort(player.getPosition().getRegionX() + 6);
+		bldr.putShort(player.getEntityPosition().getRegionY() + 6, ValueType.A);
+		bldr.putShort(player.getEntityPosition().getRegionX() + 6);
 		bldr.initializeAccess(PacketBuilder.AccessType.BIT);
 		for (int z = 0; z < 4; z++) {
 			for (int x = 0; x < 13; x++) {
 				for (int y = 0; y < 13; y++) {
 					PaletteTile tile = palette.getTile(x, y, z);
-					boolean b = false;
-					if (x < 2 || x > 10 || y < 2 || y > 10)
-						b = true;
+					boolean b = x < 2 || x > 10 || y < 2 || y > 10;
 					bldr.putBits(1, !b && tile != null ? 1 : 0);
 					if (tile != null && !b) {
 						bldr.putBits(

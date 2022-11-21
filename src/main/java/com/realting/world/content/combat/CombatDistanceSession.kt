@@ -26,14 +26,14 @@ class CombatDistanceSession
             return
         }
         if (!Locations.Location.ignoreFollowDistance(builder.character)) {
-            if (!Locations.goodDistance(builder.character.position, victim.position, 40)) {
+            if (!Locations.goodDistance(builder.character.entityPosition, victim.entityPosition, 40)) {
                 builder.reset(true)
                 stop()
                 return
             }
         }
         if (Locations.goodDistance(
-                builder.character.position, victim.position, builder.strategy.attackDistance(
+                builder.character.entityPosition, victim.entityPosition, builder.strategy.attackDistance(
                     builder.character
                 )
             )

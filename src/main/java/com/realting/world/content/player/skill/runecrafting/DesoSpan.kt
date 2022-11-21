@@ -1,14 +1,14 @@
 package com.realting.world.content.player.skill.runecrafting
 
 import com.realting.engine.task.Task
-import com.realting.model.container.impl.Equipment
-import com.realting.world.World
-import com.realting.model.movement.MovementQueue
 import com.realting.engine.task.TaskManager
 import com.realting.model.*
+import com.realting.model.container.impl.Equipment
 import com.realting.model.entity.character.npc.NPC
 import com.realting.model.entity.character.player.Player
+import com.realting.model.movement.MovementQueue
 import com.realting.util.Misc
+import com.realting.world.World
 
 object DesoSpan {
     private val SIPHONING_ANIMATION = Animation(9368)
@@ -64,7 +64,7 @@ object DesoSpan {
         val energyType = Energy.forId(n.id)
         if (energyType != null) {
             player.skillManager.stopSkilling()
-            if (player.position == n.position) MovementQueue.stepAway(player)
+            if (player.entityPosition == n.entityPosition) MovementQueue.stepAway(player)
             player.setEntityInteraction(n)
             if (player.skillManager.getCurrentLevel(Skill.RUNECRAFTING) < energyType.levelReq) {
                 player.packetSender.sendMessage("You need a Runecrafting level of at least " + energyType.levelReq + " to siphon this energy source.")

@@ -30,20 +30,20 @@ object GroundItemManager {
             if (groundItem.isGlobal) {
                 for (p in World.getPlayers()) {
                     if (p == null) continue
-                    if (p.position.distanceToPoint(
-                            groundItem.position.x, groundItem.position.y
+                    if (p.entityPosition.distanceToPoint(
+                            groundItem.entityPosition.x, groundItem.entityPosition.y
                         ) <= 120
                     ) p.packetSender.removeGroundItem(
-                        groundItem.item.id, groundItem.position.x, groundItem.position.y, groundItem.item.amount
+                        groundItem.item.id, groundItem.entityPosition.x, groundItem.entityPosition.y, groundItem.item.amount
                     )
                 }
             } else {
                 val person = World.getPlayerByName(groundItem.owner)
-                if (person != null && person.position.distanceToPoint(
-                        groundItem.position.x, groundItem.position.y
+                if (person != null && person.entityPosition.distanceToPoint(
+                        groundItem.entityPosition.x, groundItem.entityPosition.y
                     ) <= 120
                 ) person.packetSender.removeGroundItem(
-                    groundItem.item.id, groundItem.position.x, groundItem.position.y, groundItem.item.amount
+                    groundItem.item.id, groundItem.entityPosition.x, groundItem.entityPosition.y, groundItem.item.amount
                 )
             }
             if (delistGItem) groundItems.remove(groundItem)
@@ -57,10 +57,10 @@ object GroundItemManager {
      */
     @JvmStatic
     fun spawnGroundItem(p: Player?, g: GroundItem) {
-        var g = g
+        var varGroundItem = g
         if (p == null) // || p.getRights() == PlayerRights.DEVELOPER)
             return
-        val item = g.item
+        val item = varGroundItem.item
         if (item.id <= 0) {
             return
         }
@@ -71,17 +71,17 @@ object GroundItemManager {
             return
         }
         if (doingDungeoneering(p)) {
-            g = GroundItem(item, g.position, "Dungeoneering", true, -1, false, -1)
-            p.minigameAttributes.dungeoneeringAttributes.party!!.groundItems.add(g)
+            varGroundItem = GroundItem(item, varGroundItem.entityPosition, "Dungeoneering", true, -1, false, -1)
+            p.minigameAttributes.dungeoneeringAttributes.party!!.groundItems.add(varGroundItem)
             if (item.id == 17489) {
-                p.minigameAttributes.dungeoneeringAttributes.party!!.gatestonePosition = g.position.copy()
+                p.minigameAttributes.dungeoneeringAttributes.party!!.gatestonePosition = varGroundItem.entityPosition.copy()
             }
         }
         if (ItemDefinition.forId(item.id).isStackable) {
-            val it = getGroundItem(p, item, g.position)
+            val it = getGroundItem(p, item, varGroundItem.entityPosition)
             if (it != null) {
                 it.item.amount =
-                    if (it.item.amount + g.item.amount > Int.MAX_VALUE) Int.MAX_VALUE else it.item.amount + g.item.amount
+                    if (it.item.amount + varGroundItem.item.amount > Int.MAX_VALUE) Int.MAX_VALUE else it.item.amount + varGroundItem.item.amount
                 if (it.item.amount <= 0) remove(it, true) else it.isRefreshNeeded = true
                 return
             }
@@ -90,7 +90,7 @@ object GroundItemManager {
 		if(Misc.getMinutesPlayed(p) < 15) {
 			g.setGlobalStatus(false);
 			g.setGoGlobal(false);
-		}*/add(g, true)
+		}*/add(varGroundItem, true)
     }
 
     /**
@@ -104,21 +104,21 @@ object GroundItemManager {
             groundItem.isGlobal -> {
                 for (p in World.getPlayers()) {
                     if (p == null) continue
-                    if (groundItem.position.z == p.position.z && p.position.distanceToPoint(
-                            groundItem.position.x, groundItem.position.y
+                    if (groundItem.entityPosition.z == p.entityPosition.z && p.entityPosition.distanceToPoint(
+                            groundItem.entityPosition.x, groundItem.entityPosition.y
                         ) <= 120
                     ) p.packetSender.createGroundItem(
-                        groundItem.item.id, groundItem.position.x, groundItem.position.y, groundItem.item.amount
+                        groundItem.item.id, groundItem.entityPosition.x, groundItem.entityPosition.y, groundItem.item.amount
                     )
                 }
             }
             else -> {
                 val person = World.getPlayerByName(groundItem.owner)
-                if (person != null && groundItem.position.z == person.position.z && person.position.distanceToPoint(
-                        groundItem.position.x, groundItem.position.y
+                if (person != null && groundItem.entityPosition.z == person.entityPosition.z && person.entityPosition.distanceToPoint(
+                        groundItem.entityPosition.x, groundItem.entityPosition.y
                     ) <= 120
                 ) person.packetSender.createGroundItem(
-                    groundItem.item.id, groundItem.position.x, groundItem.position.y, groundItem.item.amount
+                    groundItem.item.id, groundItem.entityPosition.x, groundItem.entityPosition.y, groundItem.item.amount
                 )
             }
         }
@@ -139,14 +139,14 @@ object GroundItemManager {
      */
     @JvmStatic
     fun pickupGroundItem(p: Player, item: Item, position: Position) {
-        var item = item
+        var varItem = item
         if (!p.lastItemPickup.elapsed(500)) return
-        val canAddItem = p.inventory.freeSlots > 0 || item.definition.isStackable && p.inventory.contains(item.id)
+        val canAddItem = p.inventory.freeSlots > 0 || varItem.definition.isStackable && p.inventory.contains(varItem.id)
         if (!canAddItem) {
             p.inventory.full()
             return
         }
-        val gt = getGroundItem(p, item, position)
+        val gt = getGroundItem(p, varItem, position)
         if (gt == null || gt.hasBeenPickedUp() || !groundItems.contains(gt)) //last one isn't needed, but hey, just trying to be safe
             return else {
             /*	if(p.getHostAdress().equals(gt.getFromIP()) && !p.getUsername().equals(gt.getOwner())) { //Transferring items by IP..
@@ -164,20 +164,20 @@ object GroundItemManager {
                     return
                 }
             }
-            if (item.id == 17489 && doingDungeoneering(p)) {
+            if (varItem.id == 17489 && doingDungeoneering(p)) {
                 p.minigameAttributes.dungeoneeringAttributes.party!!.gatestonePosition = null
             }
-            item = gt.item
-            if (item.id == 7509 && position == GlobalItemSpawner.ROCKCAKE_POSITION) {
-                item = Item(7510, gt.item.amount)
+            varItem = gt.item
+            if (varItem.id == 7509 && position == GlobalItemSpawner.ROCKCAKE_POSITION) {
+                varItem = Item(7510, gt.item.amount)
             }
             gt.setPickedUp(true)
             remove(gt, true)
-            p.inventory.add(item)
-            if (ItemDefinition.forId(item.id) != null && ItemDefinition.forId(item.id).name != null) {
-                PlayerLogs.log(p.username, "Picked up gr.Item " + item.definition.name + ", amount: " + item.amount)
+            p.inventory.add(varItem)
+            if (ItemDefinition.forId(varItem.id) != null && ItemDefinition.forId(varItem.id).name != null) {
+                PlayerLogs.log(p.username, "Picked up gr.Item " + varItem.definition.name + ", amount: " + varItem.amount)
             } else {
-                PlayerLogs.log(p.username, "Picked up gr.Item " + item.id + ", amount: " + item.amount)
+                PlayerLogs.log(p.username, "Picked up gr.Item " + varItem.id + ", amount: " + varItem.amount)
             }
             p.lastItemPickup.reset()
             Sounds.sendSound(p, Sounds.Sound.PICKUP_ITEM)
@@ -195,15 +195,15 @@ object GroundItemManager {
     fun handleRegionChange(p: Player) {
         for (gi in groundItems) {
             if (gi == null) continue
-            p.packetSender.removeGroundItem(gi.item.id, gi.position.x, gi.position.y, gi.item.amount)
+            p.packetSender.removeGroundItem(gi.item.id, gi.entityPosition.x, gi.entityPosition.y, gi.item.amount)
         }
         for (gi in groundItems) {
-            if (gi == null || p.position.z != gi.position.z || p.position.distanceToPoint(
-                    gi.position.x, gi.position.y
+            if (gi == null || p.entityPosition.z != gi.entityPosition.z || p.entityPosition.distanceToPoint(
+                    gi.entityPosition.x, gi.entityPosition.y
                 ) > 120
             ) continue
             if (gi.isGlobal || !gi.isGlobal && gi.owner == p.username) p.packetSender.createGroundItem(
-                gi.item.id, gi.position.x, gi.position.y, gi.item.amount
+                gi.item.id, gi.entityPosition.x, gi.entityPosition.y, gi.item.amount
             )
         }
     }
@@ -218,8 +218,8 @@ object GroundItemManager {
     @JvmStatic
     fun getGroundItem(p: Player?, item: Item, position: Position): GroundItem? {
         for (l in groundItems) {
-            if (l == null || l.position.z != position.z) continue
-            if (l.position == position && l.item.id == item.id) {
+            if (l == null || l.entityPosition.z != position.z) continue
+            if (l.entityPosition == position && l.item.id == item.id) {
                 if (l.isGlobal) return l else if (p != null) {
                     val owner = World.getPlayerByName(l.owner)
                     if (owner == null || owner.index != p.index) continue
@@ -237,8 +237,8 @@ object GroundItemManager {
      */
     fun clearArea(pos: Position, owner: String) {
         for (l in groundItems) {
-            if (l == null || l.position.z != pos.z) continue
-            if (l.position == pos && l.owner == owner) remove(l, true)
+            if (l == null || l.entityPosition.z != pos.z) continue
+            if (l.entityPosition == pos && l.owner == owner) remove(l, true)
         }
     }
 }

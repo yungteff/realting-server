@@ -1,14 +1,16 @@
 package com.realting.world.content.minigames
 
 import com.realting.engine.task.Task
-import com.realting.model.RegionInstance.RegionInstanceType
 import com.realting.engine.task.TaskManager
-import com.realting.world.World
-import com.realting.world.content.dialogue.DialogueManager
-import com.realting.model.*
+import com.realting.model.Locations
+import com.realting.model.Position
+import com.realting.model.RegionInstance
+import com.realting.model.RegionInstance.RegionInstanceType
 import com.realting.model.entity.character.npc.NPC
 import com.realting.model.entity.character.player.Player
 import com.realting.util.Misc
+import com.realting.world.World
+import com.realting.world.content.dialogue.DialogueManager
 
 object FightCave {
     const val JAD_NPC_ID = 2745
@@ -34,7 +36,7 @@ object FightCave {
                     stop()
                     return
                 }
-                val n = NPC(JAD_NPC_ID, Position(2399, 5083, player.position.z)).setSpawnedFor(player)
+                val n = NPC(JAD_NPC_ID, Position(2399, 5083, player.entityPosition.z)).setSpawnedFor(player)
                 World.register(n)
                 player.regionInstance.npcsList.add(n)
                 n.combatBuilder.attack(player)

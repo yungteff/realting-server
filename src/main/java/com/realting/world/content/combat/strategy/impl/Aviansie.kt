@@ -26,7 +26,7 @@ class Aviansie : CombatStrategy {
         if (aviansie!!.isChargingAttack || victim!!.constitution <= 0) {
             return true
         }
-        if (Locations.goodDistance(aviansie.position.copy(), victim!!.position.copy(), 1) && Misc.getRandom(5) <= 3) {
+        if (Locations.goodDistance(aviansie.entityPosition.copy(), victim.entityPosition.copy(), 1) && Misc.getRandom(5) <= 3) {
             aviansie.performAnimation(Animation(aviansie.definition.attackAnimation))
             aviansie.combatBuilder.container = CombatContainer(aviansie, victim, 1, 1, CombatType.MELEE, true)
         } else {

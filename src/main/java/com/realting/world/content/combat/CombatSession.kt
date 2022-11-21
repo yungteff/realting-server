@@ -85,9 +85,9 @@ class CombatSession
                         )
                     )
                     if (player.combatSpecial.combatType === CombatType.RANGED) {
-                        DefaultRangedCombatStrategy.decrementAmmo(player, builder.victim.position)
+                        DefaultRangedCombatStrategy.decrementAmmo(player, builder.victim.entityPosition)
                         if (CombatFactory.darkBow(player) || player.rangedWeaponData == RangedWeaponData.MAGIC_SHORTBOW && magicShortbowSpec) {
-                            DefaultRangedCombatStrategy.decrementAmmo(player, builder.victim.position)
+                            DefaultRangedCombatStrategy.decrementAmmo(player, builder.victim.entityPosition)
                         }
                     }
                 }

@@ -14,9 +14,9 @@ public class HeightCheckPacketListener implements PacketListener {
 	@Override
 	public void handleMessage(Player player, Packet packet) {
 		int plane = packet.readByte();
-		if(player.getPosition().getZ() >= 0 && player.getPosition().getZ() < 4) { //Only check for normal height levels, not minigames etc
+		if(player.getEntityPosition().getZ() >= 0 && player.getEntityPosition().getZ() < 4) { //Only check for normal height levels, not minigames etc
 
-			if(plane != player.getPosition().getZ()) { //Player might have used a third-party-software to change their height level
+			if(plane != player.getEntityPosition().getZ()) { //Player might have used a third-party-software to change their height level
 
 				if(!player.isNeedsPlacement() && !player.getMovementQueue().isLockedMovement()) { //Only check if player isn't being blocked
 

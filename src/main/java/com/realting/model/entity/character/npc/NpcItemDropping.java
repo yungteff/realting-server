@@ -276,7 +276,7 @@ public class NpcItemDropping {
         if (npc.getLocation() == Locations.Location.WARRIORS_GUILD)
             WarriorsGuild.handleDrop(p, npc);
         NPCDrops drops = NPCDrops.forId(npc.getId());
-        final Position npcPos = npc.getPosition().copy();
+        final Position npcPos = npc.getEntityPosition().copy();
         if (drops == null) {
             /* If an NPC's drops don't exist still give charms cuz lol */
             if (Misc.inclusiveRandom(1, 3) == 1) {
@@ -294,7 +294,7 @@ public class NpcItemDropping {
             return;
         }
 
-        final boolean goGlobal = p.getPosition().getZ() >= 0 && p.getPosition().getZ() < 4;
+        final boolean goGlobal = p.getEntityPosition().getZ() >= 0 && p.getEntityPosition().getZ() < 4;
 
         boolean goldCharms = true;
         boolean crimsonCharms = true;
@@ -387,7 +387,7 @@ public class NpcItemDropping {
 
     public static void drop(Player player, Item item, NPC npc, Position pos, boolean goGlobal) {
         if(npc.getId() == 2007 || npc.getId() == 2042 || npc.getId() == 2043 || npc.getId() == 2044) {
-            pos = player.getPosition().copy();
+            pos = player.getEntityPosition().copy();
         }
         if ((player.getInventory().contains(18337) || (player.getSkillManager().skillCape(Skill.PRAYER) && player.getBonecrushEffect())) && BonesData.forId(item.getId()) != null) {
             player.getPacketSender().sendGlobalGraphic(new Graphic(777), pos);
@@ -432,7 +432,7 @@ public class NpcItemDropping {
                 CopyOnWriteArrayList<Player> playerList = new CopyOnWriteArrayList<Player>();
                 for(Player member : player.getCurrentClanChat().getMembers()) {
                     if(member != null) {
-                        if(member.getPosition().isWithinDistance(player.getPosition())) {
+                        if(member.getEntityPosition().isWithinDistance(player.getEntityPosition())) {
                             playerList.add(member);
                         }
                     }
@@ -523,7 +523,7 @@ public class NpcItemDropping {
     }
 
     public static void casketDrop(Player player, int combat, Position pos) {
-        int chance = (int) (1 + combat);
+        int chance = 1 + combat;
         if (Misc.getRandom(combat <= 50 ? 1300 : 1000) < chance) {
             GroundItemManager.spawnGroundItem(player, new GroundItem(new Item(7956), pos, player.getUsername(), false, 150, true, 200));
         }
@@ -582,7 +582,7 @@ public class NpcItemDropping {
         }
         if (cont) {
             if(npc.getId() == 2007 || npc.getId() == 2042 || npc.getId() == 2043 || npc.getId() == 2044) {
-                pos = player.getPosition().copy();
+                pos = player.getEntityPosition().copy();
             }
             int rand = Misc.getRandom(100);
             if (rand == 1 || (rand == 2 && player.checkItem(Equipment.RING_SLOT, 2572))) {
@@ -591,7 +591,7 @@ public class NpcItemDropping {
                 } else {
                     player.getPacketSender().sendMessage("@red@<shad=0><img=10> A clue scroll has appeared!");
                 }
-                GroundItemManager.spawnGroundItem(player, new GroundItem(new Item (ClueScroll.values()[Misc.getRandom((int) (ClueScroll.values().length-1))].getClueId()), pos, player.getUsername(), false, 150, true, 200));
+                GroundItemManager.spawnGroundItem(player, new GroundItem(new Item (ClueScroll.values()[Misc.getRandom(ClueScroll.values().length-1)].getClueId()), pos, player.getUsername(), false, 150, true, 200));
             }
         }
     }

@@ -41,7 +41,7 @@ class PlayerOptionPacketListener : PacketListener {
                 World.sendStaffMessage("[BUG TRACKER] Error 959.1 has occured. PLEASE REPORT TO CRIMSON!")
                 PlayerLogs.log(
                     "1 - PVP BUGS",
-                    "Error 959.1 PVP bug occured with " + player.username + " attacking " + attacked.username + ". Pos(p): " + player.position.toString() + " Pos(a): " + attacked.position.toString()
+                    "Error 959.1 PVP bug occured with " + player.username + " attacking " + attacked.username + ". Pos(p): " + player.entityPosition.toString() + " Pos(a): " + attacked.entityPosition.toString()
                 )
                 println("Bug Found [959.1]: Attacker: " + player.username + " Player Attacked: " + attacked.username)
                 return

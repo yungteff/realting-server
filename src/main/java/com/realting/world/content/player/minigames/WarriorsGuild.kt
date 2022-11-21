@@ -65,11 +65,11 @@ object WarriorsGuild {
                                 TaskManager.submit(object : Task(2) {
                                     public override fun execute() {
                                         val npc_ =
-                                            NPC(ARMOR_DATA[i][3], Position(player.position.x, player.position.y + 1))
+                                            NPC(ARMOR_DATA[i][3], Position(player.entityPosition.x, player.entityPosition.y + 1))
                                         npc_.forceChat("I'M ALIVE!!!!")
                                             .setEntityInteraction(player).combatBuilder.attackTimer = 2
                                         npc_.setSpawnedFor(player).combatBuilder.attack(player)
-                                        player.positionToFace = npc_.position
+                                        player.positionToFace = npc_.entityPosition
                                         World.register(npc_)
                                         player.regionInstance.npcsList.add(npc_)
                                         stop()
@@ -106,21 +106,21 @@ object WarriorsGuild {
             }
             if (armour != null) {
                 for (i in armour) GroundItemManager.spawnGroundItem(
-                    player, GroundItem(Item(i), npc.position.copy(), player.username, false, 80, true, 80)
+                    player, GroundItem(Item(i), npc.entityPosition.copy(), player.username, false, 80, true, 80)
                 )
                 player.minigameAttributes.warriorsGuildAttributes.setSpawnedArmour(false)
                 GroundItemManager.spawnGroundItem(
                     player, GroundItem(
-                        Item(8851, getTokenAmount(npc.id)), npc.position.copy(), player.username, false, 80, true, 80
+                        Item(8851, getTokenAmount(npc.id)), npc.entityPosition.copy(), player.username, false, 80, true, 80
                     )
                 )
                 armour = null
             }
-        } else if (npc.id == 4291 && player.position.z == 2) {
+        } else if (npc.id == 4291 && player.entityPosition.z == 2) {
             if (Misc.getRandom(20) <= 4) {
                 GroundItemManager.spawnGroundItem(
                     player,
-                    GroundItem(Item(getDefender(player)), npc.position.copy(), player.username, false, 100, false, -1)
+                    GroundItem(Item(getDefender(player)), npc.entityPosition.copy(), player.username, false, 100, false, -1)
                 )
             }
         }
@@ -187,7 +187,7 @@ object WarriorsGuild {
                     stop()
                     return
                 }
-                if (player.location !== Locations.Location.WARRIORS_GUILD || player.position.z != 2) {
+                if (player.location !== Locations.Location.WARRIORS_GUILD || player.entityPosition.z != 2) {
                     player.minigameAttributes.warriorsGuildAttributes.setEnteredTokenRoom(false)
                     stop()
                     return

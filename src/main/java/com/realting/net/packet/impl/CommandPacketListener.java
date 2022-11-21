@@ -487,7 +487,7 @@ public class CommandPacketListener implements PacketListener {
 				return;
 			}
 			Position position = GameSettings.EDGE_CORDS;
-			TeleportHandler.teleportPlayer(player, position, TeleportType.NORMAL);;
+			TeleportHandler.teleportPlayer(player, position, TeleportType.NORMAL);
 			player.getPacketSender().sendMessage("Welcome to Edgeville.");
 		}
 		if ((command[0].equalsIgnoreCase("shop") && !player.getRights().OwnerDeveloperOnly()) || command[0].equalsIgnoreCase("shops")) {
@@ -622,7 +622,7 @@ public class CommandPacketListener implements PacketListener {
 				player.getPacketSender().sendMessage("You must wait at least 1 second between every yell-message you send.");
 				return;
 			}
-			String yellMessage = wholeCommand.substring(5, wholeCommand.length());
+			String yellMessage = wholeCommand.substring(5);
 			String formatYell = yellMessage.substring(0, 1).toUpperCase() + yellMessage.substring(1).toLowerCase();
 			if(Misc.blockedWord(yellMessage) && !(player.getRights().OwnerDeveloperOnly())) {
 				DialogueManager.sendStatement(player, "A word was blocked in your sentence. Please do not repeat it!");
@@ -864,7 +864,7 @@ public class CommandPacketListener implements PacketListener {
 			//if (command[2])
 		}
 		if (wholeCommand.toLowerCase().startsWith("sc")) {
-			String yellMessage = wholeCommand.substring(3, wholeCommand.length());
+			String yellMessage = wholeCommand.substring(3);
 			String formatYell = yellMessage.substring(0, 1).toUpperCase() + yellMessage.substring(1).toLowerCase();
 			String rights = player.getRights().toString();
 			String rank = rights.substring(0, 1).toUpperCase() + rights.substring(1).toLowerCase();
@@ -876,7 +876,7 @@ public class CommandPacketListener implements PacketListener {
 			TeleportHandler.teleportPlayer(player, new Position(2519, 9320), TeleportType.NORMAL);
 		}
 		if (command[0].equalsIgnoreCase("jail")) {
-			Player player2 = World.getPlayerByName(wholeCommand.substring(command[0].length() + 1, wholeCommand.length()));
+			Player player2 = World.getPlayerByName(wholeCommand.substring(command[0].length() + 1));
 			if (player2 != null) {
 				if (Jail.isJailed(player2)) {
 					player.getPacketSender().sendMessage("That player is already jailed!");
@@ -909,7 +909,7 @@ public class CommandPacketListener implements PacketListener {
 			World.sendMessage("<img=10> <col=008FB2><shad=0>Remember to collect rewards by using the ::vote command every 12 hours!");
 		}
 		if (command[0].equalsIgnoreCase("unjail")) {
-			Player player2 = World.getPlayerByName(wholeCommand.substring(command[0].length() + 1, wholeCommand.length()));
+			Player player2 = World.getPlayerByName(wholeCommand.substring(command[0].length() + 1));
 			if (player2 != null) {
 				Jail.unjail(player2);
 				PlayerLogs.log(player.getUsername(), "" + player.getUsername() + " just unjailed " + player2.getUsername() + "!");
@@ -919,7 +919,7 @@ public class CommandPacketListener implements PacketListener {
 				player2.performAnimation(new Animation(1993));
 				player.performGraphic(new Graphic(730));
 			} else {
-				player.getPacketSender().sendMessage("Could not find \"" + wholeCommand.substring(command[0].length() + 1, wholeCommand.length()) + "\" online.");
+				player.getPacketSender().sendMessage("Could not find \"" + wholeCommand.substring(command[0].length() + 1) + "\" online.");
 			}
 		}
 		if (command[0].equalsIgnoreCase("staffzone")) {
@@ -943,10 +943,10 @@ public class CommandPacketListener implements PacketListener {
 				player.getPacketSender().sendMessage("Cannot find that player online..");
 				return;
 			} else {
-				boolean canTele = TeleportHandler.checkReqs(player, player2.getPosition().copy()) && player.getRegionInstance() == null && player2.getRegionInstance() == null;
+				boolean canTele = TeleportHandler.checkReqs(player, player2.getEntityPosition().copy()) && player.getRegionInstance() == null && player2.getRegionInstance() == null;
 				if (canTele) {
 					player.performGraphic(new Graphic(342));
-					TeleportHandler.teleportPlayer(player, player2.getPosition().copy(), TeleportType.NORMAL);
+					TeleportHandler.teleportPlayer(player, player2.getEntityPosition().copy(), TeleportType.NORMAL);
 					player.getPacketSender().sendMessage("Teleporting to player: " + player2.getUsername() + "");
 					player2.performGraphic(new Graphic(730));
 				} else
@@ -1022,7 +1022,7 @@ public class CommandPacketListener implements PacketListener {
 			}
 		}
 		if(command[0].equalsIgnoreCase("ipmute")) {
-			Player player2 = World.getPlayerByName(wholeCommand.substring(command[0].length()+1, wholeCommand.length()));
+			Player player2 = World.getPlayerByName(wholeCommand.substring(command[0].length()+1));
 			if(player2 == null) {
 				player.getPacketSender().sendMessage("Could not find that player online.");
 				return;
@@ -1046,9 +1046,9 @@ public class CommandPacketListener implements PacketListener {
 				player.getPacketSender().sendMessage("Cannot find that player online..");
 				return;
 			} else {
-				boolean canTele = TeleportHandler.checkReqs(player, player2.getPosition().copy()) && player.getRegionInstance() == null && player2.getRegionInstance() == null;
+				boolean canTele = TeleportHandler.checkReqs(player, player2.getEntityPosition().copy()) && player.getRegionInstance() == null && player2.getRegionInstance() == null;
 				if(canTele && player2.getDueling().duelingStatus < 5) {
-					TeleportHandler.teleportPlayer(player2, player.getPosition().copy(), TeleportType.NORMAL);
+					TeleportHandler.teleportPlayer(player2, player.getEntityPosition().copy(), TeleportType.NORMAL);
 					player.performGraphic(new Graphic(730));
 					player.getPacketSender().sendMessage("Teleporting "+player2.getUsername()+" to you.");
 					player2.getPacketSender().sendMessage("You're being teleported to "+player.getUsername()+"...");
@@ -1065,12 +1065,12 @@ public class CommandPacketListener implements PacketListener {
 				player.getPacketSender().sendMessage("Cannot find that player..");
 				return;
 			} else {
-				boolean canTele = TeleportHandler.checkReqs(player, player2.getPosition().copy()) && player.getRegionInstance() == null && player2.getRegionInstance() == null;
+				boolean canTele = TeleportHandler.checkReqs(player, player2.getEntityPosition().copy()) && player.getRegionInstance() == null && player2.getRegionInstance() == null;
 				if(canTele && player2.getDueling().duelingStatus < 5) {
 					player.getPacketSender().sendMessage("Moving player: "+player2.getUsername()+"");
 					player2.getPacketSender().sendMessage("You've been moved to "+player.getUsername());
 					World.sendStaffMessage("<col=FF0066><img=2> [PUNISHMENTS]<col=6600FF> "+player.getUsername()+" just moved "+player2.getUsername()+ " to them.");
-					player2.moveTo(player.getPosition().copy());
+					player2.moveTo(player.getEntityPosition().copy());
 					player2.performGraphic(new Graphic(342));
 				} else
 					player.getPacketSender().sendMessage("Failed to move player to your coords. Are you or them in a minigame?").sendMessage("Also will fail if they're in duel/wild.");
@@ -1159,8 +1159,8 @@ public class CommandPacketListener implements PacketListener {
 			}
 		}
 		if(command[0].equalsIgnoreCase("pos")) {
-			player.getPacketSender().sendMessage(player.getPosition().toString());
-			System.out.println(new Gson().toJson(player.getPosition()) + ",");
+			player.getPacketSender().sendMessage(player.getEntityPosition().toString());
+			System.out.println(new Gson().toJson(player.getEntityPosition()) + ",");
 		}
 		if(command[0].equalsIgnoreCase("getpos")) {
 			Player player2 = World.getPlayerByName(wholeCommand.substring(command[0].length()+1));
@@ -1168,23 +1168,23 @@ public class CommandPacketListener implements PacketListener {
 				player.getPacketSender().sendMessage("Could not find that player online.");
 				return;
 			} else {
-				player.getPacketSender().sendMessage("[@red@"+player2.getUsername()+"@bla@] "+player2.getPosition().toString()+" @red@| @bla@Location: "+player2.getLocation());	
+				player.getPacketSender().sendMessage("[@red@"+player2.getUsername()+"@bla@] "+player2.getEntityPosition().toString()+" @red@| @bla@Location: "+player2.getLocation());
 			}
 		}
 		if(command[0].equalsIgnoreCase("wpos")) {
-			System.out.println(player.getPosition().toString());
+			System.out.println(player.getEntityPosition().toString());
 		}
 		if (command[0].equalsIgnoreCase("tele")) {
 			int x = Integer.valueOf(command[1]), y = Integer.valueOf(command[2]);
-			int z = player.getPosition().getZ();
+			int z = player.getEntityPosition().getZ();
 			if (command.length > 3)
 				z = Integer.valueOf(command[3]);
 			Position position = new Position(x, y, z);
 			player.moveTo(position);
-			player.getPacketSender().sendMessage("Teleporting to " + position.toString());
+			player.getPacketSender().sendMessage("Teleporting to " + position);
 		}
 		if(command[0].equalsIgnoreCase("isob")) {
-			player.getPacketSender().sendMessage("Are you on a custom object? "+CustomObjects.objectExists(player.getPosition().copy()));
+			player.getPacketSender().sendMessage("Are you on a custom object? "+CustomObjects.objectExists(player.getEntityPosition().copy()));
 		}
 		if(command[0].equalsIgnoreCase("ipban")) {
 			Player player2 = World.getPlayerByName(wholeCommand.substring(command[0].length()+1));
@@ -1963,7 +1963,7 @@ public class CommandPacketListener implements PacketListener {
 	}
 
 
-	private static void developerCommands(Player player, String command[], String wholeCommand) {
+	private static void developerCommands(Player player, String[] command, String wholeCommand) {
 		if (command[0].equalsIgnoreCase("godmode")) {
 			player.setConstitution(1_000_000);
 		}
@@ -2210,7 +2210,7 @@ public class CommandPacketListener implements PacketListener {
 			}
 		}
 		if(command[0].equalsIgnoreCase("location")) {
-			player.getPacketSender().sendConsoleMessage("Current location: "+player.getLocation().toString()+", coords: "+player.getPosition());
+			player.getPacketSender().sendConsoleMessage("Current location: "+player.getLocation().toString()+", coords: "+player.getEntityPosition());
 		}
 		if(command[0].equalsIgnoreCase("freeze")) {
 			player.getMovementQueue().freeze(15);
@@ -2258,7 +2258,7 @@ public class CommandPacketListener implements PacketListener {
 		}
 		if(command[0].equalsIgnoreCase("npc")) {
 			int id = Integer.parseInt(command[1]);
-			NPC npc = new NPC(id, new Position(player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ()));
+			NPC npc = new NPC(id, new Position(player.getEntityPosition().getX(), player.getEntityPosition().getY(), player.getEntityPosition().getZ()));
 			World.register(npc);
 			npc.setConstitution(20000);
 			npc.setEntityInteraction(player);
@@ -2366,7 +2366,7 @@ public class CommandPacketListener implements PacketListener {
 			player.getStrategy(npcID);
 			player.getUpdateFlag().flag(Flag.APPEARANCE);
 		} else if(command[0].equalsIgnoreCase("playobject")) {
-			player.getPacketSender().sendObjectAnimation(new GameObject(2283, player.getPosition().copy()), new Animation(751));
+			player.getPacketSender().sendObjectAnimation(new GameObject(2283, player.getEntityPosition().copy()), new Animation(751));
 			player.getUpdateFlag().flag(Flag.APPEARANCE);
 		}
 		if (command[0].equalsIgnoreCase("interface")) {
@@ -2379,7 +2379,7 @@ public class CommandPacketListener implements PacketListener {
 		}
 		if (command[0].equalsIgnoreCase("object")) {
 			int id = Integer.parseInt(command[1]);
-			player.getPacketSender().sendObject(new GameObject(id, player.getPosition(), 10, 3));
+			player.getPacketSender().sendObject(new GameObject(id, player.getEntityPosition(), 10, 3));
 			player.getPacketSender().sendMessage("Sending object: " + id);
 		}
 		if (command[0].equalsIgnoreCase("config")) {

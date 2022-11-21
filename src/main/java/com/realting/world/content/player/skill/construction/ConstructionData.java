@@ -1,13 +1,13 @@
 package com.realting.world.content.player.skill.construction;
 
-import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import com.realting.model.Position;
 import com.realting.model.Skill;
 import com.realting.model.definitions.GameObjectDefinition;
 import com.realting.model.entity.character.player.Player;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Iterator;
 /**
  * 
  * @author Owner Blade
@@ -29,7 +29,7 @@ public class ConstructionData {
 			BASE_X = 1856, BASE_Y = 5056, MIDDLE_X = 1912, MIDDLE_Y = 5112;
 	
 	public static final int[] DOORSPACEIDS = new int[] {15314, 15313, 15305, 15306,15317};
-	public static enum Portals
+	public enum Portals
 	{
 		VARROCK(1, new Position(ConstructionConstants.VARROCK_X, ConstructionConstants.VARROCK_Y), 25,
 				new int[][] {{563, 100}, {554, 100/*fire*/}, {556, 300 /*Air*/}}, new int[] {13615, 13622, 13629}),
@@ -47,11 +47,12 @@ public class ConstructionData {
 				new int[][] {{563, 200}, {565, 100}}, new int[] {13621, 13628, 13635}),
 		EMPTY(-1, null, -1, null, null),
 				;
-		private Position destination;
-		private int[][] requiredItems;
-		private int[] objects;
-		private int magicLevel, type;
-		private Portals(int id, Position destination, int magicLevel, int[][] requiredItems, int[] objects)
+		private final Position destination;
+		private final int[][] requiredItems;
+		private final int[] objects;
+		private final int magicLevel;
+		private final int type;
+		Portals(int id, Position destination, int magicLevel, int[][] requiredItems, int[] objects)
 		{
 			this.type = id;
 			this.destination = destination;
@@ -96,7 +97,7 @@ public class ConstructionData {
 					Portal portal = it.next();
 					if(portal.getRoomX() == myTiles[0]-1
 							&& portal.getRoomY() == myTiles[1]-1
-							&& portal.getRoomZ() == (p.inConstructionDungeon() ? 4 : p.getPosition().getZ())
+							&& portal.getRoomZ() == (p.inConstructionDungeon() ? 4 : p.getEntityPosition().getZ())
 							&& portal.getId() == p.getPortalSelected())
 					{
 						it.remove();
@@ -139,7 +140,7 @@ public class ConstructionData {
 			{
 				if(portal.getRoomX() == myTiles[0]-1
 						&& portal.getRoomY() == myTiles[1]-1
-						&& portal.getRoomZ() == (p.inConstructionDungeon() ? 4 : p.getPosition().getZ())
+						&& portal.getRoomZ() == (p.inConstructionDungeon() ? 4 : p.getEntityPosition().getZ())
 						&& portal.getId() == p.getPortalSelected())
 				{
 					portal.setType(type);
@@ -152,7 +153,7 @@ public class ConstructionData {
 				portal.setId(p.getPortalSelected());
 				portal.setRoomX(myTiles[0] - 1);
 				portal.setRoomY(myTiles[1] - 1);
-				portal.setRoomZ(p.inConstructionDungeon() ? 4 : p.getPosition().getZ());
+				portal.setRoomZ(p.inConstructionDungeon() ? 4 : p.getEntityPosition().getZ());
 				portal.setType(type);
 				p.getHousePortals().add(portal);
 			}
@@ -161,7 +162,7 @@ public class ConstructionData {
 			p.getPacketSender().sendInterfaceRemoval();
 		}
 	}
-	public static enum Butlers
+	public enum Butlers
 	{
 		JACK(4235, 20, 500, 6, 60),
 		MAID(4237, 25, 1000, 10, 30),
@@ -171,7 +172,7 @@ public class ConstructionData {
 		;
 		private int npcId, consLevel, loanCost,inventory;
 		private double tripSeconds;
-		private Butlers(int npcId, int consLevel, int loanCost, int inventory, double tripSeconds)
+		Butlers(int npcId, int consLevel, int loanCost, int inventory, double tripSeconds)
 		{
 			this.setNpcId(npcId);
 			this.setConsLevel(consLevel);
@@ -271,11 +272,15 @@ public class ConstructionData {
 			return null;
 		}
 
-		private int x, y, cost, levelToBuild, id;
-		private boolean[] doors;
+		private final int x;
+		private final int y;
+		private final int cost;
+		private final int levelToBuild;
+		private final int id;
+		private final boolean[] doors;
 
-		private RoomData(int x, int y, int id, int levelToBuild, int cost,
-				boolean[] doors) {
+		RoomData(int x, int y, int id, int levelToBuild, int cost,
+				 boolean[] doors) {
 			this.x = x;
 			this.y = y;
 			this.id = id;
@@ -810,13 +815,18 @@ public class ConstructionData {
 		TREASURE_ROOM_DOOR_1(92, 15327, 3, 1, 3, ConstructionData.TREASURE_ROOM, 0),
 		TREASURE_ROOM_DOOR_2(92, 15326, 4, 1, 3, ConstructionData.TREASURE_ROOM, 0),
 		;
-		private int hotSpotId, objectId, xOffset, yOffset, standardRotation,
-				objectType, roomType;
+		private final int hotSpotId;
+		private final int objectId;
+		private final int xOffset;
+		private final int yOffset;
+		private final int standardRotation;
+		private int objectType;
+		private int roomType;
 		private boolean mutiple;
 		private Dimension carpetDim;
 		
-		private HotSpots(int hotSpotId, int objectId, int xOffset, int yOffset,
-				int standardRotation, int roomType) {
+		HotSpots(int hotSpotId, int objectId, int xOffset, int yOffset,
+				 int standardRotation, int roomType) {
 			this.hotSpotId = hotSpotId;
 			this.objectId = objectId;
 			this.xOffset = xOffset;
@@ -829,24 +839,24 @@ public class ConstructionData {
 			
 		}
 
-		private HotSpots(int hotSpotId, int objectId, int xOffset, int yOffset,
-				int standardRotation, int roomType, int objectType) {
+		HotSpots(int hotSpotId, int objectId, int xOffset, int yOffset,
+				 int standardRotation, int roomType, int objectType) {
 			this(hotSpotId, objectId, xOffset, yOffset, standardRotation, roomType);
 			this.setObjectType(objectType);
 		}
-		private HotSpots(int hotSpotId, int objectId, int xOffset, int yOffset,
-				int standardRotation, int roomType, int objectType, boolean mutiple) {
+		HotSpots(int hotSpotId, int objectId, int xOffset, int yOffset,
+				 int standardRotation, int roomType, int objectType, boolean mutiple) {
 			this(hotSpotId, objectId, xOffset, yOffset, standardRotation, roomType, objectType);
 			this.setMutiple(mutiple);
 		}
-		private HotSpots(int hotSpotId, int objectId, int xOffset, int yOffset,
-				int standardRotation,int roomType, boolean mutiple) {
+		HotSpots(int hotSpotId, int objectId, int xOffset, int yOffset,
+				 int standardRotation, int roomType, boolean mutiple) {
 			this(hotSpotId, objectId, xOffset, yOffset, standardRotation, roomType);
 			this.setMutiple(mutiple);
 		}
 
-		private HotSpots(int hotSpotId, int objectId, int xOffset, int yOffset,
-				int standardRotation, int roomType, int objectType, Dimension carpetDim) {
+		HotSpots(int hotSpotId, int objectId, int xOffset, int yOffset,
+				 int standardRotation, int roomType, int objectType, Dimension carpetDim) {
 			this(hotSpotId, objectId, xOffset, yOffset, standardRotation, roomType,
 					objectType);
 			this.setCarpetDim(carpetDim);
@@ -1560,12 +1570,17 @@ public class ConstructionData {
 		
 		
 		;
-		private int hotspotId, furnitureId, xp, level, itemId;
-		private int[][] requiredItems, additionalSkillRequirements;
+		private final int hotspotId;
+		private final int furnitureId;
+		private final int xp;
+		private final int level;
+		private final int itemId;
+		private final int[][] requiredItems;
+		private int[][] additionalSkillRequirements;
 		private int furnitureRequired;
 
-		private Furniture(int hotspotId, int furnitureId, int xp, int level,
-				int itemId, int[][] requiredItems) {
+		Furniture(int hotspotId, int furnitureId, int xp, int level,
+				  int itemId, int[][] requiredItems) {
 			this.hotspotId = hotspotId;
 			this.furnitureId = furnitureId;
 			this.xp = xp;
@@ -1574,13 +1589,13 @@ public class ConstructionData {
 			this.itemId = itemId;
 			furnitureRequired = -1;
 		}
-		private Furniture(int hotspotId, int furnitureId, int xp, int level,
-				int itemId, int[][] requiredItems, int[][] additionalSkillRequirements) {
+		Furniture(int hotspotId, int furnitureId, int xp, int level,
+				  int itemId, int[][] requiredItems, int[][] additionalSkillRequirements) {
 			this(hotspotId, furnitureId, xp, level, itemId, requiredItems);
 			this.setAdditionalSkillRequirements(additionalSkillRequirements);
 		}
-		private Furniture(int hotspotId, int furnitureId, int xp, int level,
-				int itemId, int[][] requiredItems, int furnitureRequired) {
+		Furniture(int hotspotId, int furnitureId, int xp, int level,
+				  int itemId, int[][] requiredItems, int furnitureRequired) {
 			this(hotspotId, furnitureId, xp, level, itemId, requiredItems);
 			this.setFurnitureRequired(furnitureRequired);
 		}

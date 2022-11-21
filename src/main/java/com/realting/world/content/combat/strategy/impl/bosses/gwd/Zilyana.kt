@@ -25,7 +25,7 @@ class Zilyana : CombatStrategy {
         if (victim!!.constitution <= 0) {
             return true
         }
-        if (Locations.goodDistance(zilyana!!.position.copy(), victim.position.copy(), 1) && Misc.getRandom(5) <= 3) {
+        if (Locations.goodDistance(zilyana!!.entityPosition.copy(), victim.entityPosition.copy(), 1) && Misc.getRandom(5) <= 3) {
             zilyana.performAnimation(Animation(zilyana.definition.attackAnimation))
             zilyana.combatBuilder.container = CombatContainer(zilyana, victim, 1, 1, CombatType.MELEE, true)
         } else {

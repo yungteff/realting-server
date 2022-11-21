@@ -1,17 +1,17 @@
 package com.realting.world.content
 
 import com.realting.engine.task.Task
-import com.realting.model.entity.character.GroundItemManager.spawnGroundItem
-import java.util.concurrent.CopyOnWriteArrayList
-import com.realting.world.World
-import com.realting.world.clip.region.RegionClipping
-import java.util.Locale
 import com.realting.engine.task.TaskManager
 import com.realting.model.GameObject
 import com.realting.model.GroundItem
 import com.realting.model.Item
 import com.realting.model.Position
+import com.realting.model.entity.character.GroundItemManager.spawnGroundItem
 import com.realting.model.entity.character.player.Player
+import com.realting.world.World
+import com.realting.world.clip.region.RegionClipping
+import java.util.*
+import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * Handles customly spawned objects (mostly global but also privately for players)
@@ -21,8 +21,9 @@ object CustomObjects {
     private const val DISTANCE_SPAWN = 70 //Spawn if within 70 squares of distance
     private val CUSTOM_OBJECTS = CopyOnWriteArrayList<GameObject>()
     private val HOME_OBJECTS = intArrayOf(4764, 4772)
+
     @JvmStatic
-	fun init() {
+    fun init() {
         for (i in CUSTOM_OBJECTS_SPAWNS.indices) {
             val id = CUSTOM_OBJECTS_SPAWNS[i][0]
             val x = CUSTOM_OBJECTS_SPAWNS[i][1]
@@ -49,7 +50,7 @@ object CustomObjects {
     private fun handleList(`object`: GameObject, handleType: String) {
         when (handleType.uppercase(Locale.getDefault())) {
             "DELETE" -> for (objects in CUSTOM_OBJECTS) {
-                if (objects.id == `object`.id && `object`.position == objects.position) {
+                if (objects.id == `object`.id && `object`.entityPosition == objects.entityPosition) {
                     CUSTOM_OBJECTS.remove(objects)
                 }
             }
@@ -61,7 +62,7 @@ object CustomObjects {
     }
 
     @JvmStatic
-	fun spawnObject(p: Player, `object`: GameObject) {
+    fun spawnObject(p: Player, `object`: GameObject) {
         if (`object`.id != -1) {
             p.packetSender.sendObject(`object`)
             if (!RegionClipping.objectExists(`object`)) {
@@ -80,13 +81,13 @@ object CustomObjects {
     }
 
     @JvmStatic
-	fun deleteGlobalObject(`object`: GameObject) {
+    fun deleteGlobalObject(`object`: GameObject) {
         handleList(`object`, "delete")
         World.deregister(`object`)
     }
 
     @JvmStatic
-	fun spawnGlobalObject(`object`: GameObject) {
+    fun spawnGlobalObject(`object`: GameObject) {
         handleList(`object`, "add")
         World.register(`object`)
     }
@@ -94,7 +95,7 @@ object CustomObjects {
     fun spawnGlobalObjectWithinDistance(`object`: GameObject) {
         for (player in World.getPlayers()) {
             if (player == null) continue
-            if (`object`.position.isWithinDistance(player.position, DISTANCE_SPAWN)) {
+            if (`object`.entityPosition.isWithinDistance(player.entityPosition, DISTANCE_SPAWN)) {
                 spawnObject(player, `object`)
             }
         }
@@ -103,20 +104,20 @@ object CustomObjects {
     fun deleteGlobalObjectWithinDistance(`object`: GameObject) {
         for (player in World.getPlayers()) {
             if (player == null) continue
-            if (`object`.position.isWithinDistance(player.position, DISTANCE_SPAWN)) {
+            if (`object`.entityPosition.isWithinDistance(player.entityPosition, DISTANCE_SPAWN)) {
                 deleteObject(player, `object`)
             }
         }
     }
 
     @JvmStatic
-	fun objectExists(pos: Position): Boolean {
+    fun objectExists(pos: Position): Boolean {
         return getGameObject(pos) != null
     }
 
     fun getGameObject(pos: Position): GameObject? {
         for (objects in CUSTOM_OBJECTS) {
-            if (objects != null && objects.position == pos) {
+            if (objects != null && objects.entityPosition == pos) {
                 return objects
             }
         }
@@ -124,17 +125,17 @@ object CustomObjects {
     }
 
     @JvmStatic
-	fun handleRegionChange(p: Player) {
+    fun handleRegionChange(p: Player) {
         for (`object` in CUSTOM_OBJECTS) {
             if (`object` == null) continue
-            if (`object`.position.isWithinDistance(p.position, DISTANCE_SPAWN)) {
+            if (`object`.entityPosition.isWithinDistance(p.entityPosition, DISTANCE_SPAWN)) {
                 spawnObject(p, `object`)
             }
         }
     }
 
     @JvmStatic
-	fun objectRespawnTask(p: Player, tempObject: GameObject, mainObject: GameObject, cycles: Int) {
+    fun objectRespawnTask(p: Player, tempObject: GameObject, mainObject: GameObject, cycles: Int) {
         deleteObject(p, mainObject)
         spawnObject(p, tempObject)
         TaskManager.submit(object : Task(cycles) {
@@ -181,7 +182,7 @@ object CustomObjects {
 
             override fun stop() {
                 setEventRunning(false)
-                spawnGroundItem(player, GroundItem(Item(592), fire.position, player.username, false, 150, true, 100))
+                spawnGroundItem(player, GroundItem(Item(592), fire.entityPosition, player.username, false, 150, true, 100))
             }
         })
     }
@@ -199,6 +200,31 @@ object CustomObjects {
 
     //TODO: make service so that these objects can be re-used in server+client
     private val CLIENT_OBJECTS = arrayOf(
+
+        intArrayOf(6189, 2533, 3895, 0, 0),
+        //removing coal ore
+        intArrayOf(-1, 2529, 3894, 0, 0),
+        intArrayOf(-1, 2526, 3892, 0, 0),
+        intArrayOf(-1, 2528, 3892, 0, 0),
+        //adding mith
+        intArrayOf(11951, 2529, 3894, 0, 0),
+        intArrayOf(11951, 2526, 3892, 0, 0),
+        intArrayOf(11951, 2528, 3892, 0, 0),
+        //addy ore
+        intArrayOf(11941, 2524, 3890, 0, 1),
+        intArrayOf(11941, 2523, 3892, 0, 1),
+        intArrayOf(11941, 2526, 3889, 0, 1),
+        //addy ore
+        intArrayOf(14859, 2521, 3894, 0, 1),
+        intArrayOf(14859, 2522, 3895, 0, 1),
+        intArrayOf(14859, 2524, 3895, 0, 1),
+        //iron ore
+        intArrayOf(9717, 2531, 3893, 0, 1),
+        intArrayOf(9717, 2532, 3892, 0, 1),
+        intArrayOf(9717, 2533, 3891, 0, 1),
+
+
+
         intArrayOf(409, 3083, 3483, 0, 0),
         intArrayOf(411, 3085, 3483, 0, 0),
         intArrayOf(6552, 3087, 3483, 0, 0),

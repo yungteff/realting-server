@@ -13,19 +13,19 @@ object PathFinder {
         var destXInline = destX
         var destYInline = destY
         try {
-            if (destXInline == character.position.localX && destYInline == character.position.localY && !moveNear) {
+            if (destXInline == character.entityPosition.localX && destYInline == character.entityPosition.localY && !moveNear) {
                 return
             }
-            val height = character.position.z % 4
-            destXInline -= 8 * character.position.regionX
-            destYInline -= 8 * character.position.regionY
+            val height = character.entityPosition.z % 4
+            destXInline -= 8 * character.entityPosition.regionX
+            destYInline -= 8 * character.entityPosition.regionY
             val via = Array(104) { IntArray(104) }
             val cost = Array(104) { IntArray(104) }
             val tileQueueX = LinkedList<Int>()
             val tileQueueY = LinkedList<Int>()
             for (xx in 0..103) for (yy in 0..103) cost[xx][yy] = 99999999
-            var curX = character.position.localX
-            var curY = character.position.localY
+            var curX = character.entityPosition.localX
+            var curY = character.entityPosition.localY
             if (curX > via.size - 1 || curY > via[curX].size - 1) return
             if (curY < via[0].size) via[curX][curY] = 99
             if (curX < cost.size && curY < cost[0].size) cost[curX][curY] = 0
@@ -41,8 +41,8 @@ object PathFinder {
             while (tail != tileQueueX.size && tileQueueX.size < pathLength) {
                 curX = tileQueueX[tail]
                 curY = tileQueueY[tail]
-                val curAbsX = character.position.regionX * 8 + curX
-                val curAbsY = character.position.regionY * 8 + curY
+                val curAbsX = character.entityPosition.regionX * 8 + curX
+                val curAbsY = character.entityPosition.regionY * 8 + curY
                 if (curX == destXInline && curY == destYInline) {
 //                    println("found path: $foundPath")
                     foundPath = true
@@ -158,7 +158,7 @@ object PathFinder {
             tileQueueY[tail++] = curY
             var l5: Int
             var j5 = via[curX][curY].also { l5 = it }
-            while (curX != character.position.localX || curY != character.position.localY) {
+            while (curX != character.entityPosition.localX || curY != character.entityPosition.localY) {
                 if (j5 != l5) {
                     l5 = j5
                     tileQueueX[tail] = curX
@@ -169,15 +169,15 @@ object PathFinder {
                 j5 = via[curX][curY]
             }
             val size = tail--
-            var pathX = character.position.regionX * 8 + tileQueueX[tail]
-            var pathY = character.position.regionY * 8 + tileQueueY[tail]
-            character.movementQueue.addFirstStep(Position(pathX, pathY, character.position.z))
+            var pathX = character.entityPosition.regionX * 8 + tileQueueX[tail]
+            var pathY = character.entityPosition.regionY * 8 + tileQueueY[tail]
+            character.movementQueue.addFirstStep(Position(pathX, pathY, character.entityPosition.z))
             for (i in 1 until size) {
                 tail--
-                pathX = character.position.regionX * 8 + tileQueueX[tail]
-                pathY = character.position.regionY * 8 + tileQueueY[tail]
+                pathX = character.entityPosition.regionX * 8 + tileQueueX[tail]
+                pathY = character.entityPosition.regionY * 8 + tileQueueY[tail]
 //                println("pathX: $pathX pathY: $pathX")
-                character.movementQueue.addStep(Position(pathX, pathY, character.position.z))
+                character.movementQueue.addStep(Position(pathX, pathY, character.entityPosition.z))
             }
         } catch (e: Exception) {
             println("Error finding route, destx: $destXInline, destY: $destYInline. Reseted queue.")

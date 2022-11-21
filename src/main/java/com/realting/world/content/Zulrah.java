@@ -4,11 +4,11 @@ import com.realting.engine.task.Task;
 import com.realting.engine.task.TaskManager;
 import com.realting.model.Position;
 import com.realting.model.RegionInstance;
+import com.realting.model.entity.character.npc.NPC;
+import com.realting.model.entity.character.player.Player;
 import com.realting.util.Misc;
 import com.realting.world.World;
 import com.realting.world.content.combat.strategy.impl.bosses.ZulrahLogic;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.player.Player;
 
 public class Zulrah {
 	
@@ -17,7 +17,7 @@ public class Zulrah {
 		
 		int rand = Misc.randomMinusOne(ZulrahLogic.move.length);
 		
-		NPC zulrah = new NPC(ZulrahLogic.phase[Misc.randomMinusOne(ZulrahLogic.phase.length)], new Position(ZulrahLogic.move[rand].getX(), ZulrahLogic.move[rand].getY(), player.getPosition().getZ()));
+		NPC zulrah = new NPC(ZulrahLogic.phase[Misc.randomMinusOne(ZulrahLogic.phase.length)], new Position(ZulrahLogic.move[rand].getX(), ZulrahLogic.move[rand].getY(), player.getEntityPosition().getZ()));
 		zInstance.getNpcsList().add(zulrah);
 		World.register(zulrah);
 

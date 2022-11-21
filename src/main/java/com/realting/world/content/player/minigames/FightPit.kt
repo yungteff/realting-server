@@ -1,9 +1,9 @@
 package com.realting.world.content.minigames
 
-import com.realting.world.content.dialogue.DialogueManager
-import com.realting.model.*
+import com.realting.model.Position
 import com.realting.model.entity.character.player.Player
 import com.realting.util.Misc
+import com.realting.world.content.dialogue.DialogueManager
 import java.util.*
 
 object FightPit {
@@ -94,7 +94,7 @@ object FightPit {
         if (l) playerMap[player] = PLAYING
         var teleportToX = MINIGAME_START_POINT_X + Misc.getRandom(12)
         var teleportToY = MINIGAME_START_POINT_Y + Misc.getRandom(12)
-        if (!player.movementQueue.canWalk(player.position.x - teleportToX, player.position.y - teleportToY)) {
+        if (!player.movementQueue.canWalk(player.entityPosition.x - teleportToX, player.entityPosition.y - teleportToY)) {
             teleportToX = MINIGAME_START_POINT_X + Misc.getRandom(3)
             teleportToY = MINIGAME_START_POINT_Y + Misc.getRandom(3)
         }
@@ -259,7 +259,7 @@ object FightPit {
 
     @JvmStatic
     fun inFightPits(player: Player): Boolean {
-        return if (getState(player) != null && getState(player) == "PLAYING") true else false
+        return getState(player) != null && getState(player) == "PLAYING"
     }
 
     /**

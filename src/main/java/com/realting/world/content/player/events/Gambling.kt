@@ -1,13 +1,13 @@
 package com.realting.world.content.player.events
 
 import com.realting.model.*
-import com.realting.world.content.clan.ClanChatManager
-import com.realting.world.content.PlayerLogs
 import com.realting.model.entity.character.player.Player
-import com.realting.world.content.dialogue.DialogueManager
 import com.realting.model.movement.MovementQueue
 import com.realting.util.Misc
 import com.realting.world.content.CustomObjects
+import com.realting.world.content.PlayerLogs
+import com.realting.world.content.clan.ClanChatManager
+import com.realting.world.content.dialogue.DialogueManager
 
 object Gambling {
     @JvmStatic
@@ -65,17 +65,17 @@ object Gambling {
         }
         if (!player.clickDelay.elapsed(3000)) return
         for (npc in player.localNpcs) {
-            if (npc != null && npc.position == player.position) {
+            if (npc != null && npc.entityPosition == player.entityPosition) {
                 player.packetSender.sendMessage("You cannot plant a seed right here.")
                 return
             }
         }
-        if (CustomObjects.objectExists(player.position.copy())) {
+        if (CustomObjects.objectExists(player.entityPosition.copy())) {
             player.packetSender.sendMessage("You cannot plant a seed right here.")
             return
         }
         val flowers = FlowersData.generate()
-        val flower = GameObject(flowers.objectId, player.position.copy())
+        val flower = GameObject(flowers.objectId, player.entityPosition.copy())
         player.movementQueue.reset()
         player.inventory.delete(299, 1)
         player.performAnimation(Animation(827))
@@ -86,7 +86,7 @@ object Gambling {
         DialogueManager.start(player, 78)
         MovementQueue.stepAway(player)
         CustomObjects.globalObjectRemovalTask(flower, 90)
-        player.positionToFace = flower.position
+        player.positionToFace = flower.entityPosition
         player.clickDelay.reset()
     }
 

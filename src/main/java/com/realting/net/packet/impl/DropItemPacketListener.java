@@ -1,20 +1,15 @@
 package com.realting.net.packet.impl;
 
-import com.realting.model.CombatIcon;
-import com.realting.model.Graphic;
-import com.realting.model.GroundItem;
-import com.realting.model.Hit;
-import com.realting.model.Hitmask;
-import com.realting.model.Item;
+import com.realting.model.*;
 import com.realting.model.definitions.ItemDefinition;
+import com.realting.model.entity.character.GroundItemManager;
+import com.realting.model.entity.character.player.Player;
 import com.realting.net.packet.Packet;
 import com.realting.net.packet.PacketListener;
 import com.realting.world.content.PlayerLogs;
 import com.realting.world.content.Sounds;
 import com.realting.world.content.Sounds.Sound;
 import com.realting.world.content.player.skill.dungeoneering.ItemBinding;
-import com.realting.model.entity.character.GroundItemManager;
-import com.realting.model.entity.character.player.Player;
 
 /**
  * This packet listener is called when a player drops an item they
@@ -52,7 +47,7 @@ public class DropItemPacketListener implements PacketListener {
 					player.performGraphic(new Graphic(1750));
 					player.getPacketSender().sendMessage("The potion explodes in your face as you drop it!");
 				} else {
-					GroundItemManager.spawnGroundItem(player, new GroundItem(item, player.getPosition().copy(), player.getUsername(), player.getHostAddress(), false, 80, player.getPosition().getZ() >= 0 && player.getPosition().getZ() < 4 ? true : false, 80));
+					GroundItemManager.spawnGroundItem(player, new GroundItem(item, player.getEntityPosition().copy(), player.getUsername(), player.getHostAddress(), false, 80, player.getEntityPosition().getZ() >= 0 && player.getEntityPosition().getZ() < 4, 80));
 					PlayerLogs.log(player.getUsername(), "Player dropping item: "+(ItemDefinition.forId(item.getId()) != null && ItemDefinition.forId(item.getId()).getName() != null ? ItemDefinition.forId(item.getId()).getName() : item.getId())+", amount: "+item.getAmount());
 				}
 				Sounds.sendSound(player, Sound.DROP_ITEM);

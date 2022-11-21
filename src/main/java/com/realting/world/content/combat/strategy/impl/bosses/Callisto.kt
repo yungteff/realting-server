@@ -33,7 +33,7 @@ class Callisto : CombatStrategy {
                 MessageType.NPC_ALERT, "Callisto absorbs his next attack, healing himself a bit."
             )
         }
-        if (Locations.goodDistance(callisto.position.copy(), victim!!.position.copy(), 3) && Misc.getRandom(5) <= 3) {
+        if (Locations.goodDistance(callisto.entityPosition.copy(), victim.entityPosition.copy(), 3) && Misc.getRandom(5) <= 3) {
             callisto.performAnimation(Animation(callisto.definition.attackAnimation))
             callisto.combatBuilder.container = CombatContainer(callisto, victim, 1, 1, CombatType.MELEE, true)
             if (Misc.getRandom(10) <= 2) {

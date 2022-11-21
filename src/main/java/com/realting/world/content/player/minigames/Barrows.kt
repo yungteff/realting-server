@@ -1,17 +1,15 @@
 package com.realting.world.content.minigames
 
-import com.realting.model.RegionInstance.RegionInstanceType
 import com.realting.engine.task.TaskManager
-import com.realting.world.World
-import com.realting.world.content.dialogue.DialogueManager
 import com.realting.engine.task.impl.CeilingCollapseTask
 import com.realting.model.*
+import com.realting.model.RegionInstance.RegionInstanceType
 import com.realting.model.definitions.ItemDefinition
 import com.realting.model.entity.character.npc.NPC
 import com.realting.model.entity.character.player.Player
-import com.realting.model.input.impl.EnterAmountToSellToShop
-import com.realting.model.input.impl.EnterAmountToBuyFromShop
 import com.realting.util.Misc
+import com.realting.world.World
+import com.realting.world.content.dialogue.DialogueManager
 
 /**
  * Handles the Barrows minigame and it's objects, npcs, etc.
@@ -36,7 +34,7 @@ object Barrows {
                     `object`.id,
                     4,
                     2026,
-                    if (`object`.position != null) Position(3557, 9715, player.position.z) else Position(3552, 9693)
+                    if (`object`.entityPosition != null) Position(3557, 9715, player.entityPosition.z) else Position(3552, 9693)
                 )
                 return true
             }
@@ -46,7 +44,7 @@ object Barrows {
                     `object`.id,
                     0,
                     2030,
-                    if (`object`.position != null) Position(3575, 9704, player.position.z) else Position(3552, 9693)
+                    if (`object`.entityPosition != null) Position(3575, 9704, player.entityPosition.z) else Position(3552, 9693)
                 )
                 return true
             }
@@ -56,7 +54,7 @@ object Barrows {
                     `object`.id,
                     5,
                     2025,
-                    if (`object`.position != null) Position(3557, 9699, player.position.z) else Position(3552, 9693)
+                    if (`object`.entityPosition != null) Position(3557, 9699, player.entityPosition.z) else Position(3552, 9693)
                 )
                 return true
             }
@@ -66,7 +64,7 @@ object Barrows {
                     `object`.id,
                     1,
                     2029,
-                    if (`object`.position != null) Position(3571, 9684, player.position.z) else Position(3552, 9693)
+                    if (`object`.entityPosition != null) Position(3571, 9684, player.entityPosition.z) else Position(3552, 9693)
                 )
                 return true
             }
@@ -76,7 +74,7 @@ object Barrows {
                     `object`.id,
                     2,
                     2028,
-                    if (`object`.position != null) Position(3549, 9681, player.position.z) else Position(3552, 9693)
+                    if (`object`.entityPosition != null) Position(3549, 9681, player.entityPosition.z) else Position(3552, 9693)
                 )
                 return true
             }
@@ -86,119 +84,119 @@ object Barrows {
                     `object`.id,
                     3,
                     2027,
-                    if (`object`.position != null) Position(3537, 9703, player.position.z) else Position(3552, 9693)
+                    if (`object`.entityPosition != null) Position(3537, 9703, player.entityPosition.z) else Position(3552, 9693)
                 )
                 return true
             }
-            6745 -> if (`object`.position.x == 3535 && `object`.position.y == 9684) {
+            6745 -> if (`object`.entityPosition.x == 3535 && `object`.entityPosition.y == 9684) {
                 player.moveTo(Position(3535, 9689))
                 return true
-            } else if (`object`.position.x == 3534 && `object`.position.y == 9688) {
+            } else if (`object`.entityPosition.x == 3534 && `object`.entityPosition.y == 9688) {
                 player.moveTo(Position(3534, 9683))
                 return true
             }
-            6726 -> if (`object`.position.x == 3535 && `object`.position.y == 9688) {
+            6726 -> if (`object`.entityPosition.x == 3535 && `object`.entityPosition.y == 9688) {
                 player.moveTo(Position(3535, 9683))
                 return true
-            } else if (`object`.position.x == 3534 && `object`.position.y == 9684) {
+            } else if (`object`.entityPosition.x == 3534 && `object`.entityPosition.y == 9684) {
                 player.moveTo(Position(3534, 9689))
                 return true
             }
-            6737 -> if (`object`.position.x == 3535 && `object`.position.y == 9701) {
+            6737 -> if (`object`.entityPosition.x == 3535 && `object`.entityPosition.y == 9701) {
                 player.moveTo(Position(3535, 9706))
                 return true
-            } else if (`object`.position.x == 3534 && `object`.position.y == 9705) {
+            } else if (`object`.entityPosition.x == 3534 && `object`.entityPosition.y == 9705) {
                 player.moveTo(Position(3534, 9700))
                 return true
             }
-            6718 -> if (`object`.position.x == 3534 && `object`.position.y == 9701) {
+            6718 -> if (`object`.entityPosition.x == 3534 && `object`.entityPosition.y == 9701) {
                 player.moveTo(Position(3534, 9706))
                 return true
-            } else if (`object`.position.x == 3535 && `object`.position.y == 9705) {
+            } else if (`object`.entityPosition.x == 3535 && `object`.entityPosition.y == 9705) {
                 player.moveTo(Position(3535, 9700))
                 return true
             }
-            6719 -> if (`object`.position.x == 3541 && `object`.position.y == 9712) {
+            6719 -> if (`object`.entityPosition.x == 3541 && `object`.entityPosition.y == 9712) {
                 player.moveTo(Position(3546, 9712))
                 return true
-            } else if (`object`.position.x == 3545 && `object`.position.y == 9711) {
+            } else if (`object`.entityPosition.x == 3545 && `object`.entityPosition.y == 9711) {
                 player.moveTo(Position(3540, 9711))
                 return true
             }
-            6738 -> if (`object`.position.x == 3541 && `object`.position.y == 9711) {
+            6738 -> if (`object`.entityPosition.x == 3541 && `object`.entityPosition.y == 9711) {
                 player.moveTo(Position(3546, 9711))
                 return true
-            } else if (`object`.position.x == 3545 && `object`.position.y == 9712) {
+            } else if (`object`.entityPosition.x == 3545 && `object`.entityPosition.y == 9712) {
                 player.moveTo(Position(3540, 9712))
                 return true
             }
-            6740 -> if (`object`.position.x == 3558 && `object`.position.y == 9711) {
+            6740 -> if (`object`.entityPosition.x == 3558 && `object`.entityPosition.y == 9711) {
                 player.moveTo(Position(3563, 9711))
                 return true
-            } else if (`object`.position.x == 3562 && `object`.position.y == 9712) {
+            } else if (`object`.entityPosition.x == 3562 && `object`.entityPosition.y == 9712) {
                 player.moveTo(Position(3557, 9712))
                 return true
             }
-            6721 -> if (`object`.position.x == 3558 && `object`.position.y == 9712) {
+            6721 -> if (`object`.entityPosition.x == 3558 && `object`.entityPosition.y == 9712) {
                 player.moveTo(Position(3563, 9712))
                 return true
-            } else if (`object`.position.x == 3562 && `object`.position.y == 9711) {
+            } else if (`object`.entityPosition.x == 3562 && `object`.entityPosition.y == 9711) {
                 player.moveTo(Position(3557, 9711))
                 return true
             }
-            6741 -> if (`object`.position.x == 3568 && `object`.position.y == 9705) {
+            6741 -> if (`object`.entityPosition.x == 3568 && `object`.entityPosition.y == 9705) {
                 player.moveTo(Position(3568, 9700))
                 return true
-            } else if (`object`.position.x == 3569 && `object`.position.y == 9701) {
+            } else if (`object`.entityPosition.x == 3569 && `object`.entityPosition.y == 9701) {
                 player.moveTo(Position(3569, 9706))
                 return true
             }
-            6722 -> if (`object`.position.x == 3569 && `object`.position.y == 9705) {
+            6722 -> if (`object`.entityPosition.x == 3569 && `object`.entityPosition.y == 9705) {
                 player.moveTo(Position(3569, 9700))
                 return true
-            } else if (`object`.position.x == 3568 && `object`.position.y == 9701) {
+            } else if (`object`.entityPosition.x == 3568 && `object`.entityPosition.y == 9701) {
                 player.moveTo(Position(3568, 9706))
                 return true
             }
-            6747 -> if (`object`.position.x == 3568 && `object`.position.y == 9688) {
+            6747 -> if (`object`.entityPosition.x == 3568 && `object`.entityPosition.y == 9688) {
                 player.moveTo(Position(3568, 9683))
                 return true
-            } else if (`object`.position.x == 3569 && `object`.position.y == 9684) {
+            } else if (`object`.entityPosition.x == 3569 && `object`.entityPosition.y == 9684) {
                 player.moveTo(Position(3569, 9689))
                 return true
             }
-            6728 -> if (`object`.position.x == 3569 && `object`.position.y == 9688) {
+            6728 -> if (`object`.entityPosition.x == 3569 && `object`.entityPosition.y == 9688) {
                 player.moveTo(Position(3569, 9683))
                 return true
-            } else if (`object`.position.x == 3568 && `object`.position.y == 9684) {
+            } else if (`object`.entityPosition.x == 3568 && `object`.entityPosition.y == 9684) {
                 player.moveTo(Position(3568, 9689))
                 return true
             }
-            6749 -> if (`object`.position.x == 3562 && `object`.position.y == 9678) {
+            6749 -> if (`object`.entityPosition.x == 3562 && `object`.entityPosition.y == 9678) {
                 player.moveTo(Position(3557, 9678))
                 return true
-            } else if (`object`.position.x == 3558 && `object`.position.y == 9677) {
+            } else if (`object`.entityPosition.x == 3558 && `object`.entityPosition.y == 9677) {
                 player.moveTo(Position(3563, 9677))
                 return true
             }
-            6730 -> if (`object`.position.x == 3562 && `object`.position.y == 9677) {
+            6730 -> if (`object`.entityPosition.x == 3562 && `object`.entityPosition.y == 9677) {
                 player.moveTo(Position(3557, 9677))
                 return true
-            } else if (`object`.position.x == 3558 && `object`.position.y == 9678) {
+            } else if (`object`.entityPosition.x == 3558 && `object`.entityPosition.y == 9678) {
                 player.moveTo(Position(3563, 9678))
                 return true
             }
-            6748 -> if (`object`.position.x == 3545 && `object`.position.y == 9678) {
+            6748 -> if (`object`.entityPosition.x == 3545 && `object`.entityPosition.y == 9678) {
                 player.moveTo(Position(3540, 9678))
                 return true
-            } else if (`object`.position.x == 3541 && `object`.position.y == 9677) {
+            } else if (`object`.entityPosition.x == 3541 && `object`.entityPosition.y == 9677) {
                 player.moveTo(Position(3546, 9677))
                 return true
             }
-            6729 -> if (`object`.position.x == 3545 && `object`.position.y == 9677) {
+            6729 -> if (`object`.entityPosition.x == 3545 && `object`.entityPosition.y == 9677) {
                 player.moveTo(Position(3540, 9677))
                 return true
-            } else if (`object`.position.x == 3541 && `object`.position.y == 9678) {
+            } else if (`object`.entityPosition.x == 3541 && `object`.entityPosition.y == 9678) {
                 player.moveTo(Position(3546, 9678))
                 return true
             }
@@ -261,10 +259,10 @@ object Barrows {
                     TaskManager.submit(CeilingCollapseTask(player))
                 }
             }
-            6744, 6725 -> if (player.position.x == 3563) showRiddle(player)
-            6746, 6727 -> if (player.position.y == 9683) showRiddle(player)
-            6743, 6724 -> if (player.position.x == 3540) showRiddle(player)
-            6739, 6720 -> if (player.position.y == 9706) player.moveTo(Position(3551, 9694))
+            6744, 6725 -> if (player.entityPosition.x == 3563) showRiddle(player)
+            6746, 6727 -> if (player.entityPosition.y == 9683) showRiddle(player)
+            6743, 6724 -> if (player.entityPosition.x == 3540) showRiddle(player)
+            6739, 6720 -> if (player.entityPosition.y == 9706) player.moveTo(Position(3551, 9694))
         }
         return false
     }
@@ -316,14 +314,14 @@ object Barrows {
      */
     fun searchCoffin(player: Player, obj: Int, coffinId: Int, npcId: Int, spawnPos: Position?) {
         player.packetSender.sendInterfaceRemoval()
-        if (player.position.z == -1) {
+        if (player.entityPosition.z == -1) {
             if (selectCoffin(player, obj)) return
         }
         if (player.minigameAttributes.barrowsMinigameAttributes.barrowsData[coffinId][1] == 0) {
             if (player.location === Locations.Location.BARROWS) {
                 player.regionInstance = RegionInstance(player, RegionInstanceType.BARROWS)
                 val npc_ = NPC(npcId, spawnPos)
-                npc_.forceChat(if (player.position.z == -1) "You dare disturb my rest!" else "You dare steal from us!")
+                npc_.forceChat(if (player.entityPosition.z == -1) "You dare disturb my rest!" else "You dare steal from us!")
                 npc_.combatBuilder.attackTimer = 3
                 npc_.spawnedFor = player
                 npc_.combatBuilder.attack(player)

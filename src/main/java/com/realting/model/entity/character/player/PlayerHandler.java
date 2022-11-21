@@ -227,21 +227,21 @@ public class PlayerHandler {
 			player.getPacketSender().sendMessage("Your Dungeon has been disbanded.");
 			player.setInDung(false);
 		}
-		if (player.getLocation() == Location.GRAVEYARD && player.getPosition().getY() > 3566) {
+		if (player.getLocation() == Location.GRAVEYARD && player.getEntityPosition().getY() > 3566) {
 			PlayerLogs.log(player.getUsername(), "logged in inside the graveyard arena, moved their ass out.");
 			player.moveTo(new Position(3503, 3565, 0));
 			player.setPositionToFace(new Position(3503, 3566));
 			player.getPacketSender().sendMessage("You logged off inside the graveyard arena. Moved you to lobby area.");
 		}
-		if (player.getPosition().getX() == 3004 && player.getPosition().getY() >= 3938 && player.getPosition().getY() <= 3949) {
+		if (player.getEntityPosition().getX() == 3004 && player.getEntityPosition().getY() >= 3938 && player.getEntityPosition().getY() <= 3949) {
 			PlayerLogs.log(player.getUsername(), player.getUsername()+" was stuck in the obstacle pipe in the Wild.");
-			player.moveTo(new Position(3006, player.getPosition().getY(), player.getPosition().getZ()));
+			player.moveTo(new Position(3006, player.getEntityPosition().getY(), player.getEntityPosition().getZ()));
 			player.getPacketSender().sendMessage("You logged off inside the obstacle pipe, moved out.");
 		}
 		GlobalItemSpawner.spawnGlobalGroundItems(player);
 		player.unlockPkTitles();
 		//player.getPacketSender().sendString(39160, "@or2@Players online:   @or2@[ @yel@"+(int)(World.getPlayers().size())+"@or2@ ]"); Handled by PlayerPanel.java
-		player.getPacketSender().sendString(57003, "Players:  @gre@"+(int)(World.getPlayers().size()));
+		player.getPacketSender().sendString(57003, "Players:  @gre@"+ World.getPlayers().size());
 		
 	}
 

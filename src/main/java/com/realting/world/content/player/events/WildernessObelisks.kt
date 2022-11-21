@@ -79,7 +79,7 @@ object WildernessObelisks {
         for (player in World.getPlayers()) {
             if (player == null || player.location == null || player.location !== Locations.Location.WILDERNESS) continue
             if (Locations.goodDistance(
-                    player.position.copy(), Position(
+                    player.entityPosition.copy(), Position(
                         OBELISK_COORDS[index][0] + 2, OBELISK_COORDS[index][1] + 2
                     ), 1
                 )

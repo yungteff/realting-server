@@ -29,13 +29,13 @@ class Vetion : CombatStrategy {
         if (vetion!!.isChargingAttack || victim!!.constitution <= 0) {
             return true
         }
-        if (Locations.goodDistance(vetion.position.copy(), victim!!.position.copy(), 3) && Misc.getRandom(5) <= 3) {
+        if (Locations.goodDistance(vetion.entityPosition.copy(), victim.entityPosition.copy(), 3) && Misc.getRandom(5) <= 3) {
             vetion.performAnimation(Animation(5487))
             vetion.combatBuilder.container = CombatContainer(vetion, victim, 1, 1, CombatType.MELEE, true)
         } else {
             vetion.isChargingAttack = true
             vetion.performAnimation(Animation(vetion.definition.attackAnimation))
-            val start = victim.position.copy()
+            val start = victim.entityPosition.copy()
             val second = Position(start.x + 2, start.y + Misc.getRandom(2))
             val last = Position(start.x - 2, start.y - Misc.getRandom(2))
             val p = victim as Player?
@@ -50,7 +50,7 @@ class Vetion : CombatStrategy {
                     } else if (tick == 3) {
                         for (t in list) {
                             if (t == null) continue
-                            if (t.position == start || t.position == second || t.position == last) {
+                            if (t.entityPosition == start || t.entityPosition == second || t.entityPosition == last) {
                                 CombatHit(
                                     vetion.combatBuilder, CombatContainer(vetion, t, 3, CombatType.MAGIC, true)
                                 ).handleAttack()

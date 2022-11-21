@@ -1,25 +1,12 @@
 package com.realting.model.entity.character.player;
 
-import java.io.File;
-import java.io.FileReader;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.realting.engine.task.impl.FamiliarSpawnTask;
-import com.realting.model.GameMode;
-import com.realting.model.Gender;
-import com.realting.model.Item;
-import com.realting.model.MagicSpellbook;
+import com.realting.model.*;
 import com.realting.model.PlayerRelations.PrivateChatStatus;
-import com.realting.model.PlayerRights;
-import com.realting.model.Position;
-import com.realting.model.Prayerbook;
 import com.realting.model.container.impl.Bank;
 import com.realting.net.login.LoginResponses;
 import com.realting.util.json.ItemTypeAdapter;
@@ -35,6 +22,13 @@ import com.realting.world.content.player.skill.SkillManager.Skills;
 import com.realting.world.content.player.skill.slayer.SlayerMaster;
 import com.realting.world.content.player.skill.slayer.SlayerTasks;
 import org.mindrot.jbcrypt.BCrypt;
+
+import java.io.File;
+import java.io.FileReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class PlayerLoading {
@@ -123,7 +117,7 @@ public class PlayerLoading {
 			}
 
 			if (reader.has("position")) {
-				player.getPosition().setAs(builder.fromJson(reader.get("position"), Position.class));
+				player.getEntityPosition().setAs(builder.fromJson(reader.get("position"), Position.class));
 			}
 
 			if(reader.has("online-status")) {

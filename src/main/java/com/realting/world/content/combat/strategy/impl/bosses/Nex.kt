@@ -42,7 +42,7 @@ class Nex : CombatStrategy {
                 CombatHit(NEX!!.combatBuilder, CombatContainer(NEX!!, p, 1, CombatType.MAGIC, true)).handleAttack()
                 return true
             }
-            return if (p.position.distanceToPoint(NEX!!.position.x, NEX!!.position.y) <= 2 && Misc.getRandom(1) == 0) {
+            return if (p.entityPosition.distanceToPoint(NEX!!.entityPosition.x, NEX!!.entityPosition.y) <= 2 && Misc.getRandom(1) == 0) {
                 NEX!!.performAnimation(Animation(6354))
                 TaskManager.submit(object : Task(1, NEX, false) {
                     public override fun execute() {
@@ -75,11 +75,11 @@ class Nex : CombatStrategy {
                         var ticks = 0
                         public override fun execute() {
                             if (ticks == 0) {
-                                origX = p_.position.x
-                                origY = p_.position.y
+                                origX = p_.entityPosition.x
+                                origY = p_.entityPosition.y
                             }
                             if (ticks == 5) {
-                                if (origX == p_.position.x && origY == p_.position.y) {
+                                if (origX == p_.entityPosition.x && origY == p_.entityPosition.y) {
                                     p_.dealDamage(Hit(NEX, 100 + Misc.getRandom(100), Hitmask.RED, CombatIcon.NONE))
                                     p_.packetSender.sendMessage("The shadows begin to damage you!")
                                     stop()
@@ -108,7 +108,7 @@ class Nex : CombatStrategy {
                         var ticks = 0
                         public override fun execute() {
                             if (ticks == 10) setShadow(p_, 250) else {
-                                val dist = p_.position.distanceToPoint(NEX!!.position.x, NEX!!.position.y)
+                                val dist = p_.entityPosition.distanceToPoint(NEX!!.entityPosition.x, NEX!!.entityPosition.y)
                                 if (dist < 3) {
                                     p_.packetSender.sendMessage("The shadows begin to consume you!")
                                     p_.dealDamage(Hit(NEX, 10, Hitmask.RED, CombatIcon.NONE))
@@ -134,9 +134,9 @@ class Nex : CombatStrategy {
                 CombatHit(NEX!!.combatBuilder, CombatContainer(NEX!!, p, 1, CombatType.MAGIC, true)).handleAttack()
                 return true
             } else {
-                return if (p.position.distanceToPoint(
-                        NEX!!.position.x,
-                        NEX!!.position.y
+                return if (p.entityPosition.distanceToPoint(
+                        NEX!!.entityPosition.x,
+                        NEX!!.entityPosition.y
                     ) <= 2 && Misc.getRandom(1) == 0
                 ) {
                     NEX!!.performAnimation(Animation(6354))
@@ -159,7 +159,7 @@ class Nex : CombatStrategy {
             }
         }
         if (phase == 2) {
-            if (p.position.distanceToPoint(NEX!!.position.x, NEX!!.position.y) <= 2 && Misc.getRandom(1) == 0) {
+            if (p.entityPosition.distanceToPoint(NEX!!.entityPosition.x, NEX!!.entityPosition.y) <= 2 && Misc.getRandom(1) == 0) {
                 NEX!!.performAnimation(Animation(6354))
                 TaskManager.submit(object : Task(1, NEX, false) {
                     public override fun execute() {
@@ -186,7 +186,7 @@ class Nex : CombatStrategy {
                 }
                 prayerTimer = 0
             }
-            return if (p.position.distanceToPoint(NEX!!.position.x, NEX!!.position.y) <= 2 && Misc.getRandom(1) == 0) {
+            return if (p.entityPosition.distanceToPoint(NEX!!.entityPosition.x, NEX!!.entityPosition.y) <= 2 && Misc.getRandom(1) == 0) {
                 NEX!!.performAnimation(Animation(6354))
                 TaskManager.submit(object : Task(1, NEX, false) {
                     public override fun execute() {
@@ -211,8 +211,8 @@ class Nex : CombatStrategy {
                 attacks[0] = true
                 NEX!!.forceChat("Die now, in a prison of ice!")
                 NEX!!.isChargingAttack = true
-                val origX = p.position.x
-                val origY = p.position.y
+                val origX = p.entityPosition.x
+                val origY = p.entityPosition.y
                 p.movementQueue.reset()
                 for (x in origX - 1 until origX + 1) {
                     for (y in origY - 1 until origY + 1) {
@@ -221,7 +221,7 @@ class Nex : CombatStrategy {
                 }
                 TaskManager.submit(object : Task(10, NEX, false) {
                     public override fun execute() {
-                        if (p.position.x == origX && p.position.y == origY) {
+                        if (p.entityPosition.x == origX && p.entityPosition.y == origY) {
                             p.dealDamage(Hit(NEX, 250 + Misc.getRandom(150), Hitmask.RED, CombatIcon.NONE))
                         }
                         for (x in origX - 1 until origX + 1) {
@@ -242,8 +242,8 @@ class Nex : CombatStrategy {
                 NEX!!.forceChat("Contain this!")
                 NEX!!.isChargingAttack = true
                 attacks[1] = true
-                val origX = NEX!!.position.x
-                val origY = NEX!!.position.y
+                val origX = NEX!!.entityPosition.x
+                val origY = NEX!!.entityPosition.y
                 for (x in origX - 2 until origX + 2) {
                     for (y in origY - 2 until origY + 2) {
                         if (x == origX - 2 || x == origX + 2 || y == origY - 2 || y == origY + 2) {
@@ -260,7 +260,7 @@ class Nex : CombatStrategy {
                                     p.packetSender.sendGraphic(Graphic(366), Position(x, y))
                                     for (p_ in Misc.getCombinedPlayerList(p)) {
                                         if (p_ == null || p_.location !== Locations.Location.GODWARS_DUNGEON) continue
-                                        if (p_.position.x == x && p_.position.y == y) p_.dealDamage(
+                                        if (p_.entityPosition.x == x && p_.entityPosition.y == y) p_.dealDamage(
                                             Hit(
                                                 NEX,
                                                 150 + Misc.getRandom(110),
@@ -281,7 +281,7 @@ class Nex : CombatStrategy {
                     }
                 })
             } else {
-                if (p.position.distanceToPoint(NEX!!.position.x, NEX!!.position.y) <= 2 && Misc.getRandom(1) == 0) {
+                if (p.entityPosition.distanceToPoint(NEX!!.entityPosition.x, NEX!!.entityPosition.y) <= 2 && Misc.getRandom(1) == 0) {
                     NEX!!.performAnimation(Animation(6354))
                     TaskManager.submit(object : Task(1, NEX, false) {
                         public override fun execute() {
@@ -491,16 +491,16 @@ class Nex : CombatStrategy {
             phase = 0
             despawn(false)
             NEX!!.forceChat("Taste my wrath!")
-            val x = NEX!!.position.x
-            val y = NEX!!.position.y
+            val x = NEX!!.entityPosition.x
+            val y = NEX!!.entityPosition.y
             TaskManager.submit(object : Task(4) {
                 public override fun execute() {
                     for (p in World.getPlayers()) {
                         if (p == null) continue
-                        if (p.position.distanceToPoint(x, y) <= 3) {
+                        if (p.entityPosition.distanceToPoint(x, y) <= 3) {
                             p.dealDamage(Hit(NEX, 150, Hitmask.RED, CombatIcon.NONE))
                         }
-                        if (p.position.distanceToPoint(x, y) <= 20) {
+                        if (p.entityPosition.distanceToPoint(x, y) <= 20) {
                             for (x_ in x - 2 until x + 2) {
                                 for (y_ in y - 2 until y + 2) {
                                     p.packetSender.sendGraphic(Graphic(2259), Position(x_, y))
@@ -572,9 +572,9 @@ class Nex : CombatStrategy {
                     }
                     for (p2 in p.localPlayers) {
                         if (p2 == null || p2 === p) continue
-                        if (p2.position.distanceToPoint(
-                                p.position.x,
-                                p.position.y
+                        if (p2.entityPosition.distanceToPoint(
+                                p.entityPosition.x,
+                                p.entityPosition.y
                             ) == 1.0 && p2.constitution > 0 && p2.location === Locations.Location.GODWARS_DUNGEON
                         ) {
                             cough(p2)

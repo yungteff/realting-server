@@ -27,14 +27,14 @@ class Glacor : CombatStrategy {
         if (glacor!!.isChargingAttack || victim!!.constitution <= 0) {
             return true
         }
-        if (Locations.goodDistance(glacor.position.copy(), victim!!.position.copy(), 1) && Misc.getRandom(5) <= 3) {
+        if (Locations.goodDistance(glacor.entityPosition.copy(), victim.entityPosition.copy(), 1) && Misc.getRandom(5) <= 3) {
             glacor.performAnimation(Animation(glacor.definition.attackAnimation))
             glacor.combatBuilder.container = CombatContainer(glacor, victim, 1, 1, CombatType.MELEE, true)
         } else {
             glacor.performAnimation(Animation(9952))
             glacor.isChargingAttack = true
             glacor.combatBuilder.container =
-                CombatContainer(glacor, victim, 1, 2, CombatType.MAGIC, if (Misc.getRandom(10) <= 2) false else true)
+                CombatContainer(glacor, victim, 1, 2, CombatType.MAGIC, Misc.getRandom(10) > 2)
             TaskManager.submit(object : Task(1, glacor, false) {
                 var tick = 0
                 override fun execute() {

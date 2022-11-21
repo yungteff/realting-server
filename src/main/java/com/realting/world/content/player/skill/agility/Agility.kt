@@ -20,8 +20,8 @@ object Agility {
         val agilityObject = ObstacleData.forId(`object`.id)
         if (agilityObject != null) {
             if (p.isCrossingObstacle) return true
-            p.positionToFace = `object`.position
-            p.resetPosition = p.position
+            p.positionToFace = `object`.entityPosition
+            p.resetPosition = p.entityPosition
             p.isCrossingObstacle = true
             //boolean wasRunning = p.getAttributes().isRunning();
             //if(agilityObject.mustWalk()) {

@@ -33,7 +33,7 @@ class KalphiteQueen : CombatStrategy {
         val p = victim as Player?
         val list = Misc.getCombinedPlayerList(p)
         if (Locations.goodDistance(
-                KALPHITE_QUEEN!!.position.copy(), victim.position.copy(), 1
+                KALPHITE_QUEEN!!.entityPosition.copy(), victim.entityPosition.copy(), 1
             ) && Misc.getRandom(6) <= 2
         ) {
             KALPHITE_QUEEN!!.performAnimation(Animation(KALPHITE_QUEEN!!.definition.attackAnimation))
@@ -48,7 +48,7 @@ class KalphiteQueen : CombatStrategy {
                     if (tick == 1) {
                         for (toAttack in list) {
                             if (toAttack != null && Locations.goodDistance(
-                                    KALPHITE_QUEEN!!.position, toAttack.position, 7
+                                    KALPHITE_QUEEN!!.entityPosition, toAttack.entityPosition, 7
                                 ) && toAttack.constitution > 0
                             ) {
                                 Projectile(
@@ -59,7 +59,7 @@ class KalphiteQueen : CombatStrategy {
                     } else if (tick == 3) {
                         for (toAttack in list) {
                             if (toAttack != null && Locations.goodDistance(
-                                    KALPHITE_QUEEN!!.position, toAttack.position, 7
+                                    KALPHITE_QUEEN!!.entityPosition, toAttack.entityPosition, 7
                                 ) && toAttack.constitution > 0
                             ) {
                                 toAttack.performGraphic(Graphic(if (secondForm()) 278 else 279))
@@ -68,7 +68,7 @@ class KalphiteQueen : CombatStrategy {
                     } else if (tick == 5) {
                         for (toAttack in list) {
                             if (toAttack != null && Locations.goodDistance(
-                                    KALPHITE_QUEEN!!.position, toAttack.position, 7
+                                    KALPHITE_QUEEN!!.entityPosition, toAttack.entityPosition, 7
                                 ) && toAttack.constitution > 0
                             ) {
                                 KALPHITE_QUEEN!!.setEntityInteraction(toAttack)

@@ -171,9 +171,9 @@ object PuroPuro {
     fun goThroughWheat(player: Player, `object`: GameObject?) {
         if (!player.clickDelay.elapsed(2000)) return
         player.clickDelay.reset()
-        val x = player.position.x
+        val x = player.entityPosition.x
         var x2 = x
-        val y = player.position.y
+        val y = player.entityPosition.y
         var y2 = y
         if (x == 2584) {
             x2 = 2582

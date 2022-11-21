@@ -1,17 +1,17 @@
 package com.realting.world.content;
 
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import com.realting.model.GameMode;
 import com.realting.model.Item;
 import com.realting.model.Locations;
 import com.realting.model.Locations.Location;
 import com.realting.model.PlayerRights;
 import com.realting.model.definitions.ItemDefinition;
+import com.realting.model.entity.character.player.Player;
 import com.realting.util.Misc;
 import com.realting.world.World;
 import com.realting.world.content.PlayerPunishment.Jail;
-import com.realting.model.entity.character.player.Player;
+
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author: @Gabbe
@@ -22,7 +22,7 @@ import com.realting.model.entity.character.player.Player;
 
 public class Trading {
 
-	private Player player;
+	private final Player player;
 	public Trading(Player p) {
 		this.player = p;
 	}
@@ -135,7 +135,7 @@ public class Trading {
 		tradeWith = player2.getIndex();
 		if(getTradeWith() == player.getIndex())
 			return;
-		if(!Locations.goodDistance(player.getPosition().getX(), player.getPosition().getY(), player2.getPosition().getX(), player2.getPosition().getY(), 2)) {
+		if(!Locations.goodDistance(player.getEntityPosition().getX(), player.getEntityPosition().getY(), player2.getEntityPosition().getX(), player2.getEntityPosition().getY(), 2)) {
 			player.getPacketSender().sendMessage("Please get closer to request a trade.");
 			return;
 		}

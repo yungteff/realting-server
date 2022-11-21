@@ -25,17 +25,17 @@ import java.util.Map.Entry;
  */
 public class CombatBuilder {
 
-	private CharacterEntity character;
+	private final CharacterEntity character;
 	private CharacterEntity victim;
 	private CharacterEntity lastAttacker;
 
-	private HitQueue hitQueue = new HitQueue();
+	private final HitQueue hitQueue = new HitQueue();
 	private CombatSession combatSession;
 	private CombatDistanceSession distanceSession;
 	private CombatContainer container;
 	
-	private Map<Player, CombatDamageCache> damageMap = new HashMap<>();
-	private Stopwatch lastAttack = new Stopwatch();
+	private final Map<Player, CombatDamageCache> damageMap = new HashMap<>();
+	private final Stopwatch lastAttack = new Stopwatch();
 	private CombatStrategy strategy;
 	protected int attackTimer;
 	protected int cooldown;
@@ -69,7 +69,7 @@ public class CombatBuilder {
 		if (target.equals(victim)) {
 			determineStrategy();
 
-			if (!character.getPosition().equals(victim.getPosition()) && character.getPosition().isWithinDistance(victim.getPosition(), strategy.attackDistance(character))) {
+			if (!character.getEntityPosition().equals(victim.getEntityPosition()) && character.getEntityPosition().isWithinDistance(victim.getEntityPosition(), strategy.attackDistance(character))) {
 				character.getMovementQueue().reset();
 			}
 		}

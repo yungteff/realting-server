@@ -26,7 +26,7 @@ object Woodcutting {
             player.packetSender.sendMessage("You don't have enough free inventory space.")
             return
         }
-        player.positionToFace = `object`.position
+        player.positionToFace = `object`.entityPosition
         val objId = `object`.id
         val h: Hatchet? = Hatchet.Companion.forId(WoodcuttingData.getHatchet(player))
         if (h != null) {
@@ -41,7 +41,7 @@ object Woodcutting {
                 }
                 if (t != null) {
                     player.setEntityInteraction(`object`)
-                    if (player.skillManager.getCurrentLevel(Skill.WOODCUTTING) >= (if (isEvilTree) t2!!.woodcuttingLevel else t.req)) {
+                    if (player.skillManager.getCurrentLevel(Skill.WOODCUTTING) >= t.req) {
                         player.performAnimation(Animation(h.anim))
                         //int delay = Misc.getRandom(t.getTicks() - WoodcuttingData.getChopTimer(player, h)) +1;
                         player.currentTask = object : Task(1, player, false) {
@@ -68,8 +68,9 @@ object Woodcutting {
                                     stop()
                                     val cutDownRandom = Misc.getRandom(100)
                                     //	player.getPacketSender().sendMessage("Random: " + cutDownRandom);
-                                    if (!isEvilTree && (!t.isMulti || player.skillManager.skillCape(Skill.WOODCUTTING) && cutDownRandom >= 88
-                                                || !player.skillManager.skillCape(Skill.WOODCUTTING) && cutDownRandom >= 82)
+                                    if (!isEvilTree && (!t.isMulti || player.skillManager.skillCape(Skill.WOODCUTTING) && cutDownRandom >= 88 || !player.skillManager.skillCape(
+                                            Skill.WOODCUTTING
+                                        ) && cutDownRandom >= 82)
                                     ) { //82
                                         //player.getPacketSender().sendMessage("You rolled a: "+cutDownRandom);
                                         player.inventory.add(if (isEvilTree) t2!!.log else t.reward, 1)
@@ -90,12 +91,10 @@ object Woodcutting {
                                                     player.packetSender.sendMessage("You chop a log, and your Inferno Adze burns it into ash.")
                                                     if (fmLog == logData.MAGIC) {
                                                         Achievements.doProgress(
-                                                            player,
-                                                            AchievementData.BURN_100_MAGIC_LOGS
+                                                            player, AchievementData.BURN_100_MAGIC_LOGS
                                                         )
                                                         Achievements.doProgress(
-                                                            player,
-                                                            AchievementData.BURN_2500_MAGIC_LOGS
+                                                            player, AchievementData.BURN_2500_MAGIC_LOGS
                                                         )
                                                     }
                                                 } else { //if the fmLog data is null
@@ -148,7 +147,7 @@ object Woodcutting {
         oldTree.pickAmount = 10
         for (players in player.localPlayers) {
             if (players == null) continue
-            if (players.interactingObject != null && players.interactingObject.position == player.interactingObject.position.copy()) {
+            if (players.interactingObject != null && players.interactingObject.entityPosition == player.interactingObject.entityPosition.copy()) {
                 players.skillManager.stopSkilling()
                 players.packetSender.sendClientRightClickRemoval()
             }
@@ -156,9 +155,7 @@ object Woodcutting {
         player.packetSender.sendClientRightClickRemoval()
         player.skillManager.stopSkilling()
         CustomObjects.globalObjectRespawnTask(
-            GameObject(1343, oldTree.position.copy(), 10, 0),
-            oldTree,
-            20 + Misc.getRandom(10)
+            GameObject(1343, oldTree.entityPosition.copy(), 10, 0), oldTree, 20 + Misc.getRandom(10)
         )
     }
 }

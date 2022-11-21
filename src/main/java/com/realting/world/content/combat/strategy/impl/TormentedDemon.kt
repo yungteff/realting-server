@@ -27,7 +27,7 @@ class TormentedDemon : CombatStrategy {
         if (td!!.isChargingAttack) {
             return true
         }
-        if (Locations.goodDistance(td.position.copy(), victim.position.copy(), 1) && Misc.getRandom(6) <= 4) {
+        if (Locations.goodDistance(td.entityPosition.copy(), victim.entityPosition.copy(), 1) && Misc.getRandom(6) <= 4) {
             td.performAnimation(anim)
             td.performGraphic(gfx1)
             td.combatBuilder.container = CombatContainer(td, victim, 1, 2, CombatType.MELEE, true)

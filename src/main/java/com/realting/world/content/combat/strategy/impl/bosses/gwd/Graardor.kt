@@ -27,7 +27,7 @@ class Graardor : CombatStrategy {
             return true
         }
         val style = if (Misc.getRandom(4) <= 1 && Locations.goodDistance(
-                graardor.position, victim!!.position, 1
+                graardor.entityPosition, victim!!.entityPosition, 1
             )
         ) CombatType.MELEE else CombatType.RANGED
         if (style === CombatType.MELEE) {
@@ -39,7 +39,7 @@ class Graardor : CombatStrategy {
             val target = victim as Player?
             for (t in Misc.getCombinedPlayerList(target)) {
                 if (t == null || t.location !== Locations.Location.GODWARS_DUNGEON || t.isTeleporting) continue
-                if (t.position.distanceToPoint(graardor.position.x, graardor.position.y) > 20) continue
+                if (t.entityPosition.distanceToPoint(graardor.entityPosition.x, graardor.entityPosition.y) > 20) continue
                 Projectile(graardor, target, graphic1.id, 44, 3, 43, 43, 0).sendProjectile()
             }
             TaskManager.submit(object : Task(2, target, false) {

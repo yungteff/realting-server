@@ -2,15 +2,8 @@ package com.realting.model.entity.character;
 
 import com.realting.engine.task.Task;
 import com.realting.engine.task.TaskManager;
-import com.realting.model.Animation;
-import com.realting.model.Direction;
-import com.realting.model.Flag;
-import com.realting.model.Graphic;
-import com.realting.model.Hit;
+import com.realting.model.*;
 import com.realting.model.Locations.Location;
-import com.realting.model.Position;
-import com.realting.model.RegionInstance;
-import com.realting.model.UpdateFlag;
 import com.realting.model.entity.Entity;
 import com.realting.model.movement.MovementQueue;
 import com.realting.util.Stopwatch;
@@ -42,10 +35,10 @@ public abstract class CharacterEntity extends Entity {
 	
 	/*** INSTANCES ***/
 	private Direction direction, primaryDirection = Direction.NONE, secondaryDirection = Direction.NONE, lastDirection = Direction.NONE;
-	private CombatBuilder combatBuilder = new CombatBuilder(this);
+	private final CombatBuilder combatBuilder = new CombatBuilder(this);
 	private MovementQueue movementQueue = new MovementQueue(this);
-	private Stopwatch lastCombat = new Stopwatch();
-	private UpdateFlag updateFlag = new UpdateFlag();
+	private final Stopwatch lastCombat = new Stopwatch();
+	private final UpdateFlag updateFlag = new UpdateFlag();
 	private Location location;
 	private Position positionToFace;
 	private Animation animation;
@@ -435,7 +428,7 @@ public abstract class CharacterEntity extends Entity {
 		this.direction = direction;
 		if (direction != null) {
 			int[] directionDeltas = direction.getDirectionDelta();
-			setPositionToFace(getPosition().copy().add(directionDeltas[0], directionDeltas[1]));
+			setPositionToFace(getEntityPosition().copy().add(directionDeltas[0], directionDeltas[1]));
 		} else {
 			setPositionToFace(null);
 		}

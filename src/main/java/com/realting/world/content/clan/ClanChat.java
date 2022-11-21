@@ -1,18 +1,18 @@
 package com.realting.world.content.clan;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import com.realting.engine.task.Task;
 import com.realting.engine.task.TaskManager;
 import com.realting.model.Locations;
 import com.realting.model.Position;
 import com.realting.model.RegionInstance;
+import com.realting.model.entity.character.player.Player;
 import com.realting.util.Stopwatch;
 import com.realting.world.World;
-import com.realting.model.entity.character.player.Player;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * An instance of a clanchat channel, holding all fields.
@@ -44,12 +44,12 @@ public class ClanChat {
 	private final int index;
 	private boolean lootShare;
 	private boolean guild;
-	private Stopwatch lastAction = new Stopwatch();
+	private final Stopwatch lastAction = new Stopwatch();
 
-	private ClanChatRank[] rankRequirement = new ClanChatRank[7];
-	private CopyOnWriteArrayList<Player> members = new CopyOnWriteArrayList<Player>();
-	private CopyOnWriteArrayList<String> bannedNames = new CopyOnWriteArrayList<String>();
-	private Map<String, ClanChatRank> rankedNames = new HashMap<String, ClanChatRank>();
+	private final ClanChatRank[] rankRequirement = new ClanChatRank[7];
+	private final CopyOnWriteArrayList<Player> members = new CopyOnWriteArrayList<Player>();
+	private final CopyOnWriteArrayList<String> bannedNames = new CopyOnWriteArrayList<String>();
+	private final Map<String, ClanChatRank> rankedNames = new HashMap<String, ClanChatRank>();
 
 	private boolean doingClanBarrows;
 	private int height;
@@ -195,7 +195,7 @@ public class ClanChat {
 		ArrayList<Player> list = new ArrayList<Player>();
 		
 		for(Player p : getMembers()) {
-			if(p == null || !Locations.goodDistance(p.getPosition(), t, 7)) {
+			if(p == null || !Locations.goodDistance(p.getEntityPosition(), t, 7)) {
 				continue;
 			}
 			list.add(p);

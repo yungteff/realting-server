@@ -1,8 +1,8 @@
 package com.realting.world.content.player.skill.woodcutting
 
-import com.realting.model.entity.character.GroundItemManager
 import com.realting.model.GroundItem
 import com.realting.model.Item
+import com.realting.model.entity.character.GroundItemManager
 import com.realting.model.entity.character.player.Player
 import com.realting.util.Misc
 
@@ -44,7 +44,7 @@ object BirdNests {
      */
     @JvmStatic
     fun dropNest(p: Player) {
-        if (p.position.z > 0) {
+        if (p.entityPosition.z > 0) {
             return
         }
         if (Misc.getRandom(60) == 1) {
@@ -68,7 +68,7 @@ object BirdNests {
                 nest.amount = 1
                 GroundItemManager.spawnGroundItem(
                     p,
-                    GroundItem(nest, p.position.copy(), p.username, false, 80, true, 80)
+                    GroundItem(nest, p.entityPosition.copy(), p.username, false, 80, true, 80)
                 )
                 p.packetSender.sendMessage("A bird's nest falls out of the tree!")
             }

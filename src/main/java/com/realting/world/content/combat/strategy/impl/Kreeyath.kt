@@ -32,7 +32,7 @@ class Kreeyath : CombatStrategy {
             kreeyath.combatBuilder.attackTimer = 4
             return true
         }
-        if (Locations.goodDistance(kreeyath.position.copy(), victim.position.copy(), 1) && Misc.getRandom(5) <= 3) {
+        if (Locations.goodDistance(kreeyath.entityPosition.copy(), victim.entityPosition.copy(), 1) && Misc.getRandom(5) <= 3) {
             kreeyath.performAnimation(Animation(kreeyath.definition.attackAnimation))
             kreeyath.combatBuilder.container = CombatContainer(kreeyath, victim, 1, 1, CombatType.MELEE, true)
         } else {

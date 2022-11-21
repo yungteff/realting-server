@@ -1,19 +1,15 @@
 package com.realting.world.content.combat.magic;
 
-import java.util.Iterator;
-import java.util.Optional;
-
-import com.realting.model.CombatIcon;
-import com.realting.model.Hit;
-import com.realting.model.Hitmask;
-import com.realting.model.Item;
-import com.realting.model.Locations;
+import com.realting.model.*;
 import com.realting.model.Locations.Location;
-import com.realting.util.Misc;
-import com.realting.world.World;
 import com.realting.model.entity.character.CharacterEntity;
 import com.realting.model.entity.character.npc.NPC;
 import com.realting.model.entity.character.player.Player;
+import com.realting.util.Misc;
+import com.realting.world.World;
+
+import java.util.Iterator;
+import java.util.Optional;
 
 /**
  * A {@link CombatSpell} implementation that is primarily used for spells that
@@ -73,7 +69,7 @@ public abstract class CombatAncientSpell extends CombatSpell {
             }
             
 
-            if (next.getPosition().isWithinDistance(castOn.getPosition(),
+            if (next.getEntityPosition().isWithinDistance(castOn.getEntityPosition(),
                 spellRadius()) && !next.equals(cast) && !next.equals(castOn) && next.getConstitution() > 0 && next.getConstitution() > 0) {
                 cast.getCurrentlyCasting().endGraphic().ifPresent(next::performGraphic);
                 int calc = Misc.inclusiveRandom(0, maximumHit());

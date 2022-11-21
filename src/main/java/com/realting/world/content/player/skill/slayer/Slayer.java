@@ -18,7 +18,7 @@ import com.realting.world.content.transportation.TeleportHandler;
 
 public class Slayer {
 
-	private Player player;
+	private final Player player;
 
 	public Slayer(Player p) {
 		this.player = p;
@@ -112,7 +112,7 @@ public class Slayer {
 					Player duo = World.getPlayerByName(duoPartner);
 					if(duo != null) {
 						if(checkDuoSlayer(player, false)) {
-							duo.getSlayer().handleSlayerTaskDeath(npc, Locations.goodDistance(player.getPosition(), duo.getPosition(), 20));
+							duo.getSlayer().handleSlayerTaskDeath(npc, Locations.goodDistance(player.getEntityPosition(), duo.getEntityPosition(), 20));
 						} else {
 							resetDuo(player, duo);
 						}

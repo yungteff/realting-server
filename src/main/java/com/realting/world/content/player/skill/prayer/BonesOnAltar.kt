@@ -42,7 +42,7 @@ object BonesOnAltar {
                         return
                     }
                     player.interactingObject != null -> {
-                        player.positionToFace = player.interactingObject.position.copy()
+                        player.positionToFace = player.interactingObject.entityPosition.copy()
                         player.interactingObject.performGraphic(Graphic(624))
                     }
                 }

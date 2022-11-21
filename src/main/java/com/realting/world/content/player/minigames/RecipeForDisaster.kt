@@ -48,7 +48,7 @@ object RecipeForDisaster {
                     return
                 }
                 val npc = if (wave >= 5) 3491 else 3493 + wave
-                val n = NPC(npc, Position(spawnPos.x, spawnPos.y, p.position.z)).setSpawnedFor(p)
+                val n = NPC(npc, Position(spawnPos.x, spawnPos.y, p.entityPosition.z)).setSpawnedFor(p)
                 World.register(n)
                 p.regionInstance.npcsList.add(n)
                 n.combatBuilder.attack(p)

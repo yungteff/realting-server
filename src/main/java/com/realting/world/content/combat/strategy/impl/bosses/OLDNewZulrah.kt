@@ -194,8 +194,8 @@ class OLDNewZulrah : CombatStrategy {
                 val newdir = Misc.getRandom(moveX.size - 1)
                 dir = newdir
             }
-            if (ZULRAH != null && ZULRAH!!.isRegistered && ZULRAH!!.position.x != moveX[dir]) {
-                println("Error. Dir = " + dir + ", Zulrah's pos = " + ZULRAH!!.position.x + ", moveX[" + dir + "] = " + moveX[dir])
+            if (ZULRAH != null && ZULRAH!!.isRegistered && ZULRAH!!.entityPosition.x != moveX[dir]) {
+                println("Error. Dir = " + dir + ", Zulrah's pos = " + ZULRAH!!.entityPosition.x + ", moveX[" + dir + "] = " + moveX[dir])
             }
             return dir
         }
@@ -203,8 +203,8 @@ class OLDNewZulrah : CombatStrategy {
         private fun newDir(): Int {
             val current = getDir()
             val newdir = Misc.getRandom(moveX.size - 1)
-            if (ZULRAH != null && ZULRAH!!.isRegistered && ZULRAH!!.position.x != moveX[current]) {
-                println("[ERROR 666] Zulrah's X = " + ZULRAH!!.position.x + ", dir = " + current + ", moveX[" + current + "] = " + moveX[current])
+            if (ZULRAH != null && ZULRAH!!.isRegistered && ZULRAH!!.entityPosition.x != moveX[current]) {
+                println("[ERROR 666] Zulrah's X = " + ZULRAH!!.entityPosition.x + ", dir = " + current + ", moveX[" + current + "] = " + moveX[current])
                 return 666
             }
             if (newdir == current) {

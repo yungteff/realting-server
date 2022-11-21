@@ -40,19 +40,19 @@ class KreeArra : CombatStrategy {
                 if (tick == 1) {
                     for (near in Misc.getCombinedPlayerList(target)) {
                         if (near == null || near.location !== Locations.Location.GODWARS_DUNGEON || near.isTeleporting) continue
-                        if (near.position.distanceToPoint(kreearra.position.x, kreearra.position.y) > 20) continue
+                        if (near.entityPosition.distanceToPoint(kreearra.entityPosition.x, kreearra.entityPosition.y) > 20) continue
                         Projectile(
                             kreearra, victim, if (style === CombatType.MAGIC) 1198 else 1197, 44, 3, 43, 43, 0
                         ).sendProjectile()
                         if (style === CombatType.RANGED) { //Moving players randomly
                             val xToMove = Misc.getRandom(1)
                             val yToMove = Misc.getRandom(1)
-                            val xCoord = target!!.position.x
-                            val yCoord = target.position.y
+                            val xCoord = target!!.entityPosition.x
+                            val yCoord = target.entityPosition.y
                             if (xCoord >= 2841 || xCoord <= 2823 || yCoord <= 5295 || yCoord >= 5307) {
                                 return
                             } else if (Misc.getRandom(3) <= 1 && canWalk(
-                                    target.position, Position(xCoord + -xToMove, yCoord + -yToMove, 2), 1
+                                    target.entityPosition, Position(xCoord + -xToMove, yCoord + -yToMove, 2), 1
                                 )
                             ) {
                                 target.movementQueue.reset()
@@ -68,7 +68,7 @@ class KreeArra : CombatStrategy {
                 } else if (tick == 2) {
                     for (near in Misc.getCombinedPlayerList(target)) {
                         if (near == null || near.location !== Locations.Location.GODWARS_DUNGEON || near.isTeleporting) continue
-                        if (near.position.distanceToPoint(kreearra.position.x, kreearra.position.y) > 20) continue
+                        if (near.entityPosition.distanceToPoint(kreearra.entityPosition.x, kreearra.entityPosition.y) > 20) continue
                         CombatHit(
                             kreearra.combatBuilder, CombatContainer(kreearra, victim, 1, style, true)
                         ).handleAttack()

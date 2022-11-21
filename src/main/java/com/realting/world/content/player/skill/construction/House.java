@@ -1,11 +1,11 @@
 package com.realting.world.content.player.skill.construction;
 
-import java.util.ArrayList;
-
 import com.realting.model.RegionInstance;
 import com.realting.model.entity.character.CharacterEntity;
 import com.realting.model.entity.character.npc.NPC;
 import com.realting.model.entity.character.player.Player;
+
+import java.util.ArrayList;
 
 /**
  * 
@@ -18,7 +18,7 @@ public class House extends RegionInstance {
 	private ArrayList<HouseFurniture> litBurners;
 	private ArrayList<HouseFurniture> furnitureActivated;
 	private boolean locked = false;
-	private Player player;
+	private final Player player;
 	private Palette palette, secondaryPalette;
 	
 	public House(Player player) {
@@ -56,13 +56,13 @@ public class House extends RegionInstance {
 			return;
 		if(myTiles[0] == -1 || myTiles[1] == -1)
 			return;
-		Room r = house.getOwner().getHouseRooms()[player.inConstructionDungeon() ? 4 : player.getPosition().getZ()][myTiles[0]-1][myTiles[1]-1];
+		Room r = house.getOwner().getHouseRooms()[player.inConstructionDungeon() ? 4 : player.getEntityPosition().getZ()][myTiles[0]-1][myTiles[1]-1];
 		if(r == null)
 			return;
 		if(r.getType() == ConstructionData.OUBLIETTE)
 		{
-			int xOnTile = Construction.getXTilesOnTile(myTiles, player.getPosition().getX());
-			int yOnTile = Construction.getYTilesOnTile(myTiles, player.getPosition().getY());
+			int xOnTile = Construction.getXTilesOnTile(myTiles, player.getEntityPosition().getX());
+			int yOnTile = Construction.getYTilesOnTile(myTiles, player.getEntityPosition().getY());
 			if(xOnTile >=  2 && xOnTile <= 5
 					&& yOnTile >= 2 && yOnTile <= 5)
 			{
@@ -95,10 +95,10 @@ public class House extends RegionInstance {
 			int[] converted_1 = Construction.getConvertedCoords(4, 2, myTiles, r);
 			int[] converted_2 = Construction.getConvertedCoords(3, 5, myTiles, r);
 			int[] converted_3 = Construction.getConvertedCoords(4, 5, myTiles, r);
-			if(player.getPosition().getX() == converted[0] && player.getPosition().getY() == converted[1]
-					|| player.getPosition().getX() == converted_1[0] && player.getPosition().getY() == converted_1[1]
-					|| player.getPosition().getX() == converted_2[0] && player.getPosition().getY() == converted_2[1]
-					|| player.getPosition().getX() == converted_3[0] && player.getPosition().getY() == converted_3[1])
+			if(player.getEntityPosition().getX() == converted[0] && player.getEntityPosition().getY() == converted[1]
+					|| player.getEntityPosition().getX() == converted_1[0] && player.getEntityPosition().getY() == converted_1[1]
+					|| player.getEntityPosition().getX() == converted_2[0] && player.getEntityPosition().getY() == converted_2[1]
+					|| player.getEntityPosition().getX() == converted_3[0] && player.getEntityPosition().getY() == converted_3[1])
 			{
 				HouseFurniture pf = null;
 				for(HouseFurniture pf_ : house.getOwner().getHouseFurniture())

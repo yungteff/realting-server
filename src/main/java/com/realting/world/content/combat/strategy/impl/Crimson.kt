@@ -26,20 +26,20 @@ class Crimson : CombatStrategy {
         }
         val random = Misc.getRandom(10)
         if (random <= 8 && Locations.goodDistance(
-                Crimson.position.x,
-                Crimson.position.y,
-                victim!!.position.x,
-                victim.position.y,
+                Crimson.entityPosition.x,
+                Crimson.entityPosition.y,
+                victim!!.entityPosition.x,
+                victim.entityPosition.y,
                 3
             )
         ) {
             Crimson.performAnimation(attack_anim1)
             Crimson.combatBuilder.container = CombatContainer(Crimson, victim, 1, CombatType.MELEE, true)
         } else if (random <= 4 || !Locations.goodDistance(
-                Crimson.position.x,
-                Crimson.position.y,
-                victim!!.position.x,
-                victim.position.y,
+                Crimson.entityPosition.x,
+                Crimson.entityPosition.y,
+                victim!!.entityPosition.x,
+                victim.entityPosition.y,
                 8
             )
         ) {
@@ -56,7 +56,7 @@ class Crimson : CombatStrategy {
                             Projectile(
                                 Crimson,
                                 victim,
-                                graphic3.getId(),
+                                graphic3.id,
                                 44,
                                 0,
                                 0,
@@ -73,7 +73,7 @@ class Crimson : CombatStrategy {
         } else {
             Crimson.combatBuilder.container = CombatContainer(Crimson, victim, 1, CombatType.RANGED, true)
             Crimson.performAnimation(attack_anim2)
-            Projectile(Crimson, victim, graphic2.getId(), 44, 0, 0, 0, 0).sendProjectile()
+            Projectile(Crimson, victim, graphic2.id, 44, 0, 0, 0, 0).sendProjectile()
             Crimson.isChargingAttack = true
             TaskManager.submit(object : Task(2, Crimson, false) {
                 public override fun execute() {

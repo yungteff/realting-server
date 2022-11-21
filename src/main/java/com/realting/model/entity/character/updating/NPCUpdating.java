@@ -1,20 +1,20 @@
 package com.realting.model.entity.character.updating;
 
-import java.util.Iterator;
-
 import com.realting.model.Direction;
 import com.realting.model.Flag;
 import com.realting.model.Position;
 import com.realting.model.UpdateFlag;
 import com.realting.model.entity.Entity;
 import com.realting.model.entity.character.npc.NPC;
+import com.realting.model.entity.character.player.Player;
 import com.realting.net.packet.ByteOrder;
 import com.realting.net.packet.Packet.PacketType;
 import com.realting.net.packet.PacketBuilder;
 import com.realting.net.packet.PacketBuilder.AccessType;
 import com.realting.net.packet.ValueType;
 import com.realting.world.World;
-import com.realting.model.entity.character.player.Player;
+
+import java.util.Iterator;
 
 /**
  * Represents a player's npc updating task, which loops through all local
@@ -36,7 +36,7 @@ public class NPCUpdating {
 		packet.putBits(8, player.getLocalNpcs().size());
 		for (Iterator<NPC> npcIterator = player.getLocalNpcs().iterator(); npcIterator.hasNext();) {
 			NPC npc = npcIterator.next();
-			if (World.getNpcs().get(npc.getIndex()) != null && npc.isVisible() && player.getPosition().isWithinDistance(npc.getPosition()) && !npc.isNeedsPlacement()) {
+			if (World.getNpcs().get(npc.getIndex()) != null && npc.isVisible() && player.getEntityPosition().isWithinDistance(npc.getEntityPosition()) && !npc.isNeedsPlacement()) {
 				updateMovement(npc, packet);
 				if (npc.getUpdateFlag().isUpdateRequired()) {
 					appendUpdates(npc, update);
@@ -53,7 +53,7 @@ public class NPCUpdating {
 				break;
 			if (npc == null || player.getLocalNpcs().contains(npc) || !npc.isVisible() || npc.isNeedsPlacement())
 				continue;
-			if (npc.getPosition().isWithinDistance(player.getPosition())) {
+			if (npc.getEntityPosition().isWithinDistance(player.getEntityPosition())) {
 				player.getLocalNpcs().add(npc);
 				addNPC(player, npc, packet);
 				if (npc.getUpdateFlag().isUpdateRequired()) {
@@ -79,8 +79,8 @@ public class NPCUpdating {
 	 */
 	private static void addNPC(Player player, NPC npc, PacketBuilder builder) {
 		builder.putBits(14, npc.getIndex());
-		builder.putBits(5, npc.getPosition().getY()-player.getPosition().getY());
-		builder.putBits(5, npc.getPosition().getX()-player.getPosition().getX());
+		builder.putBits(5, npc.getEntityPosition().getY()-player.getEntityPosition().getY());
+		builder.putBits(5, npc.getEntityPosition().getX()-player.getEntityPosition().getX());
 		builder.putBits(1, 0);
 		builder.putBits(18, npc.getCurrentNpcId());
 		builder.putBits(1, npc.getUpdateFlag().isUpdateRequired() ? 1 : 0);

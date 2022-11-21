@@ -24,7 +24,7 @@ class ZulrahLogic : CombatStrategy {
     }
 
     override fun customContainerAttack(entity: CharacterEntity?, victim: CharacterEntity?): Boolean {
-        if (entity!!.position.z == 0) {
+        if (entity!!.entityPosition.z == 0) {
             World.deregister(entity)
         }
         if (victim!!.constitution <= 0) {
@@ -52,7 +52,7 @@ class ZulrahLogic : CombatStrategy {
                         }
                         if (tick >= ticksPerPhase) {
                             stop()
-                            player!!.minigameAttributes.zulrahAttributes.setRedFormDamage(0, false)
+                            player.minigameAttributes.zulrahAttributes.setRedFormDamage(0, false)
                             zulrah.isChargingAttack = false
                             switchPhase(entity, victim)
                             return
@@ -89,7 +89,7 @@ class ZulrahLogic : CombatStrategy {
                         }
                         if (tick >= ticksPerPhase) {
                             stop()
-                            player!!.minigameAttributes.zulrahAttributes.setRedFormDamage(0, false)
+                            player.minigameAttributes.zulrahAttributes.setRedFormDamage(0, false)
                             zulrah.isChargingAttack = false
                             switchPhase(entity, victim)
                             return
@@ -121,7 +121,7 @@ class ZulrahLogic : CombatStrategy {
                         if (tick >= ticksPerPhase) {
                             //zulrah.forceChat("phase done");
                             stop()
-                            player!!.minigameAttributes.zulrahAttributes.setRedFormDamage(0, false)
+                            player.minigameAttributes.zulrahAttributes.setRedFormDamage(0, false)
                             zulrah.isChargingAttack = false
                             switchPhase(entity, victim)
                             return
@@ -157,7 +157,7 @@ class ZulrahLogic : CombatStrategy {
                         }
                         if (tick >= ticksPerPhase) {
                             stop()
-                            player!!.minigameAttributes.zulrahAttributes.setRedFormDamage(0, false)
+                            player.minigameAttributes.zulrahAttributes.setRedFormDamage(0, false)
                             zulrah.isChargingAttack = false
                             switchPhase(entity, victim)
                             return
@@ -187,7 +187,7 @@ class ZulrahLogic : CombatStrategy {
                         return
                     }
                     zulrah.isChargingAttack = true
-                    if (player!!.minigameAttributes.zulrahAttributes.redFormDamage >= player.skillManager.getCurrentLevel(
+                    if (player.minigameAttributes.zulrahAttributes.redFormDamage >= player.skillManager.getCurrentLevel(
                             Skill.CONSTITUTION
                         )
                     ) {
@@ -286,11 +286,11 @@ class ZulrahLogic : CombatStrategy {
                             val rand = Misc.randomMinusOne(move.size)
                             val zulrah = NPC(
                                 phase[Misc.randomMinusOne(phase.size)], Position(
-                                    move[rand].x, move[rand].y, player!!.position.z
+                                    move[rand].x, move[rand].y, player.entityPosition.z
                                 )
                             )
                             World.register(zulrah)
-                            zulrah.positionToFace = player.position
+                            zulrah.positionToFace = player.entityPosition
                             zulrah.performAnimation(rise)
                             zulrah.constitution = currenthealth
                             zulrah.combatBuilder.attack(player)

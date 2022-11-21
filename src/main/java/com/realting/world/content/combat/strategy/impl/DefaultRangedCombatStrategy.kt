@@ -3,7 +3,6 @@ package com.realting.world.content.combat.strategy.impl
 import com.realting.engine.task.Task
 import com.realting.engine.task.TaskManager
 import com.realting.model.*
-import com.realting.model.RegionInstance.RegionInstanceType
 import com.realting.model.container.impl.Equipment
 import com.realting.model.definitions.WeaponAnimations
 import com.realting.model.definitions.WeaponInterfaces
@@ -25,7 +24,6 @@ import com.realting.world.content.combat.range.CombatRangedAmmo.*
 import com.realting.world.content.combat.strategy.CombatStrategy
 import com.realting.world.content.combat.weapon.CombatSpecial
 import com.realting.world.content.combat.weapon.CombatSpecial.Companion.updateBar
-import com.realting.world.content.combat.weapon.FightStyle
 import com.realting.world.content.minigames.Dueling.Companion.checkRule
 import com.realting.world.content.minigames.Dueling.DuelRule
 import java.util.*
@@ -104,9 +102,9 @@ class DefaultRangedCombatStrategy : CombatStrategy {
 				}*/
             }
             if (!crystalBow(player)) {
-                decrementAmmo(player, victim!!.position)
+                decrementAmmo(player, victim!!.entityPosition)
                 if (dBow || player.rangedWeaponData == RangedWeaponData.MAGIC_SHORTBOW && player.isSpecialActivated && player.combatSpecial != null && player.combatSpecial === CombatSpecial.MAGIC_SHORTBOW) {
-                    decrementAmmo(player, victim.position)
+                    decrementAmmo(player, victim.entityPosition)
                 }
             }
             player.performGraphic(
@@ -144,11 +142,18 @@ class DefaultRangedCombatStrategy : CombatStrategy {
         // Create the player instance.
         val player = entity as Player
         var distance = 5
-        if (player.rangedWeaponData != null) distance = player.rangedWeaponData.type.distanceRequired
-        if (((player.regionInstance != null) && (player.regionInstance.type == RegionInstanceType.KRAKEN)) || (player.regionInstance.type == RegionInstanceType.ZULRAH)) {
-            distance += 3
-        }
-        return distance + if (player.fightType.style === FightStyle.DEFENSIVE) 2 else 0
+
+        //TODO fix this in the future the distance is wrong when ranging from the east got something to do with clipping
+//        if (player.rangedWeaponData != null) {
+//            distance = player.rangedWeaponData.type.distanceRequired
+//        }
+//        if (((player.regionInstance != null) && (player.regionInstance.type == RegionInstanceType.KRAKEN)) || (player.regionInstance.type == RegionInstanceType.ZULRAH)) {
+//            println(player.rangedWeaponData.type.distanceRequired)
+//            distance += 3
+//        }
+
+//        return distance + if (player.fightType.style === FightStyle.DEFENSIVE) 2 else 0
+        return distance
     }
 
     /**
@@ -291,7 +296,7 @@ class DefaultRangedCombatStrategy : CombatStrategy {
                 if (player.location === Locations.Location.ZULRAH || player.location === Locations.Location.KRAKEN) {
                     GroundItemManager.spawnGroundItem(
                         player,
-                        GroundItem(Item(player.fireAmmo), player.position, player.username, false, 120, true, 120)
+                        GroundItem(Item(player.fireAmmo), player.entityPosition, player.username, false, 120, true, 120)
                     )
                 } else {
                     GroundItemManager.spawnGroundItem(

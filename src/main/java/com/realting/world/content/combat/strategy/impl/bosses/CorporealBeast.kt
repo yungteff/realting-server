@@ -30,7 +30,7 @@ class CorporealBeast : CombatStrategy {
         var stomp = false
         for (t in Misc.getCombinedPlayerList(target)) {
             if (t == null || t.location !== Locations.Location.CORPOREAL_BEAST) continue
-            if (Locations.goodDistance(t.position, cB.position, 1)) {
+            if (Locations.goodDistance(t.entityPosition, cB.entityPosition, 1)) {
                 stomp = true
                 cB.combatBuilder.victim = t
                 CombatHit(cB.combatBuilder, CombatContainer(cB, t, 1, CombatType.MAGIC, true)).handleAttack()
@@ -42,8 +42,8 @@ class CorporealBeast : CombatStrategy {
         }
         var attackStyle = Misc.getRandom(4)
         if (attackStyle == 0 || attackStyle == 1) { // melee
-            val distanceX = target!!.position.x - cB.position.x
-            val distanceY = target.position.y - cB.position.y
+            val distanceX = target!!.entityPosition.x - cB.entityPosition.x
+            val distanceY = target.entityPosition.y - cB.entityPosition.y
             if (distanceX > 4 || distanceX < -1 || distanceY > 4 || distanceY < -1) attackStyle = 4 else {
                 cB.performAnimation(Animation(if (attackStyle == 0) 10057 else 10058))
                 if (target.location === Locations.Location.CORPOREAL_BEAST) cB.combatBuilder.container =
@@ -73,7 +73,7 @@ class CorporealBeast : CombatStrategy {
                         skillT,
                         if (player.skillManager.getCurrentLevel(skillT) - lvl <= 0) 1 else lvl
                     )
-                    target!!.packetSender.sendMessage("Your " + skillT.formatName + " has been slighly drained!")
+                    target.packetSender.sendMessage("Your " + skillT.formatName + " has been slighly drained!")
                     stop()
                 }
             })

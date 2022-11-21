@@ -1,9 +1,9 @@
 package com.realting.model;
 
 import com.realting.model.definitions.GameObjectDefinition;
-import com.realting.world.World;
 import com.realting.model.entity.Entity;
 import com.realting.model.entity.character.player.Player;
+import com.realting.world.World;
 
 /**
  * This file manages a game object entity on the globe.
@@ -53,7 +53,7 @@ public class GameObject extends Entity {
 	/**
 	 * The object's id.
 	 */
-	private int id;
+	private final int id;
 
 	/**
 	 * Gets the object's id.
@@ -123,7 +123,7 @@ public class GameObject extends Entity {
 		for (Player player : World.getPlayers()) {
 			if(player == null)
 				continue;
-			if(player.getPosition().isWithinDistance(getPosition()))
+			if(player.getEntityPosition().isWithinDistance(getEntityPosition()))
 				player.getPacketSender().sendObjectAnimation(this, animation);
 		}
 	}
@@ -133,8 +133,8 @@ public class GameObject extends Entity {
 		for (Player player : World.getPlayers()) {
 			if(player == null)
 				continue;
-			if (player.getPosition().isWithinDistance(getPosition()))
-				player.getPacketSender().sendGraphic(graphic, getPosition());
+			if (player.getEntityPosition().isWithinDistance(getEntityPosition()))
+				player.getPacketSender().sendGraphic(graphic, getEntityPosition());
 		}
 	}
 

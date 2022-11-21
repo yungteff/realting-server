@@ -27,9 +27,9 @@ object Firemaking {
             player.packetSender.sendMessage("You can not light a fire in this area.")
             return
         }
-        val objectExists = CustomObjects.objectExists(player.position.copy())
+        val objectExists = CustomObjects.objectExists(player.entityPosition.copy())
         if (!Dungeoneering.doingDungeoneering(player)) {
-            if (objectExists && !addingToFire || player.position.z > 0 || !player.movementQueue.canWalk(
+            if (objectExists && !addingToFire || player.entityPosition.z > 0 || !player.movementQueue.canWalk(
                     1, 0
                 ) && !player.movementQueue.canWalk(-1, 0) && !player.movementQueue.canWalk(
                     0, 1
@@ -38,7 +38,7 @@ object Firemaking {
                 player.packetSender.sendMessage("You can not light a fire here.")
                 return
             }
-            if (player.position.x == 2848 && player.position.y == 3335 || player.position.x == 2711 && player.position.y == 3438) { //fm
+            if (player.entityPosition.x == 2848 && player.entityPosition.y == 3335 || player.entityPosition.x == 2711 && player.entityPosition.y == 3438) { //fm
                 player.packetSender.sendMessage("There's already a perfectly good fire here.")
                 return
             }
@@ -87,7 +87,7 @@ object Firemaking {
                         MovementQueue.stepAway(player)
                     }
                     CustomObjects.globalFiremakingTask(
-                        GameObject(logData.gameObject, player.position.copy()), player, logData.burnTime
+                        GameObject(logData.gameObject, player.entityPosition.copy()), player, logData.burnTime
                     )
                     player.packetSender.sendMessage("The fire catches and the logs begin to burn.")
                     stop()

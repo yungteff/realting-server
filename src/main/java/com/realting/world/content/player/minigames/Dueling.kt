@@ -28,7 +28,7 @@ open class Dueling(var player: Player) {
             return
         }
         if (!Locations.goodDistance(
-                player.position.x, player.position.y, playerToDuel.position.x, playerToDuel.position.y, 2
+                player.entityPosition.x, player.entityPosition.y, playerToDuel.entityPosition.x, playerToDuel.entityPosition.y, 2
             )
         ) {
             player.packetSender.sendMessage("Please get closer to request a duel.")
@@ -466,7 +466,7 @@ open class Dueling(var player: Player) {
             }
         }
         player.restart()
-        player.packetSender.sendPositionalHint(playerToDuel.position.copy(), 10)
+        player.packetSender.sendPositionalHint(playerToDuel.entityPosition.copy(), 10)
         player.packetSender.sendEntityHint(playerToDuel)
         TaskManager.submit(object : Task(2, player, false) {
             public override fun execute() {
@@ -717,7 +717,7 @@ open class Dueling(var player: Player) {
         fun checkDuel(playerToDuel: Player, statusReq: Int): Boolean {
             val goodInterfaceId =
                 playerToDuel.interfaceId == -1 || playerToDuel.interfaceId == 6575 || playerToDuel.interfaceId == 6412
-            return if (playerToDuel.dueling.duelingStatus != statusReq || playerToDuel.isBanking || playerToDuel.isShopping || playerToDuel.constitution <= 0 || playerToDuel.isResting || !goodInterfaceId) false else true
+            return !(playerToDuel.dueling.duelingStatus != statusReq || playerToDuel.isBanking || playerToDuel.isShopping || playerToDuel.constitution <= 0 || playerToDuel.isResting || !goodInterfaceId)
         }
 
         @JvmStatic

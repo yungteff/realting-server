@@ -22,8 +22,8 @@ object Mining {
         player.skillManager.stopSkilling()
         player.packetSender.sendInterfaceRemoval()
         if (!Locations.goodDistance(
-                player.position.copy(),
-                oreObject.position,
+                player.entityPosition.copy(),
+                oreObject.entityPosition,
                 1
             ) && oreObject.id != 24444 && oreObject.id != 24445 && oreObject.id != 38660
         ) return
@@ -36,7 +36,7 @@ object Mining {
             return
         }
         player.interactingObject = oreObject
-        player.positionToFace = oreObject.position
+        player.positionToFace = oreObject.entityPosition
         val o = MiningData.forRock(oreObject.id)
         val giveGem = o != Ores.Rune_essence && o != Ores.Pure_essence
         val reqCycle = if (o == Ores.Runite) 6 + Misc.getRandom(2) else Misc.getRandom(o!!.ticks - 1)
@@ -180,10 +180,10 @@ object Mining {
             handleBarCreation(barId, player)
             player.packetSender.sendMessage("The heat from your Inferno adze immediately ignites the ore and smelts it.")
             player.interactingObject = oreObject
-            player.positionToFace = oreObject.position
+            player.positionToFace = oreObject.entityPosition
             oreObject.performGraphic(Graphic(453))
             player.interactingObject = oreObject
-            player.positionToFace = oreObject.position
+            player.positionToFace = oreObject.entityPosition
         }
     }
 
@@ -192,13 +192,13 @@ object Mining {
         oldOre.pickAmount = 1
         for (players in player.localPlayers) {
             if (players == null) continue
-            if (players.interactingObject != null && players.interactingObject.position == player.interactingObject.position.copy()) {
+            if (players.interactingObject != null && players.interactingObject.entityPosition == player.interactingObject.entityPosition.copy()) {
                 players.packetSender.sendClientRightClickRemoval()
                 players.skillManager.stopSkilling()
             }
         }
         player.packetSender.sendClientRightClickRemoval()
         player.skillManager.stopSkilling()
-        CustomObjects.globalObjectRespawnTask(GameObject(452, oldOre.position.copy(), 10, 0), oldOre, o.respawn)
+        CustomObjects.globalObjectRespawnTask(GameObject(452, oldOre.entityPosition.copy(), 10, 0), oldOre, o.respawn)
     }
 }

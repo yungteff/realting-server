@@ -76,7 +76,7 @@ object Artifacts {
             killer, GroundItem(
                 Item(
                     getRandomItem(LOW_ARTIFACTS)
-                ), death.position.copy(), killer.username, false, 110, true, 100
+                ), death.entityPosition.copy(), killer.username, false, 110, true, 100
             )
         )
         if (Misc.getRandom(100) >= 90) GroundItemManager.spawnGroundItem(
@@ -85,7 +85,7 @@ object Artifacts {
                     getRandomItem(
                         MED_ARTIFACTS
                     )
-                ), death.position.copy(), killer.username, false, 110, true, 100
+                ), death.entityPosition.copy(), killer.username, false, 110, true, 100
             )
         )
         if (Misc.getRandom(100) >= 97) GroundItemManager.spawnGroundItem(
@@ -94,18 +94,18 @@ object Artifacts {
                     getRandomItem(
                         HIGH_ARTIFACTS
                     )
-                ), death.position.copy(), killer.username, false, 110, true, 100
+                ), death.entityPosition.copy(), killer.username, false, 110, true, 100
             )
         )
         if (Misc.getRandom(100) >= 99) GroundItemManager.spawnGroundItem(
             killer,
-            GroundItem(Item(getRandomItem(PVP_ARMORS)), death.position.copy(), killer.username, false, 110, true, 100)
+            GroundItem(Item(getRandomItem(PVP_ARMORS)), death.entityPosition.copy(), killer.username, false, 110, true, 100)
         )
         if (Misc.getRandom(100) >= 99) {
             val rareDrop = getRandomItem(EXR_ARTIFACTS)
             val itemName = Misc.formatText(ItemDefinition.forId(rareDrop).name)
             GroundItemManager.spawnGroundItem(
-                killer, GroundItem(Item(rareDrop), death.position.copy(), killer.username, false, 110, true, 100)
+                killer, GroundItem(Item(rareDrop), death.entityPosition.copy(), killer.username, false, 110, true, 100)
             )
             World.sendMessage(
                 "<img=10><col=009966><shad=0> " + killer.username + " has just received " + Misc.anOrA(

@@ -1,11 +1,5 @@
 package com.realting.model.container;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.realting.model.GroundItem;
@@ -16,6 +10,12 @@ import com.realting.model.container.impl.Shop;
 import com.realting.model.definitions.ItemDefinition;
 import com.realting.model.entity.character.GroundItemManager;
 import com.realting.model.entity.character.player.Player;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Represents a container which contains items.
@@ -549,10 +549,7 @@ public abstract class ItemContainer {
 			for(int i = 0; i < items.length; i++) {
 				if(items[i] != null && items[i].getId() == item.getId()) {
 					long totalCount = (long) item.getAmount() + items[i].getAmount();
-					if(totalCount > Integer.MAX_VALUE) {
-						return false;
-					}
-					return true;
+					return totalCount <= Integer.MAX_VALUE;
 				}
 			}
 			return getFreeSlot() != -1;
@@ -608,7 +605,7 @@ public abstract class ItemContainer {
 				slot = getEmptySlot();
 			if (slot == -1) {
 				if(getPlayer().getRights() != PlayerRights.OWNER && getPlayer().getRights() != PlayerRights.DEVELOPER) {
-					GroundItemManager.spawnGroundItem(player, new GroundItem(item, player.getPosition().copy(), player.getUsername(), player.getHostAddress(), false, 120, player.getPosition().getZ() >= 0 && player.getPosition().getZ() < 4 ? true : false, 60));
+					GroundItemManager.spawnGroundItem(player, new GroundItem(item, player.getEntityPosition().copy(), player.getUsername(), player.getHostAddress(), false, 120, player.getEntityPosition().getZ() >= 0 && player.getEntityPosition().getZ() < 4, 60));
 					getPlayer().getPacketSender().sendMessage("The item which you couldn't hold has been placed beneath you.");
 					if (refresh)
 						refreshItems();
@@ -633,7 +630,7 @@ public abstract class ItemContainer {
 				if (slot == -1) {
 					if(getPlayer().getRights() != PlayerRights.OWNER && getPlayer().getRights() != PlayerRights.DEVELOPER) {
 						if (!item.getAttributes().hasAttributes()) {
-							GroundItemManager.spawnGroundItem(player, new GroundItem(Item.getNoted(item.getId(), amount), player.getPosition().copy(), player.getUsername(), false, 120, player.getPosition().getZ() >= 0 && player.getPosition().getZ() < 4 ? true : false, 60));
+							GroundItemManager.spawnGroundItem(player, new GroundItem(Item.getNoted(item.getId(), amount), player.getEntityPosition().copy(), player.getUsername(), false, 120, player.getEntityPosition().getZ() >= 0 && player.getEntityPosition().getZ() < 4, 60));
 							getPlayer().getPacketSender().sendMessage("The item(s) which you couldn't hold have been placed beneath you.");
 							if (refresh)
 								refreshItems();

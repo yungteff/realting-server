@@ -4,10 +4,10 @@ import com.realting.engine.task.impl.WalkToTask;
 import com.realting.engine.task.impl.WalkToTask.FinalizedMovementTask;
 import com.realting.model.Locations;
 import com.realting.model.Locations.Location;
+import com.realting.model.entity.character.player.Player;
 import com.realting.net.packet.Packet;
 import com.realting.net.packet.PacketListener;
 import com.realting.world.World;
-import com.realting.model.entity.character.player.Player;
 
 /**
  * This packet listener is called when a player accepts a trade offer,
@@ -33,9 +33,9 @@ public class TradeInvitationPacketListener implements PacketListener {
 		if(index < 0 || index > World.getPlayers().capacity())
 			return;
 		Player target = World.getPlayers().get(index);
-		if (target == null || !Locations.goodDistance(player.getPosition(), target.getPosition(), 13)) 
+		if (target == null || !Locations.goodDistance(player.getEntityPosition(), target.getEntityPosition(), 13))
 			return;
-		player.setWalkToTask(new WalkToTask(player, target.getPosition(), target.getSize(), new FinalizedMovementTask() {
+		player.setWalkToTask(new WalkToTask(player, target.getEntityPosition(), target.getSize(), new FinalizedMovementTask() {
 			@Override
 			public void execute() {
 				if(target.getIndex() != player.getIndex())

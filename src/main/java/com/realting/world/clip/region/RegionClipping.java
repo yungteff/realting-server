@@ -1,5 +1,16 @@
 package com.realting.world.clip.region;
 
+import com.realting.GameServer;
+import com.realting.model.GameObject;
+import com.realting.model.Locations.Location;
+import com.realting.model.Position;
+import com.realting.model.definitions.GameObjectDefinition;
+import com.realting.model.entity.character.CharacterEntity;
+import com.realting.util.Misc;
+import com.realting.world.clip.stream.ByteStream;
+import lombok.extern.java.Log;
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.File;
@@ -9,17 +20,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.logging.Level;
-
-import com.realting.GameServer;
-import com.realting.model.GameObject;
-import com.realting.model.Locations.Location;
-import com.realting.model.Position;
-import com.realting.model.definitions.GameObjectDefinition;
-import com.realting.util.Misc;
-import com.realting.world.clip.stream.ByteStream;
-import com.realting.model.entity.character.CharacterEntity;
-import lombok.extern.java.Log;
-import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * A highly modified version of the released clipping.
@@ -52,13 +52,13 @@ public final class RegionClipping {
 		}).distinct().toArray();
 	}
 
-	private static Map<Integer, RegionClipping> regions = new HashMap<>();
-	private static HashSet<Integer> loadedRegions = new HashSet<>();
+	private static final Map<Integer, RegionClipping> regions = new HashMap<>();
+	private static final HashSet<Integer> loadedRegions = new HashSet<>();
 
 	private final class RegionData {
 
-		private int mapGround;
-		private int mapObject;
+		private final int mapGround;
+		private final int mapObject;
 
 		public RegionData(int mapGround, int mapObject) {
 			this.mapGround = mapGround;
@@ -66,10 +66,10 @@ public final class RegionClipping {
 		}
 	}
 
-	private RegionData regionData;
+	private final RegionData regionData;
 	private final int id;
 	private final boolean osrs;
-	private int[][][] clips = new int[4][][];
+	private final int[][][] clips = new int[4][][];
 	public GameObject[][][] gameObjects = new GameObject[4][][];
 
 
@@ -328,7 +328,7 @@ public final class RegionClipping {
 
 	public static boolean objectExists(GameObject object) {
 		Location loc = Location.getLocation(object);
-		Position pos = object.getPosition();
+		Position pos = object.getEntityPosition();
 		int id = object.getId();
 		boolean barrows = pos.getZ() == -1
 				&& object.getDefinition() != null
@@ -377,11 +377,9 @@ public final class RegionClipping {
 		boolean draynor = (id == 135 && pos.getX() == 3109 && pos.getY() == 3353) || (id == 134 && pos.getX() == 3108 && pos.getY() == 3353);
 		if (well || mageBankLever || lawAltar || trees || chaosTunnels || lunar || barrows || rfd || lumbridgeCastle || barbCourseRopeswing || catherbyAquariums || freeForAllPortal || warriorsGuild || fightPit || godwars || barrows || waterRcAltar || crystalChest || draynor)
 			return true;
-		int[] info = getObjectInformation(object.getPosition());
+		int[] info = getObjectInformation(object.getEntityPosition());
 		if (info != null) {
-			if (info[2] == object.getId()) {
-				return true;
-			}
+			return info[2] == object.getId();
 		}
 		return false;
 	}
@@ -586,14 +584,14 @@ public final class RegionClipping {
 
 	public static void addObject(GameObject gameObject) {
 		if (gameObject.getId() != 65535)
-			addObject(gameObject.getId(), gameObject.getPosition().getX(),
-					gameObject.getPosition().getY(), gameObject.getPosition()
+			addObject(gameObject.getId(), gameObject.getEntityPosition().getX(),
+					gameObject.getEntityPosition().getY(), gameObject.getEntityPosition()
 							.getZ(), gameObject.getType(), gameObject.getFace());
 	}
 
 	public static void removeObject(GameObject gameObject) {
-		addObject(-1, gameObject.getPosition().getX(), gameObject.getPosition()
-				.getY(), gameObject.getPosition().getZ(), gameObject.getType(),
+		addObject(-1, gameObject.getEntityPosition().getX(), gameObject.getEntityPosition()
+				.getY(), gameObject.getEntityPosition().getZ(), gameObject.getType(),
 				gameObject.getFace());
 	}
 
@@ -748,14 +746,14 @@ public final class RegionClipping {
 	public static boolean canProjectileAttack(CharacterEntity a, CharacterEntity b) {
 		if (!a.isPlayer()) {
 			if (b.isPlayer()) {
-				return canProjectileMove(b.getPosition().getX(), b
-						.getPosition().getY(), a.getPosition().getX(), a
-						.getPosition().getY(), a.getPosition().getZ(), 1, 1);
+				return canProjectileMove(b.getEntityPosition().getX(), b
+						.getEntityPosition().getY(), a.getEntityPosition().getX(), a
+						.getEntityPosition().getY(), a.getEntityPosition().getZ(), 1, 1);
 			}
 		}
-		return canProjectileMove(a.getPosition().getX(),
-				a.getPosition().getY(), b.getPosition().getX(), b.getPosition()
-						.getY(), a.getPosition().getZ(), 1, 1);
+		return canProjectileMove(a.getEntityPosition().getX(),
+				a.getEntityPosition().getY(), b.getEntityPosition().getX(), b.getEntityPosition()
+						.getY(), a.getEntityPosition().getZ(), 1, 1);
 	}
 
 	public static boolean canProjectileMove(int startX, int startY, int endX,
@@ -892,29 +890,29 @@ public final class RegionClipping {
 
 	public final static boolean isInDiagonalBlock(CharacterEntity attacked,
                                                   CharacterEntity attacker) {
-		return attacked.getPosition().getX() - 1 == attacker.getPosition()
+		return attacked.getEntityPosition().getX() - 1 == attacker.getEntityPosition()
 				.getX()
-				&& attacked.getPosition().getY() + 1 == attacker.getPosition()
+				&& attacked.getEntityPosition().getY() + 1 == attacker.getEntityPosition()
 						.getY()
-				|| attacker.getPosition().getX() - 1 == attacked.getPosition()
+				|| attacker.getEntityPosition().getX() - 1 == attacked.getEntityPosition()
 						.getX()
-				&& attacker.getPosition().getY() + 1 == attacked.getPosition()
+				&& attacker.getEntityPosition().getY() + 1 == attacked.getEntityPosition()
 						.getY()
-				|| attacked.getPosition().getX() + 1 == attacker.getPosition()
+				|| attacked.getEntityPosition().getX() + 1 == attacker.getEntityPosition()
 						.getX()
-				&& attacked.getPosition().getY() - 1 == attacker.getPosition()
+				&& attacked.getEntityPosition().getY() - 1 == attacker.getEntityPosition()
 						.getY()
-				|| attacker.getPosition().getX() + 1 == attacked.getPosition()
+				|| attacker.getEntityPosition().getX() + 1 == attacked.getEntityPosition()
 						.getX()
-				&& attacker.getPosition().getY() - 1 == attacked.getPosition()
+				&& attacker.getEntityPosition().getY() - 1 == attacked.getEntityPosition()
 						.getY()
-				|| attacked.getPosition().getX() + 1 == attacker.getPosition()
+				|| attacked.getEntityPosition().getX() + 1 == attacker.getEntityPosition()
 						.getX()
-				&& attacked.getPosition().getY() + 1 == attacker.getPosition()
+				&& attacked.getEntityPosition().getY() + 1 == attacker.getEntityPosition()
 						.getY()
-				|| attacker.getPosition().getX() + 1 == attacked.getPosition()
+				|| attacker.getEntityPosition().getX() + 1 == attacked.getEntityPosition()
 						.getX()
-				&& attacker.getPosition().getY() + 1 == attacked.getPosition()
+				&& attacker.getEntityPosition().getY() + 1 == attacked.getEntityPosition()
 						.getY();
 	}
 

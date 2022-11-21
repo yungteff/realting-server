@@ -1,29 +1,21 @@
 package com.realting.engine.task.impl;
 
-import java.util.ArrayList;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import com.realting.GameSettings;
 import com.realting.engine.task.Task;
-import com.realting.model.Animation;
-import com.realting.model.DamageDealer;
-import com.realting.model.Flag;
-import com.realting.model.GameMode;
-import com.realting.model.GroundItem;
-import com.realting.model.Item;
+import com.realting.model.*;
 import com.realting.model.Locations.Location;
-import com.realting.model.PlayerRights;
-import com.realting.model.Position;
-import com.realting.model.Skill;
 import com.realting.model.definitions.ItemDefinition;
+import com.realting.model.entity.character.GroundItemManager;
+import com.realting.model.entity.character.npc.NPC;
+import com.realting.model.entity.character.player.Player;
 import com.realting.util.Misc;
 import com.realting.world.World;
 import com.realting.world.content.ItemsKeptOnDeath;
 import com.realting.world.content.PlayerLogs;
 import com.realting.world.content.PlayerPanel;
-import com.realting.model.entity.character.GroundItemManager;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.player.Player;
+
+import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Represents a player's death task, through which the process of dying is handled,
@@ -70,7 +62,7 @@ public class PlayerDeathTask extends Task {
 				this.death = getDeathNpc(player);
 				break;
 			case 1:
-				this.oldPosition = player.getPosition().copy();
+				this.oldPosition = player.getEntityPosition().copy();
 				this.loc = player.getLocation();
 				if(loc != Location.DUNGEONEERING && loc != Location.PEST_CONTROL_GAME && loc != Location.DUEL_ARENA && loc != Location.FREE_FOR_ALL_ARENA 
 						&& loc != Location.FREE_FOR_ALL_WAIT && loc != Location.SOULWARS && loc != Location.FIGHT_PITS && loc != Location.FIGHT_PITS_WAIT_ROOM 
@@ -92,11 +84,7 @@ public class PlayerDeathTask extends Task {
 					}
 					if(loc == Location.THE_SIX || loc == Location.NOMAD){
 						spawnItems = false;//&& loc != Location.NOMAD && (loc != Location.WILDERNESS && killer.getGameMode() != GameMode.NORMAL); //&& !(loc == Location.GODWARS_DUNGEON && player.getMinigameAttributes().getGodwarsDungeonAttributes().hasEnteredRoom());
-					} else if (loc == Location.WILDERNESS && killer != null && killer.isPlayer() && killer.getGameMode() != GameMode.NORMAL) {
-						spawnItems = false;
-					} else {
-						spawnItems = true;
-					}
+					} else spawnItems = loc != Location.WILDERNESS || killer == null || !killer.isPlayer() || killer.getGameMode() == GameMode.NORMAL;
 					//System.out.println("Location: "+loc+" | spawnItems: "+spawnItems);
 					//System.out.println("Killer: "+killer.getUsername()+" | "+killer.getGameMode());
 					//System.out.println("Victim: "+player.getUsername()+" | "+player.getGameMode());
@@ -122,7 +110,7 @@ public class PlayerDeathTask extends Task {
 						/*final CopyOnWriteArrayList<Item> playerItems = new CopyOnWriteArrayList<Item>();
 						playerItems.addAll(player.getInventory().getValidItems());
 						playerItems.addAll(player.getEquipment().getValidItems());*/
-						final Position position = player.getPosition();
+						final Position position = player.getEntityPosition();
 						/*Collections.sort(playerItems, new Comparator<Item>() { // Despite this actually sorting properly, it does not affect how the client displays grounditems.
 						    @Override
 						    public int compare(Item i1, Item i2) {
@@ -201,7 +189,7 @@ public class PlayerDeathTask extends Task {
 				loc.onDeath(player);
 				player.respawned();
 				if(loc != Location.DUNGEONEERING) {
-					if(player.getPosition().equals(oldPosition))
+					if(player.getEntityPosition().equals(oldPosition))
 						player.moveTo(GameSettings.DEFAULT_POSITION.copy());
 				}
 				player = null;
@@ -221,7 +209,7 @@ public class PlayerDeathTask extends Task {
 	}
 
 	public static NPC getDeathNpc(Player player) {
-		NPC death = new NPC(2862, new Position(player.getPosition().getX() + 1, player.getPosition().getY() + 1));
+		NPC death = new NPC(2862, new Position(player.getEntityPosition().getX() + 1, player.getEntityPosition().getY() + 1));
 		World.register(death);
 		death.setEntityInteraction(player);
 		death.performAnimation(new Animation(401));

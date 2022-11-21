@@ -38,10 +38,10 @@ public class DwarfMultiCannon {
 		c.getSkillManager().stopSkilling();
 		final boolean movementLock = c.getMovementQueue().isLockedMovement();
 		c.getMovementQueue().setLockMovement(true);
-		final GameObject object = new GameObject(CANNON_BASE, c.getPosition().copy());
-		final GameObject object2 = new GameObject(CANNON_STAND, c.getPosition().copy());
-		final GameObject object3 = new GameObject(CANNON_BARRELS, c.getPosition().copy());
-		final GameObject object4 = new GameObject(CANNON, c.getPosition().copy());
+		final GameObject object = new GameObject(CANNON_BASE, c.getEntityPosition().copy());
+		final GameObject object2 = new GameObject(CANNON_STAND, c.getEntityPosition().copy());
+		final GameObject object3 = new GameObject(CANNON_BARRELS, c.getEntityPosition().copy());
+		final GameObject object4 = new GameObject(CANNON, c.getEntityPosition().copy());
 		c.getInventory().delete(CANNON_FURNACE_ID, 1);
 		c.getInventory().delete(CANNON_BARRELS_ID, 1);
 		c.getInventory().delete(CANNON_STAND_ID, 1);
@@ -115,7 +115,7 @@ public class DwarfMultiCannon {
 			c.getPacketSender().sendMessage("You cannot setup a cannon here.");
 			return false;
 		}
-		if(!c.getMovementQueue().canWalk(3, 3) || CustomObjects.objectExists(c.getPosition().copy()) || !c.getLocation().isCannonAllowed() || c.getPosition().getZ() != 0) {
+		if(!c.getMovementQueue().canWalk(3, 3) || CustomObjects.objectExists(c.getEntityPosition().copy()) || !c.getLocation().isCannonAllowed() || c.getEntityPosition().getZ() != 0) {
 			c.getPacketSender().sendMessage("The dwarf-cannon cannot be setup here. Try moving around a bit.");
 			return false;
 		}
@@ -292,11 +292,11 @@ public class DwarfMultiCannon {
 				continue;
 			if(!n.getLocation().isCannonAllowed())
 				continue;
-			int myX = cannon.getObject().getPosition().getX();
-			int myY = cannon.getObject().getPosition().getY();
-			int theirX = n.getPosition().getX(); 
-			int theirY = n.getPosition().getY();
-			if (n.getDefinition().isAttackable() && n.getConstitution() > 0 && Locations.goodDistance(cannon.getObject().getPosition(), n.getPosition(), 8)) {
+			int myX = cannon.getObject().getEntityPosition().getX();
+			int myY = cannon.getObject().getEntityPosition().getY();
+			int theirX = n.getEntityPosition().getX();
+			int theirY = n.getEntityPosition().getY();
+			if (n.getDefinition().isAttackable() && n.getConstitution() > 0 && Locations.goodDistance(cannon.getObject().getEntityPosition(), n.getEntityPosition(), 8)) {
 				if(!Locations.inMulti(n) && n.getCombatBuilder().isBeingAttacked() && n.getCombatBuilder().getLastAttacker() != p) {
 					continue;
 				}

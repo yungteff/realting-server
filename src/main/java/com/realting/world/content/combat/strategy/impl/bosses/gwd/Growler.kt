@@ -28,7 +28,7 @@ class Growler : CombatStrategy {
         if (growler!!.isChargingAttack || victim!!.constitution <= 0) {
             return true
         }
-        if (Locations.goodDistance(growler.position.copy(), victim!!.position.copy(), 1) && Misc.getRandom(5) <= 3) {
+        if (Locations.goodDistance(growler.entityPosition.copy(), victim.entityPosition.copy(), 1) && Misc.getRandom(5) <= 3) {
             growler.performAnimation(Animation(growler.definition.attackAnimation))
             growler.combatBuilder.container = CombatContainer(growler, victim, 1, 1, CombatType.MELEE, true)
         } else {

@@ -4,7 +4,7 @@ com.realting.GameServer.class
 
 player files:
 -
-data-saves-characters
+data.saves.characters
 
 item list
 -

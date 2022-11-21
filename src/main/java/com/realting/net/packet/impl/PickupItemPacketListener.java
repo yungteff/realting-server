@@ -6,11 +6,11 @@ import com.realting.model.GroundItem;
 import com.realting.model.Item;
 import com.realting.model.Position;
 import com.realting.model.container.impl.Equipment;
+import com.realting.model.entity.character.GroundItemManager;
+import com.realting.model.entity.character.player.Player;
 import com.realting.net.packet.Packet;
 import com.realting.net.packet.PacketListener;
 import com.realting.util.Misc;
-import com.realting.model.entity.character.GroundItemManager;
-import com.realting.model.entity.character.player.Player;
 
 /**
  * This packet listener is used to pick up ground items
@@ -28,7 +28,7 @@ public class PickupItemPacketListener implements PacketListener {
 		final int x = packet.readLEShort();
 		if(player.isTeleporting())
 			return;
-		final Position position = new Position(x, y, player.getPosition().getZ());
+		final Position position = new Position(x, y, player.getEntityPosition().getZ());
 		if(!player.getLastItemPickup().elapsed(500))
 			return;
 		if(player.getConstitution() <= 0 || player.isTeleporting())
@@ -36,7 +36,7 @@ public class PickupItemPacketListener implements PacketListener {
 		player.setWalkToTask(new WalkToTask(player, position, 1, new FinalizedMovementTask() {
 			@Override
 			public void execute() {
-				if (Math.abs(player.getPosition().getX() - x) > 25 || Math.abs(player.getPosition().getY() - y) > 25) {
+				if (Math.abs(player.getEntityPosition().getX() - x) > 25 || Math.abs(player.getEntityPosition().getY() - y) > 25) {
 					player.getMovementQueue().reset();
 					return;
 				}
@@ -55,7 +55,7 @@ public class PickupItemPacketListener implements PacketListener {
 						player.getPacketSender().sendMessage("You cannot hold that amount of this item. Clear your inventory!");
 						return;
 					}
-					GroundItemManager.pickupGroundItem(player, new Item(itemId), new Position(x, y, player.getPosition().getZ()));
+					GroundItemManager.pickupGroundItem(player, new Item(itemId), new Position(x, y, player.getEntityPosition().getZ()));
 				}
 			}
 		}));

@@ -52,12 +52,12 @@ class WalkToTask(
             return
         }
         if (Locations.goodDistance(
-                player.position.x,
-                player.position.y,
+                player.entityPosition.x,
+                player.entityPosition.y,
                 destination.x,
                 destination.y,
                 distance
-            ) || destination == player.position
+            ) || destination == player.entityPosition
         ) {
             finalizedTask.execute()
             player.setEntityInteraction(null)

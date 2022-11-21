@@ -2,6 +2,7 @@ package com.realting.net.packet.impl;
 
 import com.realting.model.ChatMessage.Message;
 import com.realting.model.Flag;
+import com.realting.model.entity.character.player.Player;
 import com.realting.net.packet.Packet;
 import com.realting.net.packet.PacketListener;
 import com.realting.util.Misc;
@@ -9,7 +10,6 @@ import com.realting.webhooks.discord.DiscordMessager;
 import com.realting.world.content.PlayerLogs;
 import com.realting.world.content.PlayerPunishment;
 import com.realting.world.content.dialogue.DialogueManager;
-import com.realting.model.entity.character.player.Player;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -90,9 +90,9 @@ public class ChatPacketListener implements PacketListener {
 			return;
 		}
 		player.getChatMessages().set(new Message(color, effects, text));
-		PlayerLogs.log(player.getUsername(), player.getLocation().toString()+"|"+player.getPosition().getX()+","+player.getPosition().getY()+","+player.getPosition().getZ()+"|Said: "+readable);
+		PlayerLogs.log(player.getUsername(), player.getLocation().toString()+"|"+player.getEntityPosition().getX()+","+player.getEntityPosition().getY()+","+player.getEntityPosition().getZ()+"|Said: "+readable);
 		player.getUpdateFlag().flag(Flag.CHAT);
-		DiscordMessager.sendChatMessage("**"+player.getUsername()+"**|"+player.getLocation().toString()+"|"+player.getPosition().getX()+","+player.getPosition().getY()+","+player.getPosition().getZ()+"|Said: "+readable);
+		DiscordMessager.sendChatMessage("**"+player.getUsername()+"**|"+player.getLocation().toString()+"|"+player.getEntityPosition().getX()+","+player.getEntityPosition().getY()+","+player.getEntityPosition().getZ()+"|Said: "+readable);
 	}
 
 }

@@ -4,18 +4,13 @@ import com.realting.engine.task.Task;
 import com.realting.engine.task.TaskManager;
 import com.realting.engine.task.impl.WalkToTask;
 import com.realting.engine.task.impl.WalkToTask.FinalizedMovementTask;
-import com.realting.model.Animation;
-import com.realting.model.GameMode;
-import com.realting.model.GameObject;
-import com.realting.model.Graphic;
-import com.realting.model.Item;
+import com.realting.model.*;
 import com.realting.model.Locations.Location;
-import com.realting.model.PlayerRights;
-import com.realting.model.Position;
-import com.realting.model.Skill;
 import com.realting.model.definitions.GameObjectDefinition;
 import com.realting.model.definitions.ItemDefinition;
 import com.realting.model.definitions.NpcDefinition;
+import com.realting.model.entity.character.npc.NPC;
+import com.realting.model.entity.character.player.Player;
 import com.realting.net.packet.Packet;
 import com.realting.net.packet.PacketListener;
 import com.realting.util.Misc;
@@ -52,8 +47,6 @@ import com.realting.world.content.player.skill.slayer.SlayerDialogues;
 import com.realting.world.content.player.skill.slayer.SlayerTasks;
 import com.realting.world.content.player.skill.smithing.EquipmentMaking;
 import com.realting.world.content.player.skill.smithing.Smelting;
-import com.realting.model.entity.character.npc.NPC;
-import com.realting.model.entity.character.player.Player;
 
 /**
  * This packet listener is called when a player 'uses' an item on another
@@ -174,7 +167,7 @@ public class UseItemPacketListener implements PacketListener {
 		if (item == null)
 			return;
 		final GameObject gameObject = new GameObject(objectId, new Position(
-				objectX, objectY, player.getPosition().getZ()));
+				objectX, objectY, player.getEntityPosition().getZ()));
 		if(objectId > 0 && objectId != 6 && !RegionClipping.objectExists(gameObject)) {
 			//	player.getPacketSender().sendMessage("An error occured. Error code: "+id).sendMessage("Please report the error to a staff member.");
 			return;
@@ -187,12 +180,12 @@ public class UseItemPacketListener implements PacketListener {
 				player.getPacketSender().sendMessage("ItemOnObject - <shad=000000><col=ffffff>[<col=ff774a>"+ItemDefinition.forId(itemId).getName()+":"+itemId+" <col=ffffff>was used on <col=4AD2FF>"+gameObject.getId()+"<col=ffffff>] @red@(null obj. def)");
 			}
 		}
-		player.setWalkToTask(new WalkToTask(player, gameObject.getPosition().copy(),
+		player.setWalkToTask(new WalkToTask(player, gameObject.getEntityPosition().copy(),
 				gameObject.getSize(), new FinalizedMovementTask() {
 			@Override
 			public void execute() {
 				if (CookingData.forFish(item.getId()) != null && CookingData.isRange(objectId)) {
-					player.setPositionToFace(gameObject.getPosition());
+					player.setPositionToFace(gameObject.getEntityPosition());
 					Cooking.selectionInterface(player, CookingData.forFish(item.getId()));
 					return;
 				}
@@ -354,7 +347,7 @@ public class UseItemPacketListener implements PacketListener {
 					player.getPacketSender().sendMessage("I should do this after giving the Reindeer their runes.");
 					return;
 				} else if (player.getInventory().getAmount(1907) >= 1) {
-					player.setPositionToFace(npc.getPosition());
+					player.setPositionToFace(npc.getEntityPosition());
 					player.performAnimation(new Animation(4540));
 					player.getInventory().delete(1907, 100);
 					player.setchristmas2016(6);
@@ -443,7 +436,7 @@ public class UseItemPacketListener implements PacketListener {
 		case 962:
 			if(!player.getInventory().contains(962) || player.getRights() == PlayerRights.ADMINISTRATOR)
 				return;
-			player.setPositionToFace(target.getPosition());
+			player.setPositionToFace(target.getEntityPosition());
 			player.performGraphic(new Graphic(1006));
 			player.performAnimation(new Animation(451));
 			player.getPacketSender().sendMessage("You pull the Christmas cracker...");

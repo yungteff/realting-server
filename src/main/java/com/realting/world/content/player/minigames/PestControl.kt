@@ -2,22 +2,18 @@ package com.realting.world.content.minigames
 
 import com.realting.engine.task.Task
 import com.realting.engine.task.TaskManager
-import com.realting.world.World
-import com.realting.world.content.dialogue.DialogueManager
-import com.realting.world.content.PlayerPanel
 import com.realting.model.*
-import java.util.concurrent.CopyOnWriteArrayList
-import java.util.Locale
-import java.util.HashMap
-import com.realting.model.movement.MovementQueue
-
 import com.realting.model.definitions.ItemDefinition
 import com.realting.model.entity.character.npc.NPC
 import com.realting.model.entity.character.player.Player
-import com.realting.model.input.impl.EnterAmountToSellToShop
-import com.realting.model.input.impl.EnterAmountToBuyFromShop
+import com.realting.model.movement.MovementQueue
 import com.realting.model.movement.PathFinder
 import com.realting.util.Misc
+import com.realting.world.World
+import com.realting.world.content.PlayerPanel
+import com.realting.world.content.dialogue.DialogueManager
+import java.util.*
+import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * Pest control minigame
@@ -244,7 +240,7 @@ class PestControl(val id: Int) {
         private fun endGame(won: Boolean) {
             val it = playerMap.keys.iterator()
             while (it.hasNext()) {
-                val p = it.next() ?: continue
+                val p = it.next()
                 val state = getState(p)
                 if (state != null && state == PLAYING) {
                     leave(p, false)
@@ -364,7 +360,7 @@ class PestControl(val id: Int) {
                             spawnPCNPC(
                                 luckiest.lowestNPCID + (Math.random() * (luckiest.highestNPCID - luckiest.lowestNPCID)).toInt(),
                                 Position(
-                                    portals[i]!!.position.x, portals[i]!!.position.y - 1, 0
+                                    portals[i]!!.entityPosition.x, portals[i]!!.entityPosition.y - 1, 0
                                 ),
                                 400
                             )
@@ -395,7 +391,7 @@ class PestControl(val id: Int) {
             for (i in portals.indices) {
                 if (portals[i] != null && portals[i]!!.constitution > 0 && portals[i]!!.constitution > 0) {
                     val distanceCandidate = distance(
-                        npc.position.x, npc.position.y, portals[i]!!.position.x, portals[i]!!.position.y
+                        npc.entityPosition.x, npc.entityPosition.y, portals[i]!!.entityPosition.x, portals[i]!!.entityPosition.y
                     )
                     if (distanceCandidate < distance) {
                         closestPortal = portals[i]
@@ -411,7 +407,7 @@ class PestControl(val id: Int) {
                 if (closestPortal.constitution > defaultPortalConstitution) closestPortal.constitution =
                     defaultPortalConstitution
             } else if (closestPortal != null) {
-                PathFinder.findPath(npc, closestPortal.position.x, closestPortal.position.y - 1, true, 1, 1)
+                PathFinder.findPath(npc, closestPortal.entityPosition.x, closestPortal.entityPosition.y - 1, true, 1, 1)
                 return
             }
         }
@@ -419,19 +415,19 @@ class PestControl(val id: Int) {
         private fun processShifter(npc: NPC?, npc_: PestControlNPC) {
             if (npc != null && knight != null) {
                 if (isFree(npc, npc_)) {
-                    if (distance(npc.position.x, npc.position.y, knight!!.position.x, knight!!.position.y) > 5) {
+                    if (distance(npc.entityPosition.x, npc.entityPosition.y, knight!!.entityPosition.x, knight!!.entityPosition.y) > 5) {
                         val npcId = npc.id
                         val pos = Position(
-                            knight!!.position.x + Misc.getRandom(3),
-                            knight!!.position.y + Misc.getRandom(2),
-                            npc.position.z
+                            knight!!.entityPosition.x + Misc.getRandom(3),
+                            knight!!.entityPosition.y + Misc.getRandom(2),
+                            npc.entityPosition.z
                         )
                         World.deregister(npc)
                         npcList.remove(npc)
                         npcList.add(spawnPCNPC(npcId, pos, 200))
                     } else {
-                        if (distance(npc.position.x, npc.position.y, knight!!.position.x, knight!!.position.y) > 1) {
-                            PathFinder.findPath(npc, knight!!.position.x, knight!!.position.y - 1, true, 1, 1)
+                        if (distance(npc.entityPosition.x, npc.entityPosition.y, knight!!.entityPosition.x, knight!!.entityPosition.y) > 1) {
+                            PathFinder.findPath(npc, knight!!.entityPosition.x, knight!!.entityPosition.y - 1, true, 1, 1)
                         } else {
                             npc.combatBuilder.reset(true)
                             val max = 5 + npc.definition.combatLevel / 9
@@ -439,15 +435,15 @@ class PestControl(val id: Int) {
                         }
                     }
                 }
-                if (npc.position.copy() == knight!!.position.copy()) MovementQueue.stepAway(npc)
+                if (npc.entityPosition.copy() == knight!!.entityPosition.copy()) MovementQueue.stepAway(npc)
             }
         }
 
         private fun processDefiler(npc: NPC?, npc_: PestControlNPC) {
             if (npc != null) {
                 if (isFree(npc, npc_)) {
-                    if (distance(npc.position.x, npc.position.y, knight!!.position.x, knight!!.position.y) > 5) {
-                        PathFinder.findPath(npc, knight!!.position.x, knight!!.position.y - 1, true, 1, 1)
+                    if (distance(npc.entityPosition.x, npc.entityPosition.y, knight!!.entityPosition.x, knight!!.entityPosition.y) > 5) {
+                        PathFinder.findPath(npc, knight!!.entityPosition.x, knight!!.entityPosition.y - 1, true, 1, 1)
                     } else {
                         if (Math.random() <= 0.04) for (p in playerMap.keys) {
                             if (p != null) {
@@ -476,7 +472,7 @@ class PestControl(val id: Int) {
         private fun attack(npc: NPC?, knight: NPC?, anim: Int, maxhit: Int, icon: CombatIcon): Boolean {
             if (knight == null || npc == null) return false
             npc.setEntityInteraction(knight)
-            npc.positionToFace = knight.position
+            npc.positionToFace = knight.entityPosition
             if (npc.combatBuilder.attackTimer == 0) {
                 val damage = (Math.random() * maxhit).toInt()
                 npc.performAnimation(Animation(anim))

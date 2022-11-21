@@ -373,8 +373,8 @@ enum class CombatSpecial
             ) {
                 override fun onHit(damage: Int, accurate: Boolean) {
                     if (target!!.isPlayer) {
-                        var moveX = target.position.x - player.position.x
-                        var moveY = target.position.y - player.position.y
+                        var moveX = target.entityPosition.x - player.entityPosition.x
+                        var moveY = target.entityPosition.y - player.entityPosition.y
                         if (moveX > 0) moveX = 1 else if (moveX < 0) moveX = -1
                         if (moveY > 0) moveY = 1 else if (moveY < 0) moveY = -1
                         if (target.movementQueue.canWalk(moveX, moveY)) {

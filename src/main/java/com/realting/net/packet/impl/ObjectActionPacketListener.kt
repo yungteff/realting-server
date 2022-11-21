@@ -1,78 +1,78 @@
 package com.realting.net.packet.impl
 
-import com.realting.world.content.player.skill.woodcutting.Woodcutting.cutWood
-import com.realting.world.content.player.skill.mining.MiningData.forRock
-import com.realting.world.content.player.skill.mining.Mining.startMining
-import com.realting.world.content.player.skill.runecrafting.Runecrafting.runecraftingAltar
-import com.realting.world.content.player.skill.runecrafting.Runecrafting.craftRunes
-import com.realting.world.content.player.events.WildernessObelisks.handleObelisk
-import com.realting.world.content.player.skill.dungeoneering.Dungeoneering.doingDungeoneering
-import com.realting.world.content.player.skill.fishing.Fishing.setupFishing
-import com.realting.world.content.player.skill.woodcutting.WoodcuttingData.getHatchet
-import com.realting.world.content.player.skill.hunter.Hunter.dismantle
-import com.realting.world.content.player.skill.hunter.PuroPuro.goThroughWheat
-import com.realting.world.content.minigames.Nomad.endFight
-import com.realting.world.content.minigames.RecipeForDisaster.openRFDShop
-import com.realting.world.content.minigames.RecipeForDisaster.leave
-import com.realting.world.content.minigames.RecipeForDisaster.enter
-import com.realting.world.content.minigames.FightPit.addPlayer
-import com.realting.world.content.minigames.FightPit.removePlayer
-import com.realting.world.content.minigames.FightCave.leaveCave
-import com.realting.world.content.minigames.FightCave.enterCave
-import com.realting.world.content.minigames.Dueling.Companion.checkRule
-import com.realting.world.content.minigames.PestControl.Companion.boardBoat
-import com.realting.world.content.minigames.WarriorsGuild.warriorsGuildDialogue
-import com.realting.world.content.minigames.WarriorsGuild.handleTokenRemoval
-import com.realting.world.content.minigames.WarriorsGuild.resetCyclopsCombat
-import com.realting.world.content.player.skill.hunter.Hunter.lootTrap
-import com.realting.world.content.player.skill.thieving.Stalls.stealFromStall
-import com.realting.world.content.player.skill.fishing.Fishing.forSpot
-import com.realting.world.content.player.skill.smithing.EquipmentMaking.handleAnvil
-import com.realting.world.content.combat.weapon.CombatSpecial.Companion.updateBar
-import com.realting.world.content.player.skill.smithing.Smelting.openInterface
-import com.realting.world.content.player.skill.mining.Prospecting.prospectOre
-import com.realting.world.content.player.skill.crafting.Flax.showSpinInterface
-import com.realting.world.content.player.skill.crafting.Jewelry.jewelryInterface
-import com.realting.net.packet.PacketListener
-import com.realting.world.clip.region.RegionClipping
-import com.realting.model.definitions.GameObjectDefinition
-import com.realting.engine.task.impl.WalkToTask
-import com.realting.engine.task.impl.WalkToTask.FinalizedMovementTask
-import com.realting.world.content.player.skill.woodcutting.WoodcuttingData
-import com.realting.world.content.randomevents.EvilTree.EvilTreeDef
-import com.realting.world.content.player.skill.runecrafting.RunecraftingData.RuneData
-import com.realting.world.content.player.skill.agility.Agility
-import com.realting.world.content.minigames.Barrows
-import com.realting.world.content.player.skill.construction.ConstructionActions
-import com.realting.world.content.holidayevents.easter2017data
-import com.realting.engine.task.TaskManager
-import com.realting.world.content.holidayevents.christmas2016
 import com.realting.GameSettings
 import com.realting.engine.task.Task
+import com.realting.engine.task.TaskManager
+import com.realting.engine.task.impl.WalkToTask
+import com.realting.engine.task.impl.WalkToTask.FinalizedMovementTask
 import com.realting.model.*
-import com.realting.world.content.transportation.TeleportHandler
-import com.realting.world.content.transportation.TeleportType
-import com.realting.world.content.dialogue.DialogueManager
-import com.realting.world.content.player.skill.fishing.Fishing
-import com.realting.world.content.portal.portal
-import com.realting.world.content.transportation.TeleportLocations
 import com.realting.model.container.impl.Equipment
-import com.realting.world.content.player.skill.woodcutting.WoodcuttingData.Hatchet
-import com.realting.world.content.minigames.Dueling.DuelRule
-import com.realting.world.World
-import com.realting.world.content.combat.range.DwarfMultiCannon
-import com.realting.model.input.impl.EnterAmountOfLogsToAdd
-import com.realting.world.content.combat.prayer.PrayerHandler
-import com.realting.world.content.combat.prayer.CurseHandler
+import com.realting.model.definitions.GameObjectDefinition
 import com.realting.model.entity.character.player.Player
-import com.realting.world.content.combat.magic.Autocasting
-import com.realting.world.content.CrystalChest
 import com.realting.model.input.impl.DonateToWell
+import com.realting.model.input.impl.EnterAmountOfLogsToAdd
 import com.realting.net.packet.Packet
+import com.realting.net.packet.PacketListener
 import com.realting.util.Misc
+import com.realting.world.World
+import com.realting.world.clip.region.RegionClipping
+import com.realting.world.content.CrystalChest
 import com.realting.world.content.CustomObjects
+import com.realting.world.content.combat.magic.Autocasting
+import com.realting.world.content.combat.prayer.CurseHandler
+import com.realting.world.content.combat.prayer.PrayerHandler
+import com.realting.world.content.combat.range.DwarfMultiCannon
+import com.realting.world.content.combat.weapon.CombatSpecial.Companion.updateBar
+import com.realting.world.content.dialogue.DialogueManager
 import com.realting.world.content.grandexchange.GrandExchange
+import com.realting.world.content.holidayevents.christmas2016
+import com.realting.world.content.holidayevents.easter2017data
+import com.realting.world.content.minigames.Barrows
+import com.realting.world.content.minigames.Dueling.Companion.checkRule
+import com.realting.world.content.minigames.Dueling.DuelRule
+import com.realting.world.content.minigames.FightCave.enterCave
+import com.realting.world.content.minigames.FightCave.leaveCave
+import com.realting.world.content.minigames.FightPit.addPlayer
+import com.realting.world.content.minigames.FightPit.removePlayer
+import com.realting.world.content.minigames.Nomad.endFight
+import com.realting.world.content.minigames.PestControl.Companion.boardBoat
+import com.realting.world.content.minigames.RecipeForDisaster.enter
+import com.realting.world.content.minigames.RecipeForDisaster.leave
+import com.realting.world.content.minigames.RecipeForDisaster.openRFDShop
+import com.realting.world.content.minigames.WarriorsGuild.handleTokenRemoval
+import com.realting.world.content.minigames.WarriorsGuild.resetCyclopsCombat
+import com.realting.world.content.minigames.WarriorsGuild.warriorsGuildDialogue
+import com.realting.world.content.player.events.WildernessObelisks.handleObelisk
+import com.realting.world.content.player.skill.agility.Agility
 import com.realting.world.content.player.skill.construction.Construction
+import com.realting.world.content.player.skill.construction.ConstructionActions
+import com.realting.world.content.player.skill.crafting.Flax.showSpinInterface
+import com.realting.world.content.player.skill.crafting.Jewelry.jewelryInterface
+import com.realting.world.content.player.skill.dungeoneering.Dungeoneering.doingDungeoneering
+import com.realting.world.content.player.skill.fishing.Fishing
+import com.realting.world.content.player.skill.fishing.Fishing.forSpot
+import com.realting.world.content.player.skill.fishing.Fishing.setupFishing
+import com.realting.world.content.player.skill.hunter.Hunter.dismantle
+import com.realting.world.content.player.skill.hunter.Hunter.lootTrap
+import com.realting.world.content.player.skill.hunter.PuroPuro.goThroughWheat
+import com.realting.world.content.player.skill.mining.Mining.startMining
+import com.realting.world.content.player.skill.mining.MiningData.forRock
+import com.realting.world.content.player.skill.mining.Prospecting.prospectOre
+import com.realting.world.content.player.skill.runecrafting.Runecrafting.craftRunes
+import com.realting.world.content.player.skill.runecrafting.Runecrafting.runecraftingAltar
+import com.realting.world.content.player.skill.runecrafting.RunecraftingData.RuneData
+import com.realting.world.content.player.skill.smithing.EquipmentMaking.handleAnvil
+import com.realting.world.content.player.skill.smithing.Smelting.openInterface
+import com.realting.world.content.player.skill.thieving.Stalls.stealFromStall
+import com.realting.world.content.player.skill.woodcutting.Woodcutting.cutWood
+import com.realting.world.content.player.skill.woodcutting.WoodcuttingData
+import com.realting.world.content.player.skill.woodcutting.WoodcuttingData.Hatchet
+import com.realting.world.content.player.skill.woodcutting.WoodcuttingData.getHatchet
+import com.realting.world.content.portal.portal
+import com.realting.world.content.randomevents.EvilTree.EvilTreeDef
+import com.realting.world.content.transportation.TeleportHandler
+import com.realting.world.content.transportation.TeleportLocations
+import com.realting.world.content.transportation.TeleportType
 
 /**
  * This packet listener is called when a player clicked
@@ -120,7 +120,7 @@ class ObjectActionPacketListener : PacketListener {
             val x = packet.readLEShortA().toInt()
             val id = packet.readInt()
             val y = packet.readUnsignedShortA()
-            val position = Position(x, y, player.position.z)
+            val position = Position(x, y, player.entityPosition.z)
             val gameObject = GameObject(id, position)
             if (id > 0 && id != 6 && !RegionClipping.objectExists(gameObject)) {
                 if (player.rights.OwnerDeveloperOnly()) {
@@ -130,8 +130,8 @@ class ObjectActionPacketListener : PacketListener {
                 }
                 return
             }
-            var distanceX = player.position.x - position.x
-            var distanceY = player.position.y - position.y
+            var distanceX = player.entityPosition.x - position.x
+            var distanceY = player.entityPosition.y - position.y
             if (distanceX < 0) distanceX = -distanceX
             if (distanceY < 0) distanceY = -distanceY
             var size =
@@ -143,7 +143,7 @@ class ObjectActionPacketListener : PacketListener {
             player.setInteractingObject(gameObject).walkToTask =
                 WalkToTask(player, position, gameObject.getSize(), object : FinalizedMovementTask {
                     override fun execute() {
-                        player.positionToFace = gameObject.position
+                        player.positionToFace = gameObject.entityPosition
                         if (WoodcuttingData.Trees.forId(id) != null) {
                             cutWood(player, gameObject, false)
                             return
@@ -185,15 +185,15 @@ class ObjectActionPacketListener : PacketListener {
                             player.packetSender.sendMessage("You just clicked a door. ID: $id")
                             //CustomObjects.deleteGlobalObject(gameObject);
 
-                            /*Door door = Door.create(gameObject.getId(), gameObject.getPosition().getX(), gameObject.getPosition().getY());
-                                //GameObject obj = Region.loadRegion(gameObject.getPosition().getX(), gameObject.getPosition().getY()).getObject(gameObject.getId(), gameObject.getPosition().getX(), gameObject.getPosition().getY());
-                                //player.createObject(gameObject.getPosition().getX(), gameObject.getPosition().getY(), gameObject.getId(), door.isOpen() ? obj.getFace() : obj.getFace() + 1, 0);
-                                player.getPacketSender().sendObject(new GameObject(gameObject.getId(), new Position(gameObject.getPosition().getX(), gameObject.getPosition().getY()), 10, (door.isOpen() ? gameObject.getFace() : gameObject.getFace() + 1)));
-                                door.setOpen(!door.isOpen());*/
+//                            val door = Door.create(gameObject.getId(), gameObject.getPosition().getX(), gameObject.getPosition().getY());
+//                            //GameObject obj = Region.loadRegion(gameObject.getPosition().getX(), gameObject.getPosition().getY()).getObject(gameObject.getId(), gameObject.getPosition().getX(), gameObject.getPosition().getY());
+//                            //player.createObject(gameObject.getPosition().getX(), gameObject.getPosition().getY(), gameObject.getId(), door.isOpen() ? obj.getFace() : obj.getFace() + 1, 0);
+//                            player.getPacketSender().sendObject(new GameObject(gameObject.getId(), new Position(gameObject.getPosition().getX(), gameObject.getPosition().getY()), 10, (door.isOpen() ? gameObject.getFace() : gameObject.getFace() + 1)));
+//                            door.setOpen(!door.isOpen());
                         }
                         when (id) {
                             2305 -> if (player.location != null && player.location === Locations.Location.WILDERNESS) {
-                                player.moveTo(Position(3003, 10354, player.position.z))
+                                player.moveTo(Position(3003, 10354, player.entityPosition.z))
                                 player.packetSender.sendMessage("You escape from the spikes.")
                             }
                             589 -> if (Misc.easter(2017)) {
@@ -336,14 +336,14 @@ class ObjectActionPacketListener : PacketListener {
                                 }
                             }
                             134, 135 -> {
-                                if (player.position.y < 3354 && GameSettings.Halloween) {
+                                if (player.entityPosition.y < 3354 && GameSettings.Halloween) {
                                     TeleportHandler.teleportPlayer(
                                         player,
                                         Position(3109, 3354, 404),
                                         TeleportType.NORMAL
                                     )
                                 }
-                                val move = player.position.y < 3354
+                                val move = player.entityPosition.y < 3354
                                 if (!move) {
                                     player.packetSender.sendMessage("Nope, it's not going to move.")
                                 }
@@ -357,10 +357,10 @@ class ObjectActionPacketListener : PacketListener {
                                     var tick = 0
                                     public override fun execute() {
                                         tick++
-                                        if (player.position.x == 3046 && player.position.y == 9757) {
+                                        if (player.entityPosition.x == 3046 && player.entityPosition.y == 9757) {
                                             player.movementQueue.walkStep(0, -1)
                                             player.packetSender.sendMessage("As a member, you can pass through the door.")
-                                        } else if (player.position.x == 3046 && player.position.y == 9756) {
+                                        } else if (player.entityPosition.x == 3046 && player.entityPosition.y == 9756) {
                                             player.movementQueue.walkStep(0, 1)
                                             player.packetSender.sendMessage("As a member, you can pass through the door.")
                                         } else {
@@ -379,10 +379,10 @@ class ObjectActionPacketListener : PacketListener {
                                 var tick = 0
                                 public override fun execute() {
                                     tick++
-                                    if (player.position.x == 3268 && player.position.y > 3226 && player.position.y < 3229) {
+                                    if (player.entityPosition.x == 3268 && player.entityPosition.y > 3226 && player.entityPosition.y < 3229) {
                                         player.movementQueue.walkStep(-1, 0)
                                         player.packetSender.sendMessage("You pass through the gate.")
-                                    } else if (player.position.x == 3267 && player.position.y > 3226 && player.position.y < 3229) {
+                                    } else if (player.entityPosition.x == 3267 && player.entityPosition.y > 3226 && player.entityPosition.y < 3229) {
                                         player.movementQueue.walkStep(1, 0)
                                         player.packetSender.sendMessage("You pass through the gate.")
                                     } else {
@@ -404,23 +404,23 @@ class ObjectActionPacketListener : PacketListener {
                                 player.moveTo(Position(3563, 3313, 0))
                                 Locations.Location.THE_SIX.leave(player)
                             }
-                            5259 -> if (player.position.x >= 3653) { // :)
-                                if (player.position.y != 3485 && player.position.y != 3486) {
+                            5259 -> if (player.entityPosition.x >= 3653) { // :)
+                                if (player.entityPosition.y != 3485 && player.entityPosition.y != 3486) {
                                     player.packetSender.sendMessage("You need to stand infront of the barrier to pass through.")
                                     return
                                 }
-                                player.moveTo(Position(3651, player.position.y))
+                                player.moveTo(Position(3651, player.entityPosition.y))
                             } else {
                                 player.dialogueActionId = 73
                                 DialogueManager.start(player, 115)
                             }
                             10805, 10806 -> GrandExchange.open(player)
-                            38700 -> if (gameObject.position.x == 3668 && gameObject.position.y == 2976) {
+                            38700 -> if (gameObject.entityPosition.x == 3668 && gameObject.entityPosition.y == 2976) {
                                 player.packetSender.sendMessage("<img=10> @blu@Welcome to the free-for-all arena! You will not lose any items on death here.")
                                 player.moveTo(Position(2815, 5511))
                             } else if (player.location === Locations.Location.FREE_FOR_ALL_WAIT) {
                                 player.moveTo(GameSettings.DEFAULT_POSITION.copy())
-                            } else if (gameObject.position.x == 2849 && gameObject.position.y == 3353) {
+                            } else if (gameObject.entityPosition.x == 2849 && gameObject.entityPosition.y == 3353) {
                                 player.packetSender.sendMessage("<img=10> @blu@Welcome to the free-for-all arena! You will not lose any items on death here.")
                                 player.moveTo(Position(2815, 5511))
                             }
@@ -440,15 +440,15 @@ class ObjectActionPacketListener : PacketListener {
                                 player.packetSender.sendMessage("You are teleported to your party's gatestone.")
                                 player.performGraphic(Graphic(1310))
                             } else player.packetSender.sendMessage("Your party must drop a Gatestone somewhere in the dungeon to use this portal.")
-                            7353 -> player.moveTo(Position(2439, 4956, player.position.z))
-                            7321 -> player.moveTo(Position(2452, 4944, player.position.z))
-                            7322 -> player.moveTo(Position(2455, 4964, player.position.z))
-                            7315 -> player.moveTo(Position(2447, 4956, player.position.z))
-                            7316 -> player.moveTo(Position(2471, 4956, player.position.z))
-                            7318 -> player.moveTo(Position(2464, 4963, player.position.z))
-                            7324 -> player.moveTo(Position(2481, 4956, player.position.z))
-                            7319 -> if (gameObject.position.x == 2481 && gameObject.position.y == 4956) player.moveTo(
-                                Position(2467, 4940, player.position.z)
+                            7353 -> player.moveTo(Position(2439, 4956, player.entityPosition.z))
+                            7321 -> player.moveTo(Position(2452, 4944, player.entityPosition.z))
+                            7322 -> player.moveTo(Position(2455, 4964, player.entityPosition.z))
+                            7315 -> player.moveTo(Position(2447, 4956, player.entityPosition.z))
+                            7316 -> player.moveTo(Position(2471, 4956, player.entityPosition.z))
+                            7318 -> player.moveTo(Position(2464, 4963, player.entityPosition.z))
+                            7324 -> player.moveTo(Position(2481, 4956, player.entityPosition.z))
+                            7319 -> if (gameObject.entityPosition.x == 2481 && gameObject.entityPosition.y == 4956) player.moveTo(
+                                Position(2467, 4940, player.entityPosition.z)
                             )
                             4388 -> {}
                             11356 -> {
@@ -477,14 +477,14 @@ class ObjectActionPacketListener : PacketListener {
                                     player.packetSender.sendMessage("You need an Agility level of at least 61 or higher to climb this")
                                     return
                                 }
-                                if (player.position.z == 0) player.moveTo(
+                                if (player.entityPosition.z == 0) player.moveTo(
                                     Position(
                                         3422,
                                         3549,
                                         1
                                     )
-                                ) else if (player.position.z == 1) {
-                                    if (gameObject.position.x == 3447) player.moveTo(
+                                ) else if (player.entityPosition.z == 1) {
+                                    if (gameObject.entityPosition.x == 3447) player.moveTo(
                                         Position(
                                             3447,
                                             3575,
@@ -500,15 +500,15 @@ class ObjectActionPacketListener : PacketListener {
                                     player.packetSender.sendMessage("You need an Agility level of at least 61 or higher to climb this")
                                     return
                                 }
-                                if (player.position.z == 1) player.moveTo(
+                                if (player.entityPosition.z == 1) player.moveTo(
                                     Position(
                                         3422,
                                         3549,
                                         0
                                     )
-                                ) else if (player.position.z == 0) player.moveTo(
+                                ) else if (player.entityPosition.z == 0) player.moveTo(
                                     Position(3447, 3575, 1)
-                                ) else if (player.position.z == 2) player.moveTo(Position(3447, 3575, 1))
+                                ) else if (player.entityPosition.z == 2) player.moveTo(Position(3447, 3575, 1))
                                 player.performAnimation(Animation(828))
                             }
                             2470 -> {
@@ -518,16 +518,16 @@ class ObjectActionPacketListener : PacketListener {
                                     )
                                     return
                                 }
-                                if (gameObject.position.x == 2464 && gameObject.position.y == 4782) {
+                                if (gameObject.entityPosition.x == 2464 && gameObject.entityPosition.y == 4782) {
                                     player.moveTo(GameSettings.DEFAULT_POSITION.copy())
                                     player.packetSender.sendMessage("The portal teleports you home.")
                                     return
                                 }
-                                if (gameObject.position.x == 3674 && gameObject.position.y == 2981 && GameSettings.FridayThe13th) {
+                                if (gameObject.entityPosition.x == 3674 && gameObject.entityPosition.y == 2981 && GameSettings.FridayThe13th) {
                                     player.moveTo(Position(2463, 4782))
                                     player.packetSender.sendMessage("Enjoy the Friday the 13th mini-event.")
                                 }
-                                if (gameObject.position.x == 3674 && gameObject.position.y == 2981 && GameSettings.Halloween) {
+                                if (gameObject.entityPosition.x == 3674 && gameObject.entityPosition.y == 2981 && GameSettings.Halloween) {
                                     player.moveTo(Position(3108, 3352, 4))
                                     player.packetSender.sendMessage("<img=10> You teleport to the event!")
                                     return
@@ -540,17 +540,17 @@ class ObjectActionPacketListener : PacketListener {
                                     )
                                     return
                                 }
-                                if (gameObject.position.x == 2912 && gameObject.position.y == 5300) {
+                                if (gameObject.entityPosition.x == 2912 && gameObject.entityPosition.y == 5300) {
                                     player.moveTo(Position(2914, 5300, 1))
-                                } else if (gameObject.position.x == 2914 && gameObject.position.y == 5300) {
+                                } else if (gameObject.entityPosition.x == 2914 && gameObject.entityPosition.y == 5300) {
                                     player.moveTo(Position(2912, 5300, 2))
-                                } else if (gameObject.position.x == 3553 && gameObject.position.y == 9695) {
+                                } else if (gameObject.entityPosition.x == 3553 && gameObject.entityPosition.y == 9695) {
                                     player.moveTo(Position(3565, 3313, 0))
-                                } else if (gameObject.position.x == 2919 && gameObject.position.y == 5276) {
+                                } else if (gameObject.entityPosition.x == 2919 && gameObject.entityPosition.y == 5276) {
                                     player.moveTo(Position(2918, 5274))
-                                } else if (gameObject.position.x == 2918 && gameObject.position.y == 5274) {
+                                } else if (gameObject.entityPosition.x == 2918 && gameObject.entityPosition.y == 5274) {
                                     player.moveTo(Position(2919, 5276, 1))
-                                } else if (gameObject.position.x == 3001 && gameObject.position.y == 3931 || gameObject.position.x == 3652 && gameObject.position.y == 3488) {
+                                } else if (gameObject.entityPosition.x == 3001 && gameObject.entityPosition.y == 3931 || gameObject.entityPosition.x == 3652 && gameObject.entityPosition.y == 3488) {
                                     player.moveTo(GameSettings.DEFAULT_POSITION.copy())
                                     player.packetSender.sendMessage("The portal teleports you home.")
                                     //} else if(gameObject.getPosition().getX() == 2914 && gameObject.getPosition().getY() == 5300 && (player.getAmountDonated() >= 5 || player.getSkillManager().getCurrentLevel(Skill.AGILITY) == 99)) {
@@ -567,11 +567,11 @@ class ObjectActionPacketListener : PacketListener {
                                 var des = Position(-1, -1)
                                 var i = 0
                                 while (i < portal.values().size) {
-                                    if (portal.values()[i].location.x == gameObject.position.x && portal.values()[i].location.y == gameObject.position.y) {
+                                    if (portal.values()[i].location.x == gameObject.entityPosition.x && portal.values()[i].location.y == gameObject.entityPosition.y) {
                                         des = Position(
                                             portal.values()[i].destination.x,
                                             portal.values()[i].destination.y,
-                                            player.position.z
+                                            player.entityPosition.z
                                         )
                                         //System.out.println("Matched on portal index "+i);
                                         break
@@ -607,38 +607,38 @@ class ObjectActionPacketListener : PacketListener {
                                     TeleportType.LEVER
                                 )
                             } else {
-                                player.packetSender.sendMessage("ERROR: 00512, P: [" + player.position.x + "," + player.position.y + "," + player.position.z + "] - please report this bug!")
+                                player.packetSender.sendMessage("ERROR: 00512, P: [" + player.entityPosition.x + "," + player.entityPosition.y + "," + player.entityPosition.z + "] - please report this bug!")
                             }
-                            5096 -> if (gameObject.position.x == 2644 && gameObject.position.y == 9593) player.moveTo(
+                            5096 -> if (gameObject.entityPosition.x == 2644 && gameObject.entityPosition.y == 9593) player.moveTo(
                                 Position(2649, 9591)
                             )
-                            5094 -> if (gameObject.position.x == 2648 && gameObject.position.y == 9592) player.moveTo(
+                            5094 -> if (gameObject.entityPosition.x == 2648 && gameObject.entityPosition.y == 9592) player.moveTo(
                                 Position(2643, 9594, 2)
                             )
-                            5098 -> if (gameObject.position.x == 2635 && gameObject.position.y == 9511) player.moveTo(
+                            5098 -> if (gameObject.entityPosition.x == 2635 && gameObject.entityPosition.y == 9511) player.moveTo(
                                 Position(2637, 9517)
                             )
-                            5097 -> if (gameObject.position.x == 2635 && gameObject.position.y == 9514) player.moveTo(
+                            5097 -> if (gameObject.entityPosition.x == 2635 && gameObject.entityPosition.y == 9514) player.moveTo(
                                 Position(2636, 9510, 2)
                             )
                             26428, 26426, 26425, 26427 -> {
                                 var bossRoom = "Armadyl"
-                                var leaveRoom = player.position.y > 5295
+                                var leaveRoom = player.entityPosition.y > 5295
                                 var index = 0
                                 var movePos = Position(2839, if (!leaveRoom) 5296 else 5295, 2)
                                 if (id == 26425) {
                                     bossRoom = "Bandos"
-                                    leaveRoom = player.position.x > 2863
+                                    leaveRoom = player.entityPosition.x > 2863
                                     index = 1
                                     movePos = Position(if (!leaveRoom) 2864 else 2863, 5354, 2)
                                 } else if (id == 26427) {
                                     bossRoom = "Saradomin"
-                                    leaveRoom = player.position.x < 2908
+                                    leaveRoom = player.entityPosition.x < 2908
                                     index = 2
                                     movePos = Position(if (leaveRoom) 2908 else 2907, 5265)
                                 } else if (id == 26428) {
                                     bossRoom = "Zamorak"
-                                    leaveRoom = player.position.y <= 5331
+                                    leaveRoom = player.entityPosition.y <= 5331
                                     index = 3
                                     movePos = Position(2925, if (leaveRoom) 5332 else 5331, 2)
                                 }
@@ -701,15 +701,15 @@ class ObjectActionPacketListener : PacketListener {
                                     return
                                 }
                                 if (!player.clickDelay.elapsed(2000)) return
-                                val plrHeight = player.position.z
+                                val plrHeight = player.entityPosition.z
                                 if (plrHeight == 2) player.moveTo(Position(2914, 5300, 1)) else if (plrHeight == 1) {
-                                    if (gameObject.position.x == 2914 && gameObject.position.y == 5300) player.moveTo(
+                                    if (gameObject.entityPosition.x == 2914 && gameObject.entityPosition.y == 5300) player.moveTo(
                                         Position(
                                             2912,
                                             5299,
                                             2
                                         )
-                                    ) else if (gameObject.position.x == 2920 && gameObject.position.y == 5276) player.moveTo(
+                                    ) else if (gameObject.entityPosition.x == 2920 && gameObject.entityPosition.y == 5276) player.moveTo(
                                         Position(2920, 5274, 0)
                                     )
                                 } else if (plrHeight == 0) player.moveTo(Position(2920, 5276, 1))
@@ -734,7 +734,7 @@ class ObjectActionPacketListener : PacketListener {
                                 player.isCrossingObstacle = true
                                 player.updateFlag.flag(Flag.APPEARANCE)
                                 player.performAnimation(Animation(3067))
-                                val goBack2 = player.position.y >= 5344
+                                val goBack2 = player.entityPosition.y >= 5344
                                 player.packetSender.sendMessage(startMessage)
                                 player.moveTo(Position(2885, if (!goBack2) 5335 else 5342, 2))
                                 player.direction = if (goBack2) Direction.SOUTH else Direction.NORTH
@@ -753,7 +753,7 @@ class ObjectActionPacketListener : PacketListener {
                                         player.isCrossingObstacle = false
                                         player.updateFlag.flag(Flag.APPEARANCE)
                                         player.packetSender.sendMessage(endMessage)
-                                        player.moveTo(Position(2885, if (player.position.y < 5340) 5333 else 5345, 2))
+                                        player.moveTo(Position(2885, if (player.entityPosition.y < 5340) 5333 else 5345, 2))
                                         setEventRunning(false)
                                     }
                                 })
@@ -770,7 +770,7 @@ class ObjectActionPacketListener : PacketListener {
                                     player.performGraphic(Graphic(6, GraphicHeight.LOW))
                                 }
                                 if (player.rights.isMember) player.isCrossingObstacle = true
-                                val goBack = player.position.x <= 2850
+                                val goBack = player.entityPosition.x <= 2850
                                 player.performAnimation(Animation(377))
                                 TaskManager.submit(object : Task(2, player, false) {
                                     public override fun execute() {
@@ -809,7 +809,7 @@ class ObjectActionPacketListener : PacketListener {
                                             player.moveTo(
                                                 Position(
                                                     2871,
-                                                    if (player.position.y <= 5270) 5279 else 5269,
+                                                    if (player.entityPosition.y <= 5270) 5279 else 5269,
                                                     2
                                                 )
                                             )
@@ -819,7 +819,7 @@ class ObjectActionPacketListener : PacketListener {
                                     player.clickDelay.reset()
                                 }
                             }
-                            4493 -> if (player.position.x >= 3432) {
+                            4493 -> if (player.entityPosition.x >= 3432) {
                                 player.moveTo(Position(3433, 3538, 1))
                             }
                             4494 -> player.moveTo(Position(3438, 3538, 0))
@@ -829,7 +829,7 @@ class ObjectActionPacketListener : PacketListener {
                                 player.dialogueActionId = 48
                                 DialogueManager.start(player, 87)
                             }
-                            25339, 25340 -> player.moveTo(Position(1778, 5346, if (player.position.z == 0) 1 else 0))
+                            25339, 25340 -> player.moveTo(Position(1778, 5346, if (player.entityPosition.z == 0) 1 else 0))
                             10229, 10230 -> {
                                 val up = id == 10229
                                 player.performAnimation(Animation(if (up) 828 else 827))
@@ -863,37 +863,37 @@ class ObjectActionPacketListener : PacketListener {
                                         }
                                         var xMovement = 0
                                         var yMovement = 0
-                                        if (player.position.x == 2689 && player.position.y == 9564) {
+                                        if (player.entityPosition.x == 2689 && player.entityPosition.y == 9564) {
                                             xMovement = 2
                                             yMovement = 0
-                                        } else if (player.position.x == 2691 && player.position.y == 9564) {
+                                        } else if (player.entityPosition.x == 2691 && player.entityPosition.y == 9564) {
                                             xMovement = -2
                                             yMovement = 0
-                                        } else if (player.position.x == 2683 && player.position.y == 9568) {
+                                        } else if (player.entityPosition.x == 2683 && player.entityPosition.y == 9568) {
                                             xMovement = 0
                                             yMovement = 2
-                                        } else if (player.position.x == 2683 && player.position.y == 9570) {
+                                        } else if (player.entityPosition.x == 2683 && player.entityPosition.y == 9570) {
                                             xMovement = 0
                                             yMovement = -2
-                                        } else if (player.position.x == 2674 && player.position.y == 9479) {
+                                        } else if (player.entityPosition.x == 2674 && player.entityPosition.y == 9479) {
                                             xMovement = 2
                                             yMovement = 0
-                                        } else if (player.position.x == 2676 && player.position.y == 9479) {
+                                        } else if (player.entityPosition.x == 2676 && player.entityPosition.y == 9479) {
                                             xMovement = -2
                                             yMovement = 0
-                                        } else if (player.position.x == 2693 && player.position.y == 9482) {
+                                        } else if (player.entityPosition.x == 2693 && player.entityPosition.y == 9482) {
                                             xMovement = 2
                                             yMovement = 0
-                                        } else if (player.position.x == 2672 && player.position.y == 9499) {
+                                        } else if (player.entityPosition.x == 2672 && player.entityPosition.y == 9499) {
                                             xMovement = 2
                                             yMovement = 0
-                                        } else if (player.position.x == 2674 && player.position.y == 9499) {
+                                        } else if (player.entityPosition.x == 2674 && player.entityPosition.y == 9499) {
                                             xMovement = -2
                                             yMovement = 0
                                         }
                                         CustomObjects.objectRespawnTask(
                                             player,
-                                            GameObject(-1, gameObject.position.copy()),
+                                            GameObject(-1, gameObject.entityPosition.copy()),
                                             gameObject,
                                             10
                                         )
@@ -947,7 +947,7 @@ class ObjectActionPacketListener : PacketListener {
                                 player.performAnimation(Animation(769))
                                 TaskManager.submit(object : Task(1, player, false) {
                                     override fun execute() {
-                                        player.moveTo(Position(if (player.position.x >= 2880) 2878 else 2880, 9813))
+                                        player.moveTo(Position(if (player.entityPosition.x >= 2880) 2878 else 2880, 9813))
                                         stop()
                                     }
                                 })
@@ -960,11 +960,11 @@ class ObjectActionPacketListener : PacketListener {
                                 if (player.rights.isMember && player.skillManager.getCurrentLevel(Skill.AGILITY) < 70) {
                                     player.packetSender.sendMessage("You do not have 70 Agility, but as a member you can pass anyway.")
                                 }
-                                val back = player.position.x > 2888
+                                val back = player.entityPosition.x > 2888
                                 player.moveTo(if (back) Position(2886, 9799) else Position(2891, 9799))
                             }
                             2320 -> {
-                                val back = player.position.y == 9969 || player.position.y == 9970
+                                val back = player.entityPosition.y == 9969 || player.entityPosition.y == 9970
                                 player.moveTo(if (back) Position(3120, 9963) else Position(3120, 9969))
                             }
                             1755 -> {
@@ -972,15 +972,15 @@ class ObjectActionPacketListener : PacketListener {
                                 player.packetSender.sendMessage("You climb the ladder..")
                                 TaskManager.submit(object : Task(1, player, false) {
                                     override fun execute() {
-                                        if (gameObject.position.x == 2547 && gameObject.position.y == 9951) {
+                                        if (gameObject.entityPosition.x == 2547 && gameObject.entityPosition.y == 9951) {
                                             player.moveTo(Position(2548, 3551))
-                                        } else if (gameObject.position.x == 3005 && gameObject.position.y == 10363) {
+                                        } else if (gameObject.entityPosition.x == 3005 && gameObject.entityPosition.y == 10363) {
                                             player.moveTo(Position(3005, 3962))
-                                        } else if (gameObject.position.x == 3084 && gameObject.position.y == 9672) {
+                                        } else if (gameObject.entityPosition.x == 3084 && gameObject.entityPosition.y == 9672) {
                                             player.moveTo(Position(3117, 3244))
-                                        } else if (gameObject.position.x == 3097 && gameObject.position.y == 9867) {
+                                        } else if (gameObject.entityPosition.x == 3097 && gameObject.entityPosition.y == 9867) {
                                             player.moveTo(Position(3096, 3468))
-                                        } else if (gameObject.position.x == 3209 && gameObject.position.y == 9616) {
+                                        } else if (gameObject.entityPosition.x == 3209 && gameObject.entityPosition.y == 9616) {
                                             player.moveTo(Position(3210, 3216))
                                         }
                                         stop()
@@ -1030,19 +1030,19 @@ class ObjectActionPacketListener : PacketListener {
                                     player.packetSender.sendMessage("You have no business with this portal. Talk to the Gypsy first!")
                                     return
                                 }
-                                if (player.position.z > 0) {
+                                if (player.entityPosition.z > 0) {
                                     leave(player)
                                 } else {
                                     player.minigameAttributes.recipeForDisasterAttributes.setPartFinished(1, true)
                                     enter(player)
                                 }
                             }
-                            9369 -> if (player.position.y > 5175) {
+                            9369 -> if (player.entityPosition.y > 5175) {
                                 addPlayer(player)
                             } else {
                                 removePlayer(player, "leave room")
                             }
-                            9368 -> if (player.position.y < 5169) {
+                            9368 -> if (player.entityPosition.y < 5169) {
                                 removePlayer(player, "leave game")
                             }
                             9357 -> leaveCave(player, false)
@@ -1076,8 +1076,8 @@ class ObjectActionPacketListener : PacketListener {
                                 player.location.leave(player)
                             }
                             2145 -> player.packetSender.sendMessage("There's no good reason to disturb that.")
-                            1738 -> if (gameObject.position.x == 3204 && gameObject.position.y == 3207 && player.position.z == 0) {
-                                player.moveTo(Position(player.position.x, player.position.y, 1))
+                            1738 -> if (gameObject.entityPosition.x == 3204 && gameObject.entityPosition.y == 3207 && player.entityPosition.z == 0) {
+                                player.moveTo(Position(player.entityPosition.x, player.entityPosition.y, 1))
                             } else if (player.location === Locations.Location.WARRIORS_GUILD) {
                                 player.moveTo(Position(2840, 3539, 2))
                             }
@@ -1086,7 +1086,7 @@ class ObjectActionPacketListener : PacketListener {
                                     //player.moveTo(teleportTarget)
                                     //player.setDialogueActionId(154);
                                     //DialogueManager.start(player, 154);
-                                    player.moveTo(Position(player.position.x, player.position.y, 2))
+                                    player.moveTo(Position(player.entityPosition.x, player.entityPosition.y, 2))
                                 }
                                 if (player.location === Locations.Location.WARRIORS_GUILD) {
                                     player.moveTo(Position(2840, 3539, 0))
@@ -1096,21 +1096,21 @@ class ObjectActionPacketListener : PacketListener {
                                 player.moveTo(Position(2840, 3539, 0))
                             }
                             1740 -> if (player.location === Locations.Location.LUMBRIDGE) {
-                                player.moveTo(Position(player.position.x, player.position.y, 1))
+                                player.moveTo(Position(player.entityPosition.x, player.entityPosition.y, 1))
                             }
-                            15644, 15641 -> when (player.position.z) {
-                                0 -> player.moveTo(Position(2855, if (player.position.y >= 3546) 3545 else 3546))
-                                2 -> if (player.position.x == 2846) {
+                            15644, 15641 -> when (player.entityPosition.z) {
+                                0 -> player.moveTo(Position(2855, if (player.entityPosition.y >= 3546) 3545 else 3546))
+                                2 -> if (player.entityPosition.x == 2846) {
                                     if (player.inventory.getAmount(8851) < 70) {
                                         player.packetSender.sendMessage("You need at least 70 tokens to enter this area.")
                                         return
                                     }
                                     DialogueManager.start(player, warriorsGuildDialogue(player))
-                                    player.moveTo(Position(2847, player.position.y, 2))
+                                    player.moveTo(Position(2847, player.entityPosition.y, 2))
                                     handleTokenRemoval(player)
-                                } else if (player.position.x == 2847) {
+                                } else if (player.entityPosition.x == 2847) {
                                     resetCyclopsCombat(player)
-                                    player.moveTo(Position(2846, player.position.y, 2))
+                                    player.moveTo(Position(2846, player.entityPosition.y, 2))
                                     player.minigameAttributes.warriorsGuildAttributes.setEnteredTokenRoom(false)
                                 }
                             }
@@ -1154,7 +1154,7 @@ class ObjectActionPacketListener : PacketListener {
                                 }
                             }
                             2 -> {
-                                player.moveTo(Position(if (player.position.x > 2690) 2687 else 2694, 3714))
+                                player.moveTo(Position(if (player.entityPosition.x > 2690) 2687 else 2694, 3714))
                                 player.packetSender.sendMessage("You walk through the entrance..")
                             }
                             2026, 2028, 2029, 2030, 2031 -> {
@@ -1268,7 +1268,7 @@ class ObjectActionPacketListener : PacketListener {
                                 player.currentBankTab
                             )
                                 .open()
-                            11666 -> openInterface(player)
+                            11666, 6189 -> openInterface(player)
                         }
                     }
                 })
@@ -1278,15 +1278,15 @@ class ObjectActionPacketListener : PacketListener {
             val id = packet.readInt()
             val y = packet.readLEShort().toInt()
             val x = packet.readUnsignedShortA()
-            val position = Position(x, y, player.position.z)
+            val position = Position(x, y, player.entityPosition.z)
             val gameObject = GameObject(id, position)
             if (id > 0 && id != 6 && !RegionClipping.objectExists(gameObject)) {
                 //player.getPacketSender().sendMessage("An error occured. Error code: "+id).sendMessage("Please report the error to a staff member.");
                 return
             }
-            player.positionToFace = gameObject.position
-            var distanceX = player.position.x - position.x
-            var distanceY = player.position.y - position.y
+            player.positionToFace = gameObject.entityPosition
+            var distanceX = player.entityPosition.x - position.x
+            var distanceY = player.entityPosition.y - position.y
             if (distanceX < 0) distanceX = -distanceX
             if (distanceY < 0) distanceY = -distanceY
             val size = if (distanceX > distanceY) distanceX else distanceY
@@ -1303,7 +1303,7 @@ class ObjectActionPacketListener : PacketListener {
                         when (gameObject.id) {
                             2145 -> player.packetSender.sendMessage("Eww. That's a terrible idea!")
                             1739 -> if (player.location === Locations.Location.LUMBRIDGE) {
-                                player.moveTo(Position(player.position.x, player.position.y, 0))
+                                player.moveTo(Position(player.entityPosition.x, player.entityPosition.y, 0))
                             }
                             6910, 4483, 3193, 2213, 11758, 14367, 42192, 75, 26972, 11338, 19230 -> player.getBank(
                                 player.currentBankTab
@@ -1332,7 +1332,7 @@ class ObjectActionPacketListener : PacketListener {
                                     CustomObjects.globalObjectRespawnTask(
                                         GameObject(
                                             -1,
-                                            gameObject.position
+                                            gameObject.entityPosition
                                         ), gameObject, 10
                                     )
                                 }
@@ -1380,7 +1380,7 @@ class ObjectActionPacketListener : PacketListener {
             val id = packet.readInt()
             val y = packet.readUnsignedShortA()
             val x = packet.readShort().toInt()
-            val position = Position(x, y, player.position.z)
+            val position = Position(x, y, player.entityPosition.z)
             val gameObject = GameObject(id, position)
             if (!Construction.buildingHouse(player)) {
                 if (id > 0 && !RegionClipping.objectExists(gameObject)) {
@@ -1388,9 +1388,9 @@ class ObjectActionPacketListener : PacketListener {
                     return
                 }
             }
-            player.positionToFace = gameObject.position
-            var distanceX = player.position.x - position.x
-            var distanceY = player.position.y - position.y
+            player.positionToFace = gameObject.entityPosition
+            var distanceX = player.entityPosition.x - position.x
+            var distanceY = player.entityPosition.y - position.y
             if (distanceX < 0) distanceX = -distanceX
             if (distanceY < 0) distanceY = -distanceY
             val size = if (distanceX > distanceY) distanceX else distanceY
