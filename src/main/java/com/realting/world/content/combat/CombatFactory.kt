@@ -679,7 +679,7 @@ class CombatFactory private constructor() {
                 )) * 0.35).toInt()
             }
             if (victim.isNpc) {
-                val npc = victim as NPC
+                val npc = victim.toNpc()
                 if (npc.defenceWeakened[0]) {
                     maxHit += (0.10 * maxHit).toInt()
                 } else if (npc.defenceWeakened[1]) {
@@ -716,7 +716,7 @@ class CombatFactory private constructor() {
         fun getRangedMaxHit(entity: CharacterEntity, victim: CharacterEntity?): Int {
             var maxHit = 0
             if (entity.isNpc) {
-                val npc = entity as NPC
+                val npc = entity.toNpc()
                 maxHit = npc.definition.maxHit
                 if (npc.strengthWeakened[0]) {
                     maxHit -= (0.10 * maxHit).toInt()
@@ -785,25 +785,25 @@ class CombatFactory private constructor() {
             return maxHit
         }
 
-        fun getDragonFireMaxHit(e: CharacterEntity, v: CharacterEntity): Int {
+        fun getDragonFireMaxHit(entity: CharacterEntity, victim: CharacterEntity): Int {
             var baseMax = 250
-            if (e.isNpc && v.isPlayer) {
-                val victim = v as Player
-                val npc = e as NPC
+            if (entity.isNpc && victim.isPlayer) {
+                val victimPlayer = victim as Player
+                val npc = entity.toNpc()
                 baseMax = (npc.definition.maxHit * 2.5).toInt()
-                if (victim.fireImmunity > 0 || victim.equipment.items[Equipment.SHIELD_SLOT].id == 1540 || victim.equipment.items[Equipment.SHIELD_SLOT].id == 11283 || victim.equipment.items[Equipment.SHIELD_SLOT].id == 13655) {
-                    if (victim.fireDamageModifier >= 1 && (victim.equipment.items[Equipment.SHIELD_SLOT].id == 1540 || victim.equipment.items[Equipment.SHIELD_SLOT].id == 13655 || victim.equipment.items[Equipment.SHIELD_SLOT].id == 11283)) {
+                if (victimPlayer.fireImmunity > 0 || victimPlayer.equipment.items[Equipment.SHIELD_SLOT].id == 1540 || victimPlayer.equipment.items[Equipment.SHIELD_SLOT].id == 11283 || victimPlayer.equipment.items[Equipment.SHIELD_SLOT].id == 13655) {
+                    if (victimPlayer.fireDamageModifier >= 1 && (victimPlayer.equipment.items[Equipment.SHIELD_SLOT].id == 1540 || victimPlayer.equipment.items[Equipment.SHIELD_SLOT].id == 13655 || victimPlayer.equipment.items[Equipment.SHIELD_SLOT].id == 11283)) {
                         /*if(victim.getClanChatName().equalsIgnoreCase("Debug")) {
 						victim.getPacketSender().sendMessage("You block 100% of the fire from potion + shield");
 					}*/
                         return 0
-                    } else if (victim.fireDamageModifier >= 1) {
+                    } else if (victimPlayer.fireDamageModifier >= 1) {
                         /*if(victim.getClanChatName().equalsIgnoreCase("Debug")) {
 						victim.getPacketSender().sendMessage("The potion sets fire's max hit to 120.");
 					}*/
-                        victim.packetSender.sendMessage("Your potion protects against some of the dragon's fire.")
+                        victimPlayer.packetSender.sendMessage("Your potion protects against some of the dragon's fire.")
                         return 120
-                    } else if (victim.equipment.items[Equipment.SHIELD_SLOT].id == 1540 || victim.equipment.items[Equipment.SHIELD_SLOT].id == 13655 || victim.equipment.items[Equipment.SHIELD_SLOT].id == 11283) {
+                    } else if (victimPlayer.equipment.items[Equipment.SHIELD_SLOT].id == 1540 || victimPlayer.equipment.items[Equipment.SHIELD_SLOT].id == 13655 || victimPlayer.equipment.items[Equipment.SHIELD_SLOT].id == 11283) {
                         /*if(victim.getClanChatName().equalsIgnoreCase("Debug")) {
 						victim.getPacketSender().sendMessage("Your shield sets the max fire hit to 120.");
 					}*/
@@ -892,8 +892,8 @@ class CombatFactory private constructor() {
                 return false
             }
             if (victim.isNpc && entity.isPlayer) {
-                val npc = victim as NPC?
-                if (npc!!.spawnedFor != null && npc.spawnedFor.index != (entity as Player?)!!.index) {
+                val npc = victim.toNpc()
+                if (npc.spawnedFor != null && npc.spawnedFor.index != (entity as Player?)!!.index) {
                     (entity as Player?)!!.packetSender.sendMessage("That's not your enemy to fight.")
                     entity.combatBuilder.reset(true)
                     return false
@@ -1023,17 +1023,17 @@ class CombatFactory private constructor() {
 
             // Check if the npc needs to retreat.
             if (entity.isNpc) {
-                val n = entity as NPC?
-                if (!Locations.Location.ignoreFollowDistance(n) && !Nex.nexMob(n!!.id) && !n.isSummoningNpc) { //Stops combat for npcs if too far away
-                    if (n.entityPosition.isWithinDistance(victim.entityPosition, 1)) {
+                val npc = entity.toNpc()
+                if (!Locations.Location.ignoreFollowDistance(npc) && !Nex.nexMob(npc.id) && !npc.isSummoningNpc) { //Stops combat for npcs if too far away
+                    if (npc.entityPosition.isWithinDistance(victim.entityPosition, 1)) {
                         return true
                     }
-                    if (!n.entityPosition.isWithinDistance(
-                            n.defaultPosition, 10 + n.movementCoordinator.coordinator.radius
+                    if (!npc.entityPosition.isWithinDistance(
+                            npc.defaultPosition, 10 + npc.movementCoordinator.coordinator.radius
                         )
                     ) {
-                        n.movementQueue.reset()
-                        n.movementCoordinator.coordinateState = CoordinateState.AWAY
+                        npc.movementQueue.reset()
+                        npc.movementCoordinator.coordinateState = CoordinateState.AWAY
                         return false
                     }
                 }
@@ -1880,7 +1880,7 @@ class CombatFactory private constructor() {
         }
 
         fun properLocation(player: Player?, player2: Player?): Boolean {
-            return player!!.location.canAttack(player, player2)
+            return player!!.location.canAttack(player, player2!!)
         }
     }
 }

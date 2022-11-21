@@ -55,7 +55,7 @@ object TheSix {
             player.currentClanChat.height = z
             player.currentClanChat.setDoingClanBarrows(true)
             player.currentClanChat.regionInstance = RegionInstance(player, RegionInstanceType.THE_SIX)
-            player.currentClanChat.regionInstance.playersList.add(player)
+            player.currentClanChat.regionInstance.playersList!!.add(player)
             for (p in close_clan_members) {
                 if (p == null || p === player) continue
                 p.packetSender.sendInterfaceRemoval()
@@ -76,7 +76,7 @@ object TheSix {
             player.barrowsKilled = 0
             Barrows.resetBarrows(player)
             player.moveTo(Position(2384, 4721, player.currentClanChat.height))
-            player.currentClanChat.regionInstance.playersList.add(player)
+            player.currentClanChat.regionInstance.playersList!!.add(player)
         }
     }
 
@@ -94,8 +94,8 @@ object TheSix {
         }
         if (player.doingClanBarrows()) {
             if (player.currentClanChat != null && player.currentClanChat.regionInstance != null) {
-                player.currentClanChat.regionInstance.playersList.remove(player)
-                if (player.currentClanChat.regionInstance.playersList.size <= 0) {
+                player.currentClanChat.regionInstance.playersList!!.remove(player)
+                if (player.currentClanChat.regionInstance.playersList!!.size <= 0) {
                     player.currentClanChat.regionInstance.destruct()
                     player.currentClanChat.regionInstance = null
                     player.currentClanChat.setDoingClanBarrows(false)

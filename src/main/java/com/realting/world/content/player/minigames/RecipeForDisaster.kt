@@ -36,7 +36,7 @@ object RecipeForDisaster {
 
     @JvmStatic
     fun leave(player: Player?) {
-        Locations.Location.RECIPE_FOR_DISASTER.leave(player)
+        Locations.Location.RECIPE_FOR_DISASTER.leave(player!!)
     }
 
     fun spawnWave(p: Player, wave: Int) {

@@ -11,7 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList
  * Handles a custom region instance for a player
  * @author Gabriel
  */
-open class RegionInstance(var owner: Player, val type: RegionInstanceType) {
+open class RegionInstance(open var owner: Player, val type: RegionInstanceType) {
     enum class RegionInstanceType {
         BARROWS, THE_SIX, GRAVEYARD, FIGHT_CAVE, WARRIORS_GUILD, NOMAD, RECIPE_FOR_DISASTER, CONSTRUCTION_HOUSE, CONSTRUCTION_DUNGEON, TRIO, KRAKEN, ZULRAH
     }

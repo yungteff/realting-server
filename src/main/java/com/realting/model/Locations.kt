@@ -109,6 +109,7 @@ object Locations {
         }
     }
 
+    @JvmStatic
     fun goodDistance(
         objectX: Int, objectY: Int, playerX: Int, playerY: Int, distance: Int
     ): Boolean {
