@@ -1,24 +1,17 @@
 package com.realting.world.content.player.events
 
-import com.realting.world.content.dialogue.DialogueManager
-import com.realting.model.PlayerRights
 import com.realting.GameServer
+import com.realting.model.PlayerRights
 import com.realting.model.entity.character.player.Player
 import com.realting.util.FileUtils
 import com.realting.util.Misc
-import java.io.BufferedWriter
-import java.io.FileWriter
-import java.io.IOException
-import java.io.BufferedReader
-import java.io.FileReader
 import com.realting.world.World
-import kotlin.Throws
 import com.realting.world.content.PlayerLogs
 import com.realting.world.content.dialogue.Dialogue
-import com.realting.world.content.dialogue.DialogueType
 import com.realting.world.content.dialogue.DialogueExpression
-import java.lang.Exception
-import java.util.ArrayList
+import com.realting.world.content.dialogue.DialogueManager
+import com.realting.world.content.dialogue.DialogueType
+import java.io.*
 
 /**
  * Handles the Lottery.
@@ -121,7 +114,7 @@ object Lottery {
      */
     fun addToLottery(user: String) {
         CONTESTERS.add(user)
-        GameServer.getLoader().engine.submit {
+        GameServer.loader!!.engine.submit {
             try {
                 FileUtils.createNewFile(CONTESTERS_FILE_LOCATION)
                 val writer = BufferedWriter(FileWriter(CONTESTERS_FILE_LOCATION, true))

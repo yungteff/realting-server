@@ -1,44 +1,28 @@
-package com.realting;
+package com.realting
 
 /**
  * Defines runtime configuration.
  * @author Michael Sasse (https://github.com/mikeysasse/)
  */
-public class GameConfiguration {
+class GameConfiguration private constructor() {
+    var port = 0
+    var isDiscordBotEnabled = false
+    var isEncryptPasswords = false
+    var isDebug = false
 
-    /**
-     * Gets the default game configuration.
-     * @return the default configuration.
-     */
-    public static GameConfiguration getDefault() {
-        GameConfiguration configuration = new GameConfiguration();
-        configuration.port = 13377;
-        configuration.discordBotEnabled = false;
-        configuration.encryptPasswords = false;
-        configuration.debug = true;
-        return configuration;
-    }
-
-    private int port;
-    private boolean discordBotEnabled;
-    private boolean encryptPasswords;
-    private boolean debug;
-
-    private GameConfiguration() { }
-
-    public int getPort() {
-        return port;
-    }
-
-    public boolean isDiscordBotEnabled() {
-        return discordBotEnabled;
-    }
-
-    public boolean isEncryptPasswords() {
-        return encryptPasswords;
-    }
-
-    public boolean isDebug() {
-        return debug;
+    companion object {
+        /**
+         * Gets the default game configuration.
+         * @return the default configuration.
+         */
+        val default: GameConfiguration
+            get() {
+                val configuration = GameConfiguration()
+                configuration.port = 13377
+                configuration.isDiscordBotEnabled = false
+                configuration.isEncryptPasswords = false
+                configuration.isDebug = true
+                return configuration
+            }
     }
 }

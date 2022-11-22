@@ -141,7 +141,7 @@ class RegionClipping(val id: Int, map: Int, mapObj: Int, private val osrs: Boole
         @kotlin.jvm.JvmStatic
         fun init() {
             try {
-                if (!GameServer.getConfiguration().isDebug) {
+                if (!GameServer.configuration!!.isDebug) {
                     log.level = Level.OFF
                 }
                 GameObjectDefinition.init()

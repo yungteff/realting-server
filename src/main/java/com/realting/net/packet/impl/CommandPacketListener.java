@@ -1934,6 +1934,7 @@ public class CommandPacketListener implements PacketListener {
 		if (command[0].equalsIgnoreCase("update")) {
 			int time = Integer.parseInt(command[1]);
 			if(time > 0) {
+
 				GameServer.setUpdating(true);
 				World.sendStaffMessage("<col=FF0066><img=2> [PUNISHMENTS]<col=6600FF> "+player.getUsername()+" just started an update in "+time+" ticks.");
 				//DiscordMessager.sendDebugMessage(player.getUsername()+" has queued an update, we will be going down in "+time+" seconds.");
